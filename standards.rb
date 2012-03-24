@@ -4,7 +4,7 @@ Bundler.require(:default)
 
 SITE_TITLE = "Standards"
 
-DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/standards.db")
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/standards.db")
 
 class Task
 	include DataMapper::Resource
