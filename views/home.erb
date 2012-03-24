@@ -1,0 +1,15 @@
+<table>
+	<thead>
+		<th></th>
+		<% 7.times do |d| %>
+			<% day = Date.today - Date.today.wday + d %>
+			<th <%= 'class="today"' if Date.today.wday == d %>><%= day.strftime('%A') %></th>
+		<% end %>
+	</thead>
+	<tbody>
+		<% @tasks.each_with_index do |task, i| %>
+			<% @task = task %>
+			<%= erb :task_row, :layout => false %>
+		<% end %>
+	</tbody>
+</table>

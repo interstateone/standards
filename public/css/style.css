@@ -1,0 +1,17 @@
+
+header{width:100%;}header h1{float:left;margin:0 0 2% 0;}
+header ul{margin-right:2%;}header ul li{float:right;display:inline;list-style-image:none;margin-left:3%;}
+header hr{border:none;border-bottom:1px solid black;clear:both;}
+table{width:100%;}
+th{color:#AAA;font-weight:bold;padding:2%;}
+td{text-align:center;}
+td.title{text-align:left;}td.title a{text-decoration:none;color:green;}
+#edit-table{margin:0 auto;width:70%;max-width:500px;}#edit-table tr{border-bottom:1px solid #AAA;vertical-align:baseline;}#edit-table tr td{padding:8px 0 2px 0;}
+.today{color:#666;}
+input{border:none;color:#666;font-size:100%;width:100%;padding:6px 0;margin:0;}
+.check{opacity:.05;-moz-opacity:.05;filter:alpha(opacity=05);width:50px;height:50px;margin:0 auto;}
+.complete{opacity:1;-moz-opacity:1;filter:alpha(opacity=1);}
+.delete{cursor:pointer;}
+.rate{font-size:200%;}
+#stats{text-align:center;width:95%;margin:5% auto;}#stats li{display:inline-block;list-style:none;margin:0 3%;height:200px;vertical-align:top;}
+.metadata{color:#666;font-size:80%;}

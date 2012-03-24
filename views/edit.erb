@@ -1,0 +1,15 @@
+<table id="edit-table">
+	<tfoot>
+		<td colspan="2">
+			<form id="newtask" action="/">
+				<input id="tasktitle" name="tasktitle" type="textfield" name="title" placeholder="Type a new standard"></input>
+			</form>
+		</td>
+	</tfoot>
+	<tbody>
+		<% @tasks.each do |task| %>
+			<% @task = task %>
+			<%= erb :task_row_short, :layout => false %>
+		<% end %>
+	</tbody>
+</table>
