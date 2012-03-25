@@ -40,11 +40,13 @@
   				</a>
   				<a class="brand" href="/"><%= SITE_TITLE %></a>
   				<div class="nav-collapse">
-  					<ul class="nav">
-  						<li><a href="/edit" title="Edit">Tasks</a></li>
-  						<li><a href="" title="Stats">Stats</a></li>
-  						<li><a href="" title="Settings">Settings</a></li>
-  					</ul>
+  					<% if session["email"] %>
+						<ul class="nav">
+							<li><a href="/edit" title="Edit">Tasks</a></li>
+							<li><a href="" title="Stats">Stats</a></li>
+							<li><a href="" title="Settings">Settings</a></li>
+						</ul>
+					<% end %>
   					<ul class="nav pull-right">
   						<% if session["email"] %>
   							<li><a href='/logout' title="">Log Out</a></li>
