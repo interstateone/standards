@@ -46,7 +46,11 @@
   						<li><a href="" title="Settings">Settings</a></li>
   					</ul>
   					<ul class="nav pull-right">
-  						<li><a href="" title="">Log In</a></li>
+  						<% if session["email"] %>
+  							<li><a href='/logout' title="">Log Out</a></li>
+  						<% else %>
+  							<li><a href="/login" title="">Log In</a></li>
+  						<% end %>
   					</ul><!-- / -->
   				</div><!--/.nav-collapse -->
   			</div>
@@ -54,6 +58,14 @@
   	</div>
 
   	<div class="container">
+  		<% if !@errors.nil? %>
+	  		<% @errors.each do |e| %>
+				<div class="alert">
+					<a class="close" data-dismiss="alert">&times;</a>
+					<%= e.to_s %>
+				</div>
+	  		<% end %>
+  		<% end %>
 
   		<%= yield %>
 

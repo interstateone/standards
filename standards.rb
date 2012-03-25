@@ -6,9 +6,23 @@ enable :sessions
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/standards.db")
 
+class User
+	include DataMapper::Resource
+
+	has n, :tasks
+	has n, :checks
+
+	property :id, Serial
+	property :email, String, :required => true, :unique => true
+	property :password, BCryptHash, :required => true
+
+
+end
+
 class Task
 	include DataMapper::Resource
 
+	belongs_to :user
 	has n, :checks
 
 	property :id, Serial
@@ -19,6 +33,7 @@ end
 class Check
 	include DataMapper::Resource
 
+	belongs_to :user
 	belongs_to :task
 
 	property :id, Serial
@@ -29,22 +44,23 @@ DataMapper.finalize.auto_upgrade!
 
 helpers do
 	def login?
-		if session[:username].nil?
+		if session[:email].nil?
 			return false
 		else
 			return true
 		end
 	end
 
-	def username
-		return session[:username]
+	def email
+		return session[:email]
 	end
 end
 
 get '/' do
 	if login?
-		@tasks = Task.all
-		@checks = Check.all
+		@user = User.first :email => session[:email]
+		@tasks = @user.tasks
+		@checks = @user.checks
 		erb :home
 	else
 		erb :index
@@ -52,23 +68,39 @@ get '/' do
 end
 
 post '/' do
-	@task = Task.new
-	@task.title = params[:tasktitle]
-	@task.date_created = Date.today
-	@task.save
+	if login?
+		@user = User.first :email => session[:email]
+		@task = Task.new
+		@task.title = params[:tasktitle]
+		@task.date_created = Date.today
+		@task.user = @user
+		@task.save
 
-	erb :task_row_short, :layout => false
+		erb :task_row_short, :layout => false
+	else
+		erb :index
+	end
 end
 
 get '/edit' do
-	@tasks = Task.all
-	erb :edit
+	if login?
+		@user = User.first :email => session[:email]
+		@tasks = @user.tasks
+		erb :edit
+	else
+		erb :index
+	end
 end
 
 get '/stats' do
-	@tasks = Task.all
-	@checks = Check.all
-	erb :stats
+	if login?
+		@user = User.first :email => session[:email]
+		@tasks = @user.tasks
+		@checks = @user.checks
+		erb :stats
+	else
+		erb :index
+	end
 end
 
 get "/signup" do
@@ -76,24 +108,31 @@ get "/signup" do
 end
 
 post "/signup" do
-  password_salt = BCrypt::Engine.generate_salt
-  password_hash = BCrypt::Engine.hash_secret(params[:password], password_salt)
+	user = User.new
+	user.email = params["email"]
+	user.password = params["password"]
+	if user.save
+		# Log in and redirect if everything went okay
+		session[:email] = params[:email]
+		redirect "/"
+	else
+		@errors = Array.new
+		user.errors.each do |e|
+			@errors.push e
+		end
+		erb :signup
+	end
+end
 
-  #ideally this would be saved into a database, hash used just for sample
-  userTable[params[:username]] = {
-    :salt => password_salt,
-    :passwordhash => password_hash
-  }
-
-  session[:username] = params[:username]
-  redirect "/"
+get "/login" do
+	erb :login
 end
 
 post "/login" do
-  if userTable.has_key?(params[:username])
-    user = userTable[params[:username]]
-    if user[:passwordhash] == BCrypt::Engine.hash_secret(params[:password], user[:salt])
-      session[:username] = params[:username]
+  if User.first :email => params[:email]
+    user = User.first :email => params[:email]
+    if user.password == params[:password]
+      session[:email] = params[:email]
       redirect "/"
     end
   end
@@ -101,31 +140,47 @@ post "/login" do
 end
 
 get "/logout" do
-  session[:username] = nil
+  session[:email] = nil
   redirect "/"
 end
 
 get '/:id' do
-	@task = Task.get params[:id]
-	erb :task
+	if login?
+		@user = User.first :email => session[:email]
+		@task = @user.tasks.get params[:id]
+		erb :task
+	else
+		erb :index
+	end
 end
 
 post '/:id/:date/complete' do
-	t = Task.get params[:id]
-	if t.checks(:date => params[:date]).count > 0
-		c = t.checks :date => params[:date]
-		c.destroy
+	if login?
+		user = User.first :email => session[:email]
+		t = user.tasks.get params[:id]
+		if t.checks(:date => params[:date]).count > 0
+			c = t.checks :date => params[:date]
+			c.destroy
+		else
+			c = Check.new
+			c.date = params[:date]
+			c.task = t
+			c.user = user
+			c.save
+			t.save
+		end
 	else
-		c = Check.new
-		c.date = params[:date]
-		c.task = t
-		c.save
-		t.save
+		erb :index
 	end
 end
 
 delete '/:id/delete' do
-	t = Task.get params[:id]
-	t.checks.destroy
-	t.destroy
+	if login?
+		user = User.first :email => session[:email]
+		t = user.tasks.get params[:id]
+		t.checks.destroy
+		t.destroy
+	else
+		erb :index
+	end
 end
