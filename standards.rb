@@ -4,7 +4,7 @@ Bundler.require(:default)
 SITE_TITLE = "Standards"
 enable :sessions
 
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "sqlite3://#{Dir.pwd}/standards.db")
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://brandon:rb26dett@localhost/standards")
 
 class User
 	include DataMapper::Resource

@@ -39,9 +39,6 @@ GEM
       json (~> 1.6.1)
       json_pure (~> 1.6.1)
       multi_json (~> 1.0.3)
-    dm-sqlite-adapter (1.2.0)
-      dm-do-adapter (~> 1.2.0)
-      do_sqlite3 (~> 0.10.6)
     dm-timestamps (1.2.0)
       dm-core (~> 1.2.0)
     dm-transactions (1.2.0)
@@ -58,8 +55,6 @@ GEM
       dm-core (~> 1.2.0)
     do_postgres (0.10.8)
       data_objects (= 0.10.8)
-    do_sqlite3 (0.10.8)
-      data_objects (= 0.10.8)
     fastercsv (1.5.4)
     googlecharts (1.6.8)
     i18n (0.6.0)
@@ -75,7 +70,6 @@ GEM
       rack (~> 1.3, >= 1.3.6)
       rack-protection (~> 1.2)
       tilt (~> 1.3, >= 1.3.3)
-    sqlite3 (1.3.5)
     stringex (1.3.2)
     tilt (1.3.3)
     uuidtools (2.1.2)
@@ -88,8 +82,6 @@ DEPENDENCIES
   bcrypt-ruby
   datamapper
   dm-postgres-adapter
-  dm-sqlite-adapter
   googlecharts
   shotgun
   sinatra
-  sqlite3
