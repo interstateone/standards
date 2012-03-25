@@ -116,11 +116,21 @@ post "/signup" do
 		session[:email] = params[:email]
 		redirect "/"
 	else
-		@errors = Array.new
-		user.errors.each do |e|
-			@errors.push e
+		# If the user already exists, try logging them in
+		if User.first :email => params[:email]
+			user = User.first :email => params[:email]
+			if user.password == params[:password]
+				session[:email] = params[:email]
+				redirect "/"
+			end
+		# Not an existing valid user, throw the signup errors
+		else
+			@errors = Array.new
+			user.errors.each do |e|
+				@errors.push e
+			end
+			erb :signup
 		end
-		erb :signup
 	end
 end
 
