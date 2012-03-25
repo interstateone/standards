@@ -1,5 +1,4 @@
 require 'bundler/setup'
-require 'sinatra'
 
 Bundler.require(:default)
 
@@ -27,6 +26,10 @@ class Check
 end
 
 DataMapper.finalize.auto_upgrade!
+
+helpers do
+
+end
 
 get '/' do
 	@tasks = Task.all

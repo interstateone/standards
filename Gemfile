@@ -9,6 +9,7 @@ gem 'dm-postgres-adapter', :group => :production
 gem 'dm-sqlite-adapter', :group => :development
 gem "shotgun"
 gem "activesupport", :require => "active_support"
+gem "bcrypt-ruby", :require => "bcrypt"
 
 source "http://gems.github.com/"
 

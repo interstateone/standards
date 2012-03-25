@@ -85,6 +85,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  bcrypt-ruby
   datamapper
   dm-postgres-adapter
   dm-sqlite-adapter
