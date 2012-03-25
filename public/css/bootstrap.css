@@ -570,6 +570,9 @@ pre code {
   max-height: 340px;
   overflow-y: scroll;
 }
+form {
+  margin: 0 0 18px;
+}
 fieldset {
   padding: 0;
   margin: 0;
@@ -623,9 +626,9 @@ select,
   line-height: 18px;
   color: #555555;
   border: 1px solid #cccccc;
-  -webkit-border-radius: 0px;
-  -moz-border-radius: 0px;
-  border-radius: 0px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
 .uneditable-textarea {
   width: auto;
@@ -731,6 +734,7 @@ input[type="hidden"] {
 .checkbox.inline + .checkbox.inline {
   margin-left: 10px;
 }
+input,
 textarea {
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -741,6 +745,7 @@ textarea {
   -o-transition: border linear 0.2s, box-shadow linear 0.2s;
   transition: border linear 0.2s, box-shadow linear 0.2s;
 }
+input:focus,
 textarea:focus {
   border-color: rgba(82, 168, 236, 0.8);
   -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
@@ -3909,7 +3914,7 @@ a.thumbnail:hover {
 .hero-unit {
   padding: 60px;
   margin-bottom: 30px;
-  background-color: #eeeeee;
+  background-color: #ffffff;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
@@ -3957,6 +3962,7 @@ header hr {
 }
 table {
   width: 100%;
+  margin-top: 5%;
 }
 th {
   color: #AAA;
@@ -3986,14 +3992,6 @@ td.title a {
 }
 .today {
   color: #666;
-}
-input {
-  border: none;
-  color: #666;
-  font-size: 100%;
-  width: 100%;
-  padding: 6px 0;
-  margin: 0;
 }
 .check {
   opacity: .05;
@@ -4029,6 +4027,24 @@ input {
 .metadata {
   color: #666;
   font-size: 80%;
+}
+#newtask {
+  margin: 0;
+}
+#newtask #tasktitle {
+  border: none;
+  color: #666;
+  font-size: 100%;
+  width: 100%;
+  padding: 6px 0;
+  margin: 0;
+  height: 18px;
+  border: none;
+  border-color: none;
+  box-shadow: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
 }
 .pull-right {
   float: right;
