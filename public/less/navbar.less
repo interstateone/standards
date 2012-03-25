@@ -18,10 +18,7 @@
 .navbar-inner {
   padding-left:  20px;
   padding-right: 20px;
-  #gradient > .vertical(@navbarBackgroundHighlight, @navbarBackground);
-  .border-radius(4px);
-  @shadow: 0 1px 3px rgba(0,0,0,.25), inset 0 -1px 0 rgba(0,0,0,.1);
-  .box-shadow(@shadow);
+  background-color: @white;
 }
 
 // Set width to auto for default container
@@ -69,12 +66,14 @@
   .brand {
     float: left;
     display: block;
-    padding: 8px 20px 12px;
+    padding: 12px 20px;
     margin-left: -20px; // negative indent to left-align the text down the page
-    font-size: 20px;
+    font-size: 30px;
     font-weight: 200;
     line-height: 1;
-    color: @white;
+    color: @black;
+    font-family: "LeagueGothic";
+    text-transform: uppercase;
   }
   // Plain text in topbar
   .navbar-text {
@@ -205,7 +204,7 @@
   left: 0;
   display: block;
   float: left;
-  margin: 0 10px 0 0;
+  margin: 6px 10px 0 0;
 }
 .navbar .nav.pull-right {
   float: right; // redeclare due to specificity
@@ -222,7 +221,6 @@
   line-height: 19px;
   color: @navbarLinkColor;
   text-decoration: none;
-  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
 }
 // Hover
 .navbar .nav > li > a:hover {

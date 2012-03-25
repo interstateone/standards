@@ -28,7 +28,17 @@ end
 DataMapper.finalize.auto_upgrade!
 
 helpers do
+	def login?
+		if session[:username].nil?
+			return false
+		else
+			return true
+		end
+	end
 
+	def username
+		return session[:username]
+	end
 end
 
 get '/' do
