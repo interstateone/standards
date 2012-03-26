@@ -5,7 +5,7 @@ $(document).ready(function() {
 	$('a[href]:not(.delete, .delete-confirm, .target)').live('click', function (event) {
 		event.preventDefault();
 		console.log("Test");
-	    window.location.pathname = $(this).attr("href");
+	    window.location = $(this).attr("href");
 	});
 
 	// Post a new task
