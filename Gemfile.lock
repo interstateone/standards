@@ -62,6 +62,8 @@ GEM
     json_pure (1.6.5)
     multi_json (1.0.4)
     rack (1.4.1)
+    rack-flash (0.1.2)
+      rack
     rack-protection (1.2.0)
       rack
     resolv-ipv6favor (0.0.0)
@@ -84,6 +86,7 @@ DEPENDENCIES
   datamapper
   dm-postgres-adapter
   googlecharts
+  rack-flash
   resolv-ipv6favor
   shotgun
   sinatra

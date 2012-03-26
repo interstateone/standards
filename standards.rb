@@ -6,6 +6,8 @@ SITE_TITLE = "Standards"
 use Rack::Session::Cookie, :expire_after => 2592000
 set :session_secret, ENV['SESSION_KEY'] || "i_have_a_lovely_bunch_of_c0c0nu7s"
 
+use Rack::Flash, :sweep => true
+
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://brandon:rb26dett@localhost/standards")
 
 class User
@@ -128,8 +130,7 @@ post "/signup" do
 	# Validate the fields first
 	# Don't worry about existing emails, we'll handle that later
 	if !valid_email? params[:email]
-		@errors = Array.new
-		@errors.push "Please enter a valid email address."
+		flash[:error] = "Please enter a valid email address."
 		erb :signup
 	else
 
@@ -150,10 +151,7 @@ post "/signup" do
 				end
 			# Not an existing valid user, throw the signup errors
 			else
-				@errors = Array.new
-				user.errors.each do |e|
-					@errors.push e
-				end
+				flash[:error] = user.errors.join " "
 				erb :signup
 			end
 		end
@@ -172,8 +170,7 @@ post "/login" do
 			redirect "/"
 		end
 	end
-	@errors = Array.new
-	@errors.push "Email and password don't match."
+	flash[:error] = "Email and password don't match."
 	erb :login
 end
 
@@ -184,11 +181,10 @@ end
 
 post "/forgot" do
 	if !valid_email? params[:email]
-		@errors = Array.new
-		@errors.push "Please enter an email address."
+		flash[:error] = "Please enter an email address."
 		erb :login
 	else
-		
+
 	end
 end
 
