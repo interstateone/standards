@@ -1,5 +1,12 @@
 $(document).ready(function() {
 
+	// Prevent iOS from opening a new Safari instance for anchor tags
+	// :not selector prevents operating on classes that are listed below
+	$('a[href]:not(.delete, .delete-confirm, .target)').live('click', function (event) {
+		event.preventDefault();
+	    window.location = $(this).attr("href");
+	});
+
 	// Post a new task
 	$('#newtask').submit(function() {
 		$.post("/", $(this).serialize(), function(data){
@@ -45,20 +52,8 @@ $(document).ready(function() {
 		});
 	});
 
-	// View a task
-	$('a.view').live("click", function(e) {
-		var clicked = this;
-	});
-
 	$('button.forgot').click(function(e) {
 		e.preventDefault();
 		$("form").attr("action", "/forgot").submit();
-	});
-
-	// Prevent iOS from opening a new Safari instance for anchor tags
-	// :not selector prevents operating on classes that are listed above
-	$('a[href]:not(.delete, .delete-confirm, .target, .view, .forgot)').live('click', function (event) {
-		event.preventDefault();
-	    window.location = $(this).attr("href");
 	});
 });

@@ -1,9 +1,9 @@
 <h2><%= @task.title %></h2>
 <% count = @task.checks.count %>
 <% if count > 0 %>
-	<p>You've done this <%= count %> <%= count == 1 ? "time" : "times" %> since <%= @task.date_created.strftime("%B %e, %Y") %>:</p>
+	<p>You've done this <%= count %> <%= count == 1 ? "time" : "times" %> since <%= @task.created_on.strftime("%B %e, %Y") %>:</p>
 <% else %>
-	<p>You haven't done this since you started on <%= @task.date_created.strftime("%B %e, %Y") %>.</p>
+	<p>You haven't done this since you started on <%= @task.created_on.strftime("%B %e, %Y") %>.</p>
 <% end %>
 <ul id="checks">
 	<% @task.checks(:order => :date.asc).each do |check| %>
@@ -11,7 +11,7 @@
 	<% end %>
 </ul><!-- /checks -->
 
-<p>You're currently sitting at a <%= (count / (Date.today - @task.date_created + 1)).ceil %>% completion rate.</p>
+<p>You're currently sitting at a <%= (count / (Date.today - @task.created_on + 1)).ceil %>% completion rate.</p>
 <a href="/edit" title="" class="btn btn-standard">Back</a>
 <a class="delete btn btn-danger pull-right">Delete</a>
 
