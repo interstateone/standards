@@ -20,6 +20,11 @@ $(document).ready(function() {
 
 	// Delete a task
 	$('a.delete').live("click", function(e) {
+		$(this).siblings(".deleteModal").modal();
+	});
+
+	// Delete a task
+	$('a.delete-confirm').live("click", function(e) {
 		var clicked = this;
 		e.preventDefault();
 		$.post(clicked.href, { _method: 'delete' }, function(data) {
@@ -41,8 +46,9 @@ $(document).ready(function() {
 		var clicked = this;
 	});
 
-	// Prevent iOS from opening a new Safari instance
-	$('a[href]').live('click', function (event) {
+	// Prevent iOS from opening a new Safari instance for anchor tags
+	// :not selector prevents operating on classes that are listed above
+	$('a[href]:not(.delete, .delete-confirm, .target, .view)').live('click', function (event) {
 		event.preventDefault();
 	    window.location = $(this).attr("href");
 	});
