@@ -2,7 +2,9 @@ require 'bundler/setup'
 Bundler.require(:default)
 
 SITE_TITLE = "Standards"
-enable :sessions
+
+use Rack::Session::Pool, :expire_after => 2592000
+set :session_secret, ENV['SESSION_KEY'] || "i_have_a_lovely_bunch_of_c0c0nu7s"
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://brandon:rb26dett@localhost/standards")
 
@@ -186,7 +188,7 @@ post "/forgot" do
 		@errors.push "Please enter an email address."
 		erb :login
 	else
-
+		
 	end
 end
 
