@@ -3,7 +3,7 @@ Bundler.require(:default)
 
 SITE_TITLE = "Standards"
 
-use Rack::Session::Pool, :expire_after => 2592000
+use Rack::Session::Cookie, :expire_after => 2592000
 set :session_secret, ENV['SESSION_KEY'] || "i_have_a_lovely_bunch_of_c0c0nu7s"
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://brandon:rb26dett@localhost/standards")
