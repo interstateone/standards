@@ -1,18 +1,25 @@
-<table>
-	<thead>
-		<th></th>
-		<% 7.times do |d| %>
-			<% day = Date.today - Date.today.wday + d %>
-			<th class="
-				<%= ' hidden-phone' if d < Date.today.wday - 1 || d > Date.today.wday + 1 %>
-				<%= ' today' if Date.today.wday == d %>">
-				<%= day.strftime('%A') %></th>
-		<% end %>
-	</thead>
-	<tbody>
-		<% @tasks.each_with_index do |task, i| %>
-			<% @task = task %>
-			<%= erb :task_row, :layout => false %>
-		<% end %>
-	</tbody>
-</table>
+<% if @tasks.length > 0 %>
+	<table>
+		<thead>
+			<th></th>
+			<% 7.times do |d| %>
+				<% day = Date.today - Date.today.wday + d %>
+				<th class="
+					<%= ' hidden-phone' if d < Date.today.wday - 1 || d > Date.today.wday + 1 %>
+					<%= ' today' if Date.today.wday == d %>">
+					<%= day.strftime('%A') %></th>
+			<% end %>
+		</thead>
+		<tbody>
+			<% @tasks.each_with_index do |task, i| %>
+				<% @task = task %>
+				<%= erb :task_row, :layout => false %>
+			<% end %>
+		</tbody>
+	</table>
+<% else %>
+	<div class="hero-unit">
+		<h2>This is your home.</h2>
+		<p>Go to <em>tasks</em> to add your first.</p>
+	</div>
+<% end %>
