@@ -4,7 +4,8 @@ $(document).ready(function() {
 	// :not selector prevents operating on classes that are listed below
 	$('a[href]:not(.delete, .delete-confirm, .target)').live('click', function (event) {
 		event.preventDefault();
-	    window.location = $(this).attr("href");
+		console.log("Test");
+	    window.location.pathname = $(this).attr("href");
 	});
 
 	// Post a new task
