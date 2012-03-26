@@ -28,7 +28,11 @@ $(document).ready(function() {
 		var clicked = this;
 		e.preventDefault();
 		$.post(clicked.href, { _method: 'delete' }, function(data) {
-			$(clicked).closest('tr').remove();
+			if (window.location.pathname == "/edit") {
+				$(clicked).closest('tr').remove();
+			} else {
+				window.location.pathname = "/edit";
+			}
 		}, "script");
 	});
 

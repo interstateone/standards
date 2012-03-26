@@ -12,4 +12,7 @@
 </ul><!-- /checks -->
 
 <p>You're currently sitting at a <%= (count / (Date.today - @task.date_created + 1)).ceil %>% completion rate.</p>
-<p><a href="/" title="">Back</a>&nbsp;<a href="/<%= @task.id %>/delete" class="delete">Delete this task</a></p>
+<a href="/edit" title="" class="btn btn-standard">Back</a>
+<a class="delete btn btn-danger pull-right">Delete</a>
+
+<%= erb :delete_modal, :layout => false %>
