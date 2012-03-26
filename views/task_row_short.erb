@@ -1,7 +1,13 @@
 <tr>
 	<td class="title">
 		<a href="/<%= @task.id %>" class="view"><%= @task.title %></a>
-		<span class="pull-right metadata">Done <%= @task.checks.count %> <%= @task.checks.count == 1 ? "time" : "times" %>.</span>
 	</td>
 	<td><a href="/<%= @task.id %>/delete" class="delete" title=""><i class="icon-trash"></i></a></td>
+	<td>
+		<a class="draggable">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</a>
+	</td>
 </tr>

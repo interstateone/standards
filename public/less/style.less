@@ -75,6 +75,12 @@ td.title {
 @media (max-width: 480px) {
 	#edit-table {
 		width: 100%;
+		tr {
+			vertical-align: baseline;
+			td {
+				padding: 20px 0 10px 0;
+			}
+		}
 	}
 }
 
@@ -122,6 +128,24 @@ td.title {
 .metadata {
 	color: #666;
 	font-size: 80%;
+}
+
+.draggable {
+	padding: 0;
+	background-color: @white;
+	float: right;
+	color: @gray;
+
+	.icon-bar {
+		display: block;
+		width: 18px;
+		height: 2px;
+		background-color: @grayLight;
+		.border-radius(1px);
+	}
+	.icon-bar + .icon-bar {
+		margin-top: 3px;
+	}
 }
 
 #newtask {

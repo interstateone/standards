@@ -3994,6 +3994,12 @@ td.title a {
   #edit-table {
     width: 100%;
   }
+  #edit-table tr {
+    vertical-align: baseline;
+  }
+  #edit-table tr td {
+    padding: 20px 0 10px 0;
+  }
 }
 .today {
   color: #666;
@@ -4032,6 +4038,24 @@ td.title a {
 .metadata {
   color: #666;
   font-size: 80%;
+}
+.draggable {
+  padding: 0;
+  background-color: #ffffff;
+  float: right;
+  color: #555555;
+}
+.draggable .icon-bar {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background-color: #999999;
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  border-radius: 1px;
+}
+.draggable .icon-bar + .icon-bar {
+  margin-top: 3px;
 }
 #newtask {
   margin: 0;
