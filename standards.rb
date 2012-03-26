@@ -27,7 +27,7 @@ class Task
 
 	property :id, Serial
 	property :title, Text, :required => true
-	property :date_created, Date
+	property :created_on, Date, :default => proc { Date.today }
 end
 
 class Check
@@ -68,7 +68,7 @@ helpers do
 	end
 
 	def valid_password?(password)
-		
+
 	end
 end
 
@@ -88,7 +88,6 @@ post '/' do
 		@user = User.first :email => session[:email]
 		@task = Task.new
 		@task.title = params[:tasktitle]
-		@task.date_created = Date.today
 		@task.user = @user
 		@task.save
 
