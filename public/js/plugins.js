@@ -40,4 +40,10 @@ $(document).ready(function() {
 	$('a.view').live("click", function(e) {
 		var clicked = this;
 	});
+
+	// Prevent iOS from opening a new Safari instance
+	$('a[href]').live('click', function (event) {
+		event.preventDefault();
+	    window.location = $(this).attr("href");
+	});
 });
