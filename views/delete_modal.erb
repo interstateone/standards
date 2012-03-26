@@ -1,0 +1,12 @@
+<div class="modal hide fade deleteModal">
+	<div class="modal-header">
+		<h3>Delete</h3>
+	</div>
+	<div class="modal-body">
+		<p>Are you sure you want to delete the task "<%= @task.title %>"?</p>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" >No</a>
+		<a href="/<%= @task.id %>/delete" class="delete-confirm btn btn-danger" data-dismiss="modal" >Yes, delete it</a>
+	</div>
+</div>

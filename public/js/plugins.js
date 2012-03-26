@@ -50,9 +50,14 @@ $(document).ready(function() {
 		var clicked = this;
 	});
 
+	$('button.forgot').click(function(e) {
+		e.preventDefault();
+		$("form").attr("action", "/forgot").submit();
+	});
+
 	// Prevent iOS from opening a new Safari instance for anchor tags
 	// :not selector prevents operating on classes that are listed above
-	$('a[href]:not(.delete, .delete-confirm, .target, .view)').live('click', function (event) {
+	$('a[href]:not(.delete, .delete-confirm, .target, .view, .forgot)').live('click', function (event) {
 		event.preventDefault();
 	    window.location = $(this).attr("href");
 	});

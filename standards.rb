@@ -163,19 +163,31 @@ get "/login" do
 end
 
 post "/login" do
-  if User.first :email => params[:email]
-    user = User.first :email => params[:email]
-    if user.password == params[:password]
-      session[:email] = params[:email]
-      redirect "/"
-    end
-  end
-  erb :error
+	if User.first :email => params[:email]
+		user = User.first :email => params[:email]
+		if user.password == params[:password]
+			session[:email] = params[:email]
+			redirect "/"
+		end
+	end
+	@errors = Array.new
+	@errors.push "Email and password don't match."
+	erb :login
 end
 
 get "/logout" do
   session[:email] = nil
   redirect "/"
+end
+
+post "/forgot" do
+	if !valid_email? params[:email]
+		@errors = Array.new
+		@errors.push "Please enter an email address."
+		erb :login
+	else
+
+	end
 end
 
 get '/:id' do
