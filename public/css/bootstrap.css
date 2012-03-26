@@ -3990,6 +3990,11 @@ td.title a {
 #edit-table tr td {
   padding: 8px 0 2px 0;
 }
+@media (max-width: 480px) {
+  #edit-table {
+    width: 100%;
+  }
+}
 .today {
   color: #666;
 }
