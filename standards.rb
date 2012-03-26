@@ -15,7 +15,7 @@ class User
 	property :id, Serial
 	property :email, String, :required => true, :unique => true
 	property :password, BCryptHash, :required => true
-
+	property :created_on, Date, :default => proc { Date.now }
 
 end
 
