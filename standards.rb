@@ -15,7 +15,7 @@ class User
 	property :id, Serial
 	property :email, String, :required => true, :unique => true
 	property :password, BCryptHash, :required => true
-	property :created_on, Date, :default => proc { Date.now }
+	property :created_on, Date, :default => proc { Date.today }
 
 end
 
@@ -53,6 +53,22 @@ helpers do
 
 	def email
 		return session[:email]
+	end
+
+	def valid_email?(email)
+		if email =~ /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/
+			domain = email.match(/\@(.+)/)[1]
+			Resolv::DNS.open do |dns|
+				@mx = dns.getresources(domain, Resolv::DNS::Resource::IN::MX)
+			end
+			@mx.size > 0 ? true : false
+		else
+			false
+		end
+	end
+
+	def valid_password?(password)
+		
 	end
 end
 
@@ -108,28 +124,37 @@ get "/signup" do
 end
 
 post "/signup" do
-	user = User.new
-	user.email = params["email"]
-	user.password = params["password"]
-	if user.save
-		# Log in and redirect if everything went okay
-		session[:email] = params[:email]
-		redirect "/"
+	# Validate the fields first
+	# Don't worry about existing emails, we'll handle that later
+	if !valid_email? params[:email]
+		@errors = Array.new
+		@errors.push "Please enter a valid email address."
+		erb :signup
 	else
-		# If the user already exists, try logging them in
-		if User.first :email => params[:email]
-			user = User.first :email => params[:email]
-			if user.password == params[:password]
-				session[:email] = params[:email]
-				redirect "/"
-			end
-		# Not an existing valid user, throw the signup errors
+
+		user = User.new
+		user.email = params["email"]
+		user.password = params["password"]
+		if user.save
+			# Log in and redirect if everything went okay
+			session[:email] = params[:email]
+			redirect "/"
 		else
-			@errors = Array.new
-			user.errors.each do |e|
-				@errors.push e
+			# If the user already exists, try logging them in
+			if User.first :email => params[:email]
+				user = User.first :email => params[:email]
+				if user.password == params[:password]
+					session[:email] = params[:email]
+					redirect "/"
+				end
+			# Not an existing valid user, throw the signup errors
+			else
+				@errors = Array.new
+				user.errors.each do |e|
+					@errors.push e
+				end
+				erb :signup
 			end
-			erb :signup
 		end
 	end
 end

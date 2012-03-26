@@ -2834,7 +2834,7 @@ input[type="submit"].btn.btn-mini {
 }
 .navbar .btn,
 .navbar .btn-group {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 .navbar .btn-group .btn {
   margin-top: 0;
@@ -4074,6 +4074,14 @@ td.title a {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
+}
+.password-strength {
+  width: 280px;
+}
+@media (min-width: 481px) {
+  .password-strength {
+    margin-left: 160px;
+  }
 }
 .pull-right {
   float: right;

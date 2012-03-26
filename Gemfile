@@ -8,6 +8,7 @@ gem 'dm-postgres-adapter'
 gem "shotgun"
 gem "activesupport", :require => "active_support"
 gem "bcrypt-ruby", :require => "bcrypt"
+gem "resolv-ipv6favor", :require => "resolv"
 
 source "http://gems.github.com/"
 
