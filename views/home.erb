@@ -13,7 +13,7 @@
 		<tbody>
 			<% @tasks.each_with_index do |task, i| %>
 				<% @task = task %>
-				<%= erb :task_row, :layout => false %>
+				<%= erubis :task_row, :layout => false %>
 			<% end %>
 		</tbody>
 	</table>
