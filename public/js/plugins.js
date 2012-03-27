@@ -2,7 +2,7 @@ $(document).ready(function() {
 
 	// Prevent iOS from opening a new Safari instance for anchor tags
 	// :not selector prevents operating on classes that are listed below
-	$('a[href]:not(.delete, .delete-confirm, .target, .title)').live('click', function (event) {
+	$(document).on('click', 'a[href]:not(.delete, .delete-confirm, .target, .title)', function (event) {
 		event.preventDefault();
 		window.location = $(this).attr("href");
 	});
@@ -26,12 +26,12 @@ $(document).ready(function() {
 	});
 
 	// Delete a task
-	$('a.delete').live("click", function(e) {
+	$(document).on("click", 'a.delete', function(e) {
 		$(this).siblings(".deleteModal").modal();
 	});
 
 	// Delete a task
-	$('a.delete-confirm').live("click", function(e) {
+	$(document).on("click", 'a.delete-confirm', function(e) {
 		var clicked = this;
 		e.preventDefault();
 		$.post(clicked.href, { _method: 'delete' }, function(data) {
@@ -44,7 +44,7 @@ $(document).ready(function() {
 	});
 
 	// Complete a task
-	$('a.target').live("click", function(e) {
+	$(document).on("click", 'a.target', function(e) {
 		var clicked = this;
 		e.preventDefault();
 		$.post(clicked.href, null, function() {
@@ -56,22 +56,36 @@ $(document).ready(function() {
 		e.preventDefault();
 	});
 
-	// Submit a new task with the enter key
+	// Rename a task with the enter key by blurring the input
 	$('span.title').keypress(function(e){
 		if(e.which === 13){
 			e.preventDefault();
-			$(this).blur();
+			$(this).trigger("editableSubmit");
 		}
 	});
 
+	// Let the edit button make the title editable
+	$(document).on("click", "a.rename", function (e) {
+		if ($(this).data("editable")) {
+			$(this).parent().siblings("td").children("span.title").trigger("editableSubmit");
+			$(this).data("editable", false);
+		} else {
+			$(this).parent().siblings("td").children("span.title").trigger("blur");
+			$(this).data("editable", true);
+		}
+		// console.log($(this).parent().siblings("td").children("span.title"));
+	});
+
+	// Make titles editable and set submit callback to post the new title and catch errors
 	$("span.title").editable({
-		submitBy: "blur",
+		editBy: "blur",
+		submitBy: "editableSubmit",
 		onSubmit: function (content) {
 			if (content.current !== content.previous) {
-				$.post(this.closest("span.title").attr("href"), {"title": content.current}, function(data) {
+				$.post($(this).closest("span.title").attr("href"), {"title": content.current}, function(data) {
 					if (data !== "true") {
 						$("body > .container").prepend(data).alert()
-						this.text = content.previous
+						$(this).text(content.previous);
 					}
 				});
 			}
@@ -152,7 +166,7 @@ $.fn.editable = function(options){
 		// Configure events,styles for changed content
 		$this.one(opts.editBy,opts.toEditable)
 			 .data( 'editable.current',
-				    change 
+				    change
 						?$.editableFactory[opts.type].getValue($this,opts)
 						:$this.data('editable.current')
 					)

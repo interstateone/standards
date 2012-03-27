@@ -1,6 +1,6 @@
 <tr>
 	<td class="title">
-		<a href="/<%= @task.id %>" class="view"><%= @task.title %></a>
+		<%= @task.title %>
 	</td>
 	<% 7.times do |d| %>
 		<% day = Date.today - Date.today.wday + d %>
