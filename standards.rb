@@ -131,7 +131,7 @@ post "/signup" do
 		flash.now[:error] = "Please enter a valid email address."
 		erb :signup
 	else
-
+		# Try creating a new user
 		user = User.new
 		user.email = params["email"]
 		user.password = params["password"]
@@ -213,6 +213,28 @@ post '/:id/:date/complete' do
 		end
 	else
 		erb :index
+	end
+end
+
+post '/:id/rename' do
+	if login?
+		user = User.first :email => session[:email]
+		t = user.tasks.get params[:id]
+		if t != nil
+			t.title = params[:title]
+			if t.save
+				true
+			else
+				flash.now[:error] = "Something went wrong trying to rename that task."
+				erb :flash, :layout => false
+			end
+		else
+			flash.now[:error] = "That task doesn't exist."
+			erb :flash, :layout => false
+		end
+	else
+		flash.now[:error] = "Please sign in to perform that action."
+		erb :flash, :layout => false
 	end
 end
 
