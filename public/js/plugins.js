@@ -10,7 +10,11 @@ $(document).ready(function() {
 	// Post a new task
 	$('#newtask').submit(function() {
 		$.post("/", $(this).serialize(), function(data){
-			$('tbody').append(data);
+			$('tbody').append(data).children("tr").each( function (i, obj) {
+				obj = $(obj).children("td.title").children("span.title");
+				makeEditable(obj);
+				console.log(obj);
+			});
 			$('#newtask').each(function(){this.reset();});
 		}, "text");
 		return false;
@@ -59,7 +63,7 @@ $(document).ready(function() {
 	var editable = false;
 
 	// Rename a task with the enter key by blurring the input
-	$('span.title').keypress(function(e){
+	$(document).on("keypress", 'span.title', function(e){
 		if(e.which === 13){
 			e.preventDefault();
 			if (editable) {
@@ -82,20 +86,24 @@ $(document).ready(function() {
 	});
 
 	// Make titles editable and set submit callback to post the new title and catch errors
-	$("span.title").editable({
-		editBy: "blur",
-		submitBy: "editableSubmit",
-		onSubmit: function (content) {
-			if (content.current !== content.previous) {
-				$.post($(this).closest("span.title").attr("href"), {"title": content.current}, function(data) {
-					if (data !== "true") {
-						$("body > .container").prepend(data).alert()
-						$(this).text(content.previous);
-					}
-				});
+	var makeEditable = function (obj) {
+		$(obj).editable({
+			editBy: "blur",
+			submitBy: "editableSubmit",
+			onSubmit: function (content) {
+				if (content.current !== content.previous) {
+					$.post($(this).closest("span.title").attr("href"), {"title": content.current}, function(data) {
+						if (data !== "true") {
+							$("body > .container").prepend(data).alert()
+							$(this).text(content.previous);
+						}
+					});
+				}
 			}
-		}
-	});
+		});
+	};
+
+	makeEditable($("span.title"));
 });
 
 (function($){
