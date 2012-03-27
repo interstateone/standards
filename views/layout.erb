@@ -36,26 +36,19 @@
   		<div class="navbar-inner">
   			<div class="container">
   				<% if !session[:email] %>
-					<a class="btn btn-navbar" href="/login">
-						Sign in
-					</a>
-				<% end %>
+  					<a class="btn btn-navbar" href="/login">Sign in</a>
+  				<% else %>
+            <a href='/logout' title="Sign Out" class="btn btn-navbar">Sign Out</a>
+          <% end %>
   				<a class="brand" href="/"><%= SITE_TITLE %></a>
   				<div class="nav-collapse">
   					<% if session["email"] %>
-						<ul class="nav">
-							<li><a href="/edit" title="Edit"><i class="icon-edit"></i></a></li>
-							<li><a href="" title="Stats"><i class="icon-bar-chart"></i></a></li>
-							<li><a href="" title="Settings"><i class="icon-cogs"></i></a></li>
-						</ul>
-					<% end %>
-  					<ul class="nav pull-right">
-  						<% if session["email"] %>
-  							<li><a href='/logout' title="Sign Out"><i class="icon-signout"></i></a></li>
-  						<% else %>
-  							<li><a href="/login" title="">Log In</a></li>
-  						<% end %>
-  					</ul><!-- / -->
+  						<ul class="nav">
+  							<li><a href="/edit" title="Edit"><i class="icon-edit"></i></a></li>
+  							<li><a href="" title="Stats"><i class="icon-bar-chart"></i></a></li>
+  							<li><a href="" title="Settings"><i class="icon-cogs"></i></a></li>
+  						</ul>
+  					<% end %>
   				</div><!--/.nav-collapse -->
   			</div>
   		</div>

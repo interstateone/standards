@@ -56,22 +56,27 @@ $(document).ready(function() {
 		e.preventDefault();
 	});
 
+	var editable = false;
+
 	// Rename a task with the enter key by blurring the input
 	$('span.title').keypress(function(e){
 		if(e.which === 13){
 			e.preventDefault();
-			$(this).trigger("editableSubmit");
+			if (editable) {
+				$(this).trigger("editableSubmit");
+				editable = false;
+			}
 		}
 	});
 
 	// Let the edit button make the title editable
 	$(document).on("click", "a.rename", function (e) {
-		if ($(this).data("editable")) {
+		if (editable) {
 			$(this).parent().siblings("td").children("span.title").trigger("editableSubmit");
-			$(this).data("editable", false);
+			editable = false;
 		} else {
 			$(this).parent().siblings("td").children("span.title").trigger("blur");
-			$(this).data("editable", true);
+			editable = true;
 		}
 		// console.log($(this).parent().siblings("td").children("span.title"));
 	});
