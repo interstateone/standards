@@ -264,20 +264,20 @@
     margin: 0 0 0 -5px;
   }
   // Nav collapse clears brand
-  .navbar .nav-collapse {
+  /*.navbar .nav-collapse {
     clear: left;
-  }
+  }*/
   // Block-level the nav
-  .navbar .nav {
+  /*.navbar .nav {
     float: none;
     margin: 0 0 (@baseLineHeight / 2);
-  }
+  }*/
   .navbar .nav > li {
-    float: none;
+    // float: none;
   }
-  .navbar .nav > li > a {
+  /*.navbar .nav > li > a {
     margin-bottom: 2px;
-  }
+  }*/
   .navbar .nav > .divider-vertical {
     display: none;
   }
@@ -286,20 +286,20 @@
     text-shadow: none;
   }
   // Nav and dropdown links in navbar
-  .navbar .nav > li > a,
+ /* .navbar .nav > li > a,
   .navbar .dropdown-menu a {
     padding: 6px 15px;
     font-weight: bold;
     color: @navbarLinkColor;
     .border-radius(3px);
-  }
+  }*/
   .navbar .dropdown-menu li + li a {
     margin-bottom: 2px;
   }
-  .navbar .nav > li > a:hover,
+  /*.navbar .nav > li > a:hover,
   .navbar .dropdown-menu a:hover {
     background-color: @navbarBackground;
-  }
+  }*/
   // Dropdowns in the navbar
   .navbar .dropdown-menu {
     position: static;
@@ -334,10 +334,10 @@
     .box-shadow(@shadow);
   }
   // Pull right (secondary) nav content
-  .navbar .nav.pull-right {
+  /*.navbar .nav.pull-right {
     float: none;
     margin-left: 0;
-  }
+  }*/
   // Static navbar
   .navbar-static .navbar-inner {
     padding-left:  10px;
@@ -349,10 +349,10 @@
   }
 
   // Hide everything in the navbar save .brand and toggle button */
-  .nav-collapse {
+  /*.nav-collapse {
     overflow: hidden;
     height: 0;
-  }
+  }*/
 }
 
 
@@ -360,7 +360,7 @@
 // DEFAULT DESKTOP
 // ---------------
 
-@media (min-width: 980px) {
+@media (min-width: 767px) {
   .nav-collapse.collapse {
     height: auto !important;
     overflow: visible !important;

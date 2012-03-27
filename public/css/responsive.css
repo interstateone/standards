@@ -414,19 +414,16 @@
     padding-right: 10px;
     margin: 0 0 0 -5px;
   }
-  .navbar .nav-collapse {
-    clear: left;
-  }
-  .navbar .nav {
-    float: none;
-    margin: 0 0 9px;
-  }
-  .navbar .nav > li {
-    float: none;
-  }
-  .navbar .nav > li > a {
-    margin-bottom: 2px;
-  }
+  /*.navbar .nav-collapse {
+      clear: left;
+    }*/
+  /*.navbar .nav {
+      float: none;
+      margin: 0 0 (@baseLineHeight / 2);
+    }*/
+  /*.navbar .nav > li > a {
+      margin-bottom: 2px;
+    }*/
   .navbar .nav > .divider-vertical {
     display: none;
   }
@@ -434,22 +431,20 @@
     color: #999999;
     text-shadow: none;
   }
-  .navbar .nav > li > a,
-  .navbar .dropdown-menu a {
-    padding: 6px 15px;
-    font-weight: bold;
-    color: #999999;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-  }
+  /* .navbar .nav > li > a,
+    .navbar .dropdown-menu a {
+      padding: 6px 15px;
+      font-weight: bold;
+      color: @navbarLinkColor;
+      .border-radius(3px);
+    }*/
   .navbar .dropdown-menu li + li a {
     margin-bottom: 2px;
   }
-  .navbar .nav > li > a:hover,
-  .navbar .dropdown-menu a:hover {
-    background-color: #ffffff;
-  }
+  /*.navbar .nav > li > a:hover,
+    .navbar .dropdown-menu a:hover {
+      background-color: @navbarBackground;
+    }*/
   .navbar .dropdown-menu {
     position: static;
     top: auto;
@@ -486,10 +481,10 @@
     -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  .navbar .nav.pull-right {
-    float: none;
-    margin-left: 0;
-  }
+  /*.navbar .nav.pull-right {
+      float: none;
+      margin-left: 0;
+    }*/
   .navbar-static .navbar-inner {
     padding-left: 10px;
     padding-right: 10px;
@@ -497,12 +492,12 @@
   .btn-navbar {
     display: block;
   }
-  .nav-collapse {
-    overflow: hidden;
-    height: 0;
-  }
+  /*.nav-collapse {
+      overflow: hidden;
+      height: 0;
+    }*/
 }
-@media (min-width: 980px) {
+@media (min-width: 767px) {
   .nav-collapse.collapse {
     height: auto !important;
     overflow: visible !important;

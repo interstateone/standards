@@ -39,23 +39,19 @@
 					<a class="btn btn-navbar" href="/login">
 						Sign in
 					</a>
-				<% else %>
-					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-						<i class="icon-user"></i>
-					</a>
 				<% end %>
   				<a class="brand" href="/"><%= SITE_TITLE %></a>
   				<div class="nav-collapse">
   					<% if session["email"] %>
 						<ul class="nav">
-							<li><a href="/edit" title="Edit">Tasks</a></li>
-							<li><a href="" title="Stats">Stats</a></li>
-							<li><a href="" title="Settings">Settings</a></li>
+							<li><a href="/edit" title="Edit"><i class="icon-edit"></i></a></li>
+							<li><a href="" title="Stats"><i class="icon-bar-chart"></i></a></li>
+							<li><a href="" title="Settings"><i class="icon-cogs"></i></a></li>
 						</ul>
 					<% end %>
   					<ul class="nav pull-right">
   						<% if session["email"] %>
-  							<li><a href='/logout' title="">Log Out</a></li>
+  							<li><a href='/logout' title="Sign Out"><i class="icon-signout"></i></a></li>
   						<% else %>
   							<li><a href="/login" title="">Log In</a></li>
   						<% end %>

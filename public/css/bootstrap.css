@@ -4164,6 +4164,9 @@ td.title a {
   color: #999999;
   text-decoration: none;
 }
+.nav i {
+  font-size: 150%;
+}
 .rate {
   font-size: 200%;
 }
