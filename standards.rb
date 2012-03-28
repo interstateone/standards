@@ -8,6 +8,11 @@ set :session_secret, ENV['SESSION_KEY'] || "i_have_a_lovely_bunch_of_c0c0nu7s"
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://brandon:rb26dett@localhost/standards")
 
+# Configure test database
+configure :test do
+	DataMapper.setup(:default, "sqlite::memory:")
+end
+
 class User
 	include DataMapper::Resource
 
@@ -198,7 +203,8 @@ get '/:id' do
 			erubis :home
 		end
 	else
-		status 404
+		flash.now[:error] = "Please log in to access that task."
+		erubis :index
 	end
 end
 
@@ -256,5 +262,9 @@ delete '/:id/delete' do
 end
 
 not_found do
-	"Not found!"
+	status 404
+end
+
+error do
+	status 500
 end
