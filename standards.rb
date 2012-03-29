@@ -20,12 +20,18 @@ class User
 	has n, :checks
 
 	property :id, Serial
+	property :name, String, :required => true
 	property :email, String, :required => true, :unique => true
 	property :hashed_password, String
 	property :salt, String
 	property :permission_level, Integer, :default => 1
 
 	timestamps :on
+
+	validates_presence_of :name
+	validates_presence_of :email
+	validates_uniqueness_of :email
+	validates_presence_of :hashed_password
 
 	def password=(pass)
 		@password = pass
@@ -171,6 +177,7 @@ post "/signup" do
 	else
 		# Try creating a new user
 		user = User.new
+		user.name = params['name']
 		user.email = params["email"]
 		user.password = params["password"]
 		if user.save
@@ -187,7 +194,9 @@ post "/signup" do
 				end
 			# Not an existing valid user, throw the signup errors
 			else
-				flash.now[:error] = user.errors.join " "
+				user.errors.each do |e|
+					flash.now[:error] = e
+				end
 				erb :signup
 			end
 		end
