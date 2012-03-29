@@ -44,9 +44,9 @@ class User
 	end
 
 	def self.authenticate(email, pass)
-		current_user = get(:email => email)
-		return nil if current_user.nil?
-		return current_user if User.encrypt(pass, current_user.salt) == current_user.hashed_password
+		user = first :email => email
+		return nil if user.nil?
+		return user if User.encrypt(pass, user.salt) == user.hashed_password
 		nil
 	end
 
@@ -89,13 +89,28 @@ end
 DataMapper.finalize.auto_upgrade!
 
 helpers do
-	def login?
-		if session[:email].nil?
-			return false
+	def logged_in?
+		!!session[:email]
+	end
+
+	def current_user
+		if session[:email]
+			User.first :email => session[:email]
 		else
-			return true
+			false
 		end
 	end
+
+	def login_required
+		#not as efficient as checking the session. but this inits the fb_user if they are logged in
+		if current_user != false
+			return true
+		else
+			session[:return_to] = request.fullpath
+			redirect '/login'
+			return false
+		end
+  end
 
 	def email
 		return session[:email]
@@ -119,7 +134,7 @@ helpers do
 end
 
 get '/' do
-	if login?
+	if logged_in?
 		@user = User.first :email => session[:email]
 		@tasks = @user.tasks
 		@checks = @user.checks
@@ -130,31 +145,25 @@ get '/' do
 end
 
 post '/' do
-	if login?
-		@user = User.first :email => session[:email]
-		@task = Task.new
-		@task.title = params[:tasktitle]
-		@task.user = @user
-		@task.save
+	login_required
+	@user = User.first :email => session[:email]
+	@task = Task.new
+	@task.title = params[:tasktitle]
+	@task.user = @user
+	@task.save
 
-		erb :task_row_short, :layout => false
-	else
-		erb :index
-	end
+	erb :task_row_short, :layout => false
 end
 
 get '/edit' do
-	if login?
-		@user = User.first :email => session[:email]
-		@tasks = @user.tasks
-		erb :edit
-	else
-		erb :index
-	end
+	login_required
+	@user = current_user
+	@tasks = @user.tasks
+	erb :edit
 end
 
 get '/stats/?' do
-	if login?
+	if logged_in?
 		@user = User.first :email => session[:email]
 		@tasks = @user.tasks
 		@checks = @user.checks
@@ -177,26 +186,26 @@ post "/signup" do
 	else
 		# Try creating a new user
 		user = User.new
-		user.name = params['name']
-		user.email = params["email"]
-		user.password = params["password"]
+		user.name = params[:name]
+		user.email = params[:email]
+		user.password = params[:password]
 		if user.save
 			# Log in and redirect if everything went okay
 			session[:email] = params[:email]
 			redirect "/"
 		else
 			# If the user already exists, try logging them in
-			if User.first :email => params[:email]
-				user = User.first :email => params[:email]
-				if user.password == params[:password]
-					session[:email] = params[:email]
-					redirect "/"
+			if user = User.authenticate(params[:email], params[:password])
+				if session[:return_to]
+					redirect_url = session[:return_to]
+					session[:return_to] = false
+					redirect redirect_url
+				else
+					redirect '/'
 				end
 			# Not an existing valid user, throw the signup errors
 			else
-				user.errors.each do |e|
-					flash.now[:error] = e
-				end
+				flash.now[:error] = "There was a problem logging you in."
 				erb :signup
 			end
 		end
@@ -208,11 +217,14 @@ get "/login" do
 end
 
 post "/login" do
-	if User.first :email => params[:email]
-		user = User.first :email => params[:email]
-		if user.password == params[:password]
-			session[:email] = params[:email]
-			redirect "/"
+	if user = User.authenticate(params[:email], params[:password])
+		session[:email] = params[:email]
+		if session[:return_to]
+			redirect_url = session[:return_to]
+			session[:return_to] = false
+			redirect redirect_url
+		else
+			redirect '/'
 		end
 	end
 	flash.now[:error] = "Email and password don't match."
@@ -234,7 +246,7 @@ post "/forgot" do
 end
 
 get '/:id' do
-	if login?
+	if logged_in?
 		@user = User.first :email => session[:email]
 		@task = @user.tasks.get params[:id]
 		if @task
@@ -251,7 +263,7 @@ get '/:id' do
 end
 
 post '/:id/:date/complete' do
-	if login?
+	if logged_in?
 		user = User.first :email => session[:email]
 		t = user.tasks.get params[:id]
 		if t.checks(:date => params[:date]).count > 0
@@ -271,7 +283,7 @@ post '/:id/:date/complete' do
 end
 
 post '/:id/rename' do
-	if login?
+	if logged_in?
 		user = User.first :email => session[:email]
 		t = user.tasks.get params[:id]
 		if t != nil
@@ -293,7 +305,7 @@ post '/:id/rename' do
 end
 
 delete '/:id/delete' do
-	if login?
+	if logged_in?
 		user = User.first :email => session[:email]
 		t = user.tasks.get params[:id]
 		t.checks.destroy
