@@ -1,15 +1,28 @@
 <table id="edit-table">
-	<tfoot>
-		<td colspan="3">
-			<form id="newtask" action="/">
-				<input id="tasktitle" name="tasktitle" type="text" autocapitalize="sentence" autocorrect="true" name="title" placeholder="Type a new task here"></input>
-			</form>
-		</td>
-	</tfoot>
 	<tbody>
 		<% @tasks.each do |task| %>
 			<% @task = task %>
-			<%= erubis :task_row_short, :layout => false %>
+			<%= erb :task_row_short, :layout => false %>
 		<% end %>
 	</tbody>
 </table>
+<form class="form-horizontal" id="newtask" action="/">
+	<fieldset>
+		<legend>New task</legend>
+		<div class="control-group">
+			<label class="control-label" for="tasktitle">I want to </label>
+			<div class="controls">
+				<input id="tasktitle" name="tasktitle" type="text" autocapitalize="sentence" autocorrect="true" name="title" placeholder="stretch for 15min each day"></input>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="taskpurpose">I'm doing it because </label>
+			<div class="controls">
+				<input type="text" name="taskpurpose" value="" placeholder="I want to master kung-fu">
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary">Do it!</button>
+		</div>
+	</fieldset>
+</form>

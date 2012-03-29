@@ -80,7 +80,9 @@ class Task
 
 	property :id, Serial
 	property :title, Text, :required => true
-	property :created_on, Date, :default => proc { Date.today }
+	property :purpose, Text
+
+	timestamps :on
 end
 
 class Check
@@ -91,6 +93,8 @@ class Check
 
 	property :id, Serial
 	property :date, Date
+
+	timestamps :at
 end
 
 DataMapper.finalize.auto_upgrade!
@@ -152,6 +156,7 @@ post '/' do
 	@user = User.first :email => session[:email]
 	@task = Task.new
 	@task.title = params[:tasktitle]
+	@task.purpose = params[:taskpurpose]
 	@task.user = @user
 	@task.save
 
@@ -163,6 +168,24 @@ get '/edit' do
 	@user = current_user
 	@tasks = @user.tasks
 	erb :edit
+end
+
+get '/new' do
+	login_required
+	@user = current_user
+	erb :new
+end
+
+post '/new' do
+	login_required
+	@user = current_user
+	@task = Task.new
+	@task.title = params[:tasktitle]
+	@task.purpose = params[:taskpurpose]
+	@task.user = @user
+	@task.save
+
+	redirect '/'
 end
 
 get '/stats/?' do

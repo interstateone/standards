@@ -146,12 +146,12 @@ AddType text/x-vcard                        vcf
 
 #<FilesMatch "\.combined\.js$">
 #  Options +Includes
-#  AddOutputFilterubisyType INCLUDES application/javascript application/json
+#  AddOutputFilterbyType INCLUDES application/javascript application/json
 #  SetOutputFilter INCLUDES
 #</FilesMatch>
 #<FilesMatch "\.combined\.css$">
 #  Options +Includes
-#  AddOutputFilterubisyType INCLUDES text/css
+#  AddOutputFilterbyType INCLUDES text/css
 #  SetOutputFilter INCLUDES
 #</FilesMatch>
 
@@ -195,11 +195,11 @@ AddType text/x-vcard                        vcf
 
   <IfModule !mod_filter.c>
     # Legacy versions of Apache
-    AddOutputFilterubisyType DEFLATE text/html text/plain text/css application/json
-    AddOutputFilterubisyType DEFLATE application/javascript
-    AddOutputFilterubisyType DEFLATE text/xml application/xml text/x-component
-    AddOutputFilterubisyType DEFLATE application/xhtml+xml application/rss+xml application/atom+xml
-    AddOutputFilterubisyType DEFLATE image/x-icon image/svg+xml application/vnd.ms-fontobject application/x-font-ttf font/opentype
+    AddOutputFilterbyType DEFLATE text/html text/plain text/css application/json
+    AddOutputFilterbyType DEFLATE application/javascript
+    AddOutputFilterbyType DEFLATE text/xml application/xml text/x-component
+    AddOutputFilterbyType DEFLATE application/xhtml+xml application/rss+xml application/atom+xml
+    AddOutputFilterbyType DEFLATE image/x-icon image/svg+xml application/vnd.ms-fontobject application/x-font-ttf font/opentype
   </IfModule>
 
 </IfModule>

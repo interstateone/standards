@@ -57,6 +57,12 @@ td.title {
 		a {
 			text-decoration: none;
 		}
+		p {
+			margin: 0;
+		}
+			p.purpose {
+			text-indent: 5%;
+		}
 }
 #edit-table {
 	margin: 0 auto;
@@ -154,22 +160,8 @@ td.title {
 	}
 }
 
-#newtask {
-	margin: 0;
-
-	#tasktitle {
-		border: none;
-		color: #666;
-		font-size: 100%;
-		width: 100%;
-		padding: 6px 0;
-		margin: 0;
-		height: 18px;
-		border: none;
-		border-color: none;
-		box-shadow: none;
-		.border-radius(0);
-	}
+p.purpose {
+	color: @grayLight;
 }
 
 .password-strength {

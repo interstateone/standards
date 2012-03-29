@@ -11,7 +11,7 @@ $(document).ready(function() {
 	$('input#password').keyup(function () {
 		if ($(this).val().length >= 8) {
 			if ($(this).siblings('span.valid').length === 0) {
-				$(this).parent().append("<span class='help-inline valid'><i class='icon-ok'></i></span>");
+				$(this).after("<span class='help-inline valid'><i class='icon-ok'></i></span>");
 			}
 		} else {
 			$(this).siblings('span.valid').remove();
@@ -23,34 +23,33 @@ $(document).ready(function() {
 		var filter = /^(([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+)?$/;
 		if (filter.test($(this).val())) {
 			if ($(this).siblings('span.valid').length === 0) {
-				$(this).parent().append("<span class='help-inline valid'><i class='icon-ok'></i></span>");
+				$(this).after("<span class='help-inline valid'><i class='icon-ok'></i></span>");
 			}
 		} else {
 			$(this).siblings('span.valid').remove();
 		}
 	});
 
-	// Post a new task
+	/*// Post a new task
 	$('#newtask').submit(function() {
 		$.post("/", $(this).serialize(), function(data){
 			$('tbody').append(data).children("tr").each( function (i, obj) {
-				obj = $(obj).children("td.title").children("span.title");
+				obj = $(obj).children("td.title").children("p > span.title");
 				makeEditable(obj);
-				console.log(obj);
 			});
 			$('#newtask').each(function(){this.reset();});
 		}, "text");
 		return false;
-	});
+	});*/
 
-	// Submit a new task with the enter key
-	$('#newtask .input').keypress(function(e){
-		if(e.which === 13){
-			e.preventDefault();
-			$('form#login').submit();
-			return false;
-		}
-	});
+	// // Submit a new task with the enter key
+	// $('#newtask > input').keypress(function(e){
+	// 	if(e.which === 13){
+	// 		e.preventDefault();
+	// 		$('form#newtask').submit();
+	// 		return false;
+	// 	}
+	// });
 
 	// Delete a task
 	$(document).on("click", 'a.delete', function(e) {
@@ -86,7 +85,7 @@ $(document).ready(function() {
 	var editable = false;
 
 	// Rename a task with the enter key by blurring the input
-	$(document).on("keypress", 'span.title', function(e){
+	$(document).on("keypress", 'p > span.title', function(e){
 		if(e.which === 13){
 			e.preventDefault();
 			if (editable) {
@@ -99,10 +98,10 @@ $(document).ready(function() {
 	// Let the edit button make the title editable
 	$(document).on("click", "a.rename", function (e) {
 		if (editable) {
-			$(this).parent().siblings("td").children("span.title").trigger("editableSubmit");
+			$(this).parent().siblings("td").children("p > span.title").trigger("editableSubmit");
 			editable = false;
 		} else {
-			$(this).parent().siblings("td").children("span.title").trigger("blur");
+			$(this).parent().siblings("td").children("p > span.title").trigger("blur");
 			editable = true;
 		}
 		// console.log($(this).parent().siblings("td").children("span.title"));
@@ -115,9 +114,9 @@ $(document).ready(function() {
 			submitBy: "editableSubmit",
 			onSubmit: function (content) {
 				if (content.current !== content.previous) {
-					$.post($(this).closest("span.title").attr("href"), {"title": content.current}, function(data) {
+					$.post($(this).closest("p > span.title").attr("href"), {"title": content.current}, function(data) {
 						if (data !== "true") {
-							$("body > .container").prepend(data).alert()
+							$("body > .container").prepend(data).alert();
 							$(this).text(content.previous);
 						}
 					});
@@ -126,7 +125,7 @@ $(document).ready(function() {
 		});
 	};
 
-	makeEditable($("span.title"));
+	makeEditable($("p > span.title"));
 });
 
 (function($){

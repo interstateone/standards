@@ -4119,6 +4119,12 @@ td.title {
 td.title a {
   text-decoration: none;
 }
+td.title p {
+  margin: 0;
+}
+td.title p.purpose {
+  text-indent: 5%;
+}
 #edit-table {
   margin: 0 auto;
   width: 70%;
@@ -4203,23 +4209,8 @@ td.title a {
 .draggable .icon-bar + .icon-bar {
   margin-top: 3px;
 }
-#newtask {
-  margin: 0;
-}
-#newtask #tasktitle {
-  border: none;
-  color: #666;
-  font-size: 100%;
-  width: 100%;
-  padding: 6px 0;
-  margin: 0;
-  height: 18px;
-  border: none;
-  border-color: none;
-  box-shadow: none;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
+p.purpose {
+  color: #999999;
 }
 .password-strength {
   width: 280px;

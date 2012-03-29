@@ -1,12 +1,19 @@
 <tr>
 	<td class="title">
-		<span href="/<%= @task.id %>/rename" class="title"><%= @task.title %></span>
+		<p>
+			<span href="/<%= @task.id %>/rename" class="title"><%= @task.title %></span>
+		</p>
+		<p class="purpose">
+			<% if @task.purpose %>
+				because <%= @task.purpose %>
+			<% end %>
+		</p>
 	</td>
 	<td width="50">
 		<a class="rename row-icon pull-right" title="Rename"><i class="icon-pencil"></i></a>
 	</td>
 	<td width="50">
 		<a class="delete row-icon pull-right" title="Delete"><i class="icon-trash"></i></a>
-		<%= erubis :delete_modal, :layout => false %>
+		<%= erb :delete_modal, :layout => false %>
 	</td>
 </tr>

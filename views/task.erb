@@ -12,7 +12,7 @@
 </ul><!-- /checks -->
 
 <p>You're currently sitting at a <%= (count / (Date.today - @task.created_on + 1)).ceil %>% completion rate.</p>
-<a href="/edit" title="" class="btn btn-standard">Back</a>
+<a href="/" title="" class="btn btn-standard">Back</a>
 <a class="delete btn btn-danger pull-right">Delete</a>
 
-<%= erubis :delete_modal, :layout => false %>
+<%= erb :delete_modal, :layout => false %>

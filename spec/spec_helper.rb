@@ -1,5 +1,6 @@
+Bundler.require(:default, :test)
+set :environment, :test
 require_relative '../standards.rb'
-require 'rack/test'
 
 module RSpecMixin
   include Rack::Test::Methods
