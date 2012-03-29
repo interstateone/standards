@@ -104,13 +104,13 @@ helpers do
 		if session[:email]
 			User.first :email => session[:email]
 		else
-			false
+			nil
 		end
 	end
 
 	def login_required
 		#not as efficient as checking the session. but this inits the fb_user if they are logged in
-		if current_user != false
+		if current_user != nil
 			return true
 		else
 			session[:return_to] = request.fullpath

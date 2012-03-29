@@ -7,6 +7,29 @@ $(document).ready(function() {
 		window.location = $(this).attr("href");
 	});
 
+	// Password length validator
+	$('input#password').keyup(function () {
+		if ($(this).val().length >= 8) {
+			if ($(this).siblings('span.valid').length === 0) {
+				$(this).parent().append("<span class='help-inline valid'><i class='icon-ok'></i></span>");
+			}
+		} else {
+			$(this).siblings('span.valid').remove();
+		}
+	});
+
+	// Email format validator
+	$('input#email').keyup(function () {
+		var filter = /^(([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+)?$/;
+		if (filter.test($(this).val())) {
+			if ($(this).siblings('span.valid').length === 0) {
+				$(this).parent().append("<span class='help-inline valid'><i class='icon-ok'></i></span>");
+			}
+		} else {
+			$(this).siblings('span.valid').remove();
+		}
+	});
+
 	// Post a new task
 	$('#newtask').submit(function() {
 		$.post("/", $(this).serialize(), function(data){

@@ -46,7 +46,23 @@ describe 'A user' do
 		@user.save.should == true
 	end
 
-	it 'should be invalid with a password less than 8 characters long'
+	it 'should be invalid with a password less than 8 characters long' do
+		@user.attributes = valid_user_attributes.except(:password)
+		@user.save.should == false
+		@user.password = "aaa"
+		@user.save.should == false
+		@user.password = "asdfghjk4"
+		@user.save.should == true
+	end
+
+	it 'should be invalid with a password that doesnt contain a number' do
+		@user.attributes = valid_user_attributes.except(:password)
+		@user.save.should == false
+		@user.password = "asdfghjk"
+		@user.save.should == false
+		@user.password = "asdfghjk4"
+		@user.save.should == true
+	end
 end
 
 describe 'A task' do

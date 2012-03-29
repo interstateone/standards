@@ -1,8 +1,6 @@
 require_relative '../standards.rb'
 require 'rack/test'
 
-set :environment, :test
-
 module RSpecMixin
   include Rack::Test::Methods
   def app() Sinatra::Application end
