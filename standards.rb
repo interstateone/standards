@@ -84,9 +84,9 @@ get '/' do
 		@user = User.first :email => session[:email]
 		@tasks = @user.tasks
 		@checks = @user.checks
-		erubis :home
+		erb :home
 	else
-		erubis :index
+		erb :index
 	end
 end
 
@@ -98,9 +98,9 @@ post '/' do
 		@task.user = @user
 		@task.save
 
-		erubis :task_row_short, :layout => false
+		erb :task_row_short, :layout => false
 	else
-		erubis :index
+		erb :index
 	end
 end
 
@@ -108,9 +108,9 @@ get '/edit' do
 	if login?
 		@user = User.first :email => session[:email]
 		@tasks = @user.tasks
-		erubis :edit
+		erb :edit
 	else
-		erubis :index
+		erb :index
 	end
 end
 
@@ -119,14 +119,14 @@ get '/stats/?' do
 		@user = User.first :email => session[:email]
 		@tasks = @user.tasks
 		@checks = @user.checks
-		erubis :stats
+		erb :stats
 	else
-		erubis :index
+		erb :index
 	end
 end
 
 get "/signup" do
-  erubis :signup
+  erb :signup
 end
 
 post "/signup" do
@@ -134,7 +134,7 @@ post "/signup" do
 	# Don't worry about existing emails, we'll handle that later
 	if !valid_email? params[:email]
 		flash.now[:error] = "Please enter a valid email address."
-		erubis :signup
+		erb :signup
 	else
 		# Try creating a new user
 		user = User.new
@@ -155,14 +155,14 @@ post "/signup" do
 			# Not an existing valid user, throw the signup errors
 			else
 				flash.now[:error] = user.errors.join " "
-				erubis :signup
+				erb :signup
 			end
 		end
 	end
 end
 
 get "/login" do
-	erubis :login
+	erb :login
 end
 
 post "/login" do
@@ -174,7 +174,7 @@ post "/login" do
 		end
 	end
 	flash.now[:error] = "Email and password don't match."
-	erubis :login
+	erb :login
 end
 
 get "/logout" do
@@ -185,7 +185,7 @@ end
 post "/forgot" do
 	if !valid_email? params[:email]
 		flash.now[:error] = "Please enter an email address."
-		erubis :login
+		erb :login
 	else
 
 	end
@@ -196,15 +196,15 @@ get '/:id' do
 		@user = User.first :email => session[:email]
 		@task = @user.tasks.get params[:id]
 		if @task
-			erubis :task
+			erb :task
 		else
 			status 404
 			flash.now[:error] = "That task can't be found."
-			erubis :home
+			erb :home
 		end
 	else
 		flash.now[:error] = "Please log in to access that task."
-		erubis :index
+		erb :index
 	end
 end
 
@@ -224,7 +224,7 @@ post '/:id/:date/complete' do
 			t.save
 		end
 	else
-		erubis :index
+		erb :index
 	end
 end
 
@@ -238,15 +238,15 @@ post '/:id/rename' do
 				true
 			else
 				flash.now[:error] = "Something went wrong trying to rename that task."
-				erubis :flash, :layout => false
+				erb :flash, :layout => false
 			end
 		else
 			flash.now[:error] = "That task doesn't exist."
-			erubis :flash, :layout => false
+			erb :flash, :layout => false
 		end
 	else
 		flash.now[:error] = "Please sign in to perform that action."
-		erubis :flash, :layout => false
+		erb :flash, :layout => false
 	end
 end
 
@@ -257,7 +257,7 @@ delete '/:id/delete' do
 		t.checks.destroy
 		t.destroy
 	else
-		erubis :index
+		erb :index
 	end
 end
 

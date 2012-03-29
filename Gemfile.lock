@@ -56,7 +56,7 @@ GEM
       dm-core (~> 1.2.0)
     do_postgres (0.10.8)
       data_objects (= 0.10.8)
-    erubis (2.7.0)
+    erb (2.7.0)
     fastercsv (1.5.4)
     ffi (1.0.11)
     googlecharts (1.6.8)
@@ -105,7 +105,7 @@ DEPENDENCIES
   bcrypt-ruby
   datamapper
   dm-postgres-adapter
-  erubis
+  erb
   googlecharts
   growl
   guard-rspec
