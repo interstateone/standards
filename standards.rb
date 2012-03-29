@@ -31,12 +31,14 @@ class User
 	validates_presence_of :name
 	validates_presence_of :email
 	validates_uniqueness_of :email
-	validates_presence_of :hashed_password
+	validates_presence_of :hashed_password, :message => "Password must be at least 8 characters with one number."
 
 	def password=(pass)
-		@password = pass
-		self.salt = User.random_string(10) if !self.salt
-		self.hashed_password = User.encrypt(@password, self.salt)
+		if valid_password? pass
+			@password = pass
+			self.salt = User.random_string(10) if !self.salt
+			self.hashed_password = User.encrypt(@password, self.salt)
+		end
 	end
 
 	def admin?
@@ -62,6 +64,11 @@ class User
 		newpass = ""
 		1.upto(len) { |i| newpass << chars[rand(chars.size-1)] }
 		return newpass
+	end
+
+	def valid_password?(password)
+		reg = /^(?=.*\d)(?=.*([a-z]|[A-Z]))([\x20-\x7E]){8,40}$/
+		return (reg.match(password))? true : false
 	end
 end
 
@@ -127,10 +134,6 @@ helpers do
 			false
 		end
 	end
-
-	def valid_password?(password)
-
-	end
 end
 
 get '/' do
@@ -194,20 +197,21 @@ post "/signup" do
 			session[:email] = params[:email]
 			redirect "/"
 		else
-			# If the user already exists, try logging them in
-			if user = User.authenticate(params[:email], params[:password])
-				if session[:return_to]
-					redirect_url = session[:return_to]
-					session[:return_to] = false
-					redirect redirect_url
-				else
-					redirect '/'
-				end
-			# Not an existing valid user, throw the signup errors
-			else
-				flash.now[:error] = "There was a problem logging you in."
-				erb :signup
+			user.errors.each do |e|
+				flash.now[:error] = e
 			end
+			erb :signup
+			# # If the user already exists, try logging them in
+			# if user = User.authenticate(params[:email], params[:password])
+			# 	session[:email] = params[:email]
+			# 	if session[:return_to]
+			# 		redirect_url = session[:return_to]
+			# 		session[:return_to] = false
+			# 		redirect redirect_url
+			# 	else
+			# 		redirect '/'
+			# 	end
+			# end
 		end
 	end
 end
