@@ -7,26 +7,43 @@ $(document).ready(function() {
 		window.location = $(this).attr("href");
 	});
 
-	// Password length validator
-	$('input#password').keyup(function () {
-		if ($(this).val().length >= 8) {
-			if ($(this).siblings('span.valid').length === 0) {
-				$(this).after("<span class='help-inline valid'><i class='icon-ok'></i></span>");
+	// Name validator
+	$('input#name').keyup(function () {
+		if ($(this).val().length > 1) {
+			if (!$(this).parents('.control-group').hasClass('success')) {
+				$(this).parents('.control-group').toggleClass("success");
 			}
 		} else {
-			$(this).siblings('span.valid').remove();
+			if ($(this).parents('.control-group').hasClass('success')) {
+				$(this).parents('.control-group').toggleClass("success");
+			}
 		}
 	});
 
 	// Email format validator
 	$('input#email').keyup(function () {
-		var filter = /^(([a-zA-Z0-9_.-])+@([a-zA-Z0-9_.-])+\.([a-zA-Z])+([a-zA-Z])+)?$/;
+		var filter = /(.+)@(.+){2,}\.(.+){2,}/;
 		if (filter.test($(this).val())) {
-			if ($(this).siblings('span.valid').length === 0) {
-				$(this).after("<span class='help-inline valid'><i class='icon-ok'></i></span>");
+			if (!$(this).parents('.control-group').hasClass('success')) {
+				$(this).parents('.control-group').toggleClass("success");
 			}
 		} else {
-			$(this).siblings('span.valid').remove();
+			if ($(this).parents('.control-group').hasClass('success')) {
+				$(this).parents('.control-group').toggleClass("success");
+			}
+		}
+	});
+
+	// Password length validator
+	$('input#password').keyup(function () {
+		if ($(this).val().length >= 8) {
+			if (!$(this).parents('.control-group').hasClass('success')) {
+				$(this).parents('.control-group').toggleClass("success");
+			}
+		} else {
+			if ($(this).parents('.control-group').hasClass('success')) {
+				$(this).parents('.control-group').toggleClass("success");
+			}
 		}
 	});
 

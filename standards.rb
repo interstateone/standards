@@ -134,6 +134,29 @@ helpers do
 			false
 		end
 	end
+
+	def switch_pronouns(string)
+		string.gsub(/\b(I am|You are|I|You|Your|My)\b/i) do |pronoun|
+			case pronoun.downcase
+				when 'i'
+					'you'
+				when 'you'
+					'I'
+				when 'i am'
+					"You are"
+				when 'you are'
+					'I am'
+				when 'your'
+					'my'
+				when 'my'
+					'your'
+			end
+		end
+	end
+
+	def remove_trailing_period(string)
+		str.chomp('.') if (str)
+	end
 end
 
 get '/' do
@@ -175,7 +198,7 @@ end
 post '/new' do
 	login_required
 	user = current_user
-	task = user.tasks.create(:title => params[:tasktitle], :purpose => params[:taskpurpose])
+	task = user.tasks.create(:title => params[:tasktitle], :purpose => remove_trailing_period(params[:taskpurpose]))
 
 	task.errors.each do |e|
 		flash[:error] = e

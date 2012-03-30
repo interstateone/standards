@@ -1,4 +1,6 @@
-<h2><%= @task.title %></h2>
+<h2><%= @task.title.capitalize %></h2>
+<p>Remember! You're doing this because <%= switch_pronouns @task.purpose unless @task.purpose.empty? %>.</p>
+
 <% count = @task.checks.count %>
 <% if count > 0 %>
 	<p>You've done this <%= count %> <%= count == 1 ? "time" : "times" %> since <%= @task.created_on.strftime("%B %e, %Y") %>:</p>
@@ -12,6 +14,7 @@
 </ul><!-- /checks -->
 
 <p>You're currently sitting at a <%= (count / (Date.today - @task.created_on + 1)).ceil %>% completion rate.</p>
+
 <a href="/" title="" class="btn btn-standard">Back</a>
 <a class="delete btn btn-danger pull-right">Delete</a>
 
