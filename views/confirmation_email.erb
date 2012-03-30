@@ -1,0 +1,4 @@
+<p>Welcome <%= @user.email %>!</p>
+<p>You can confirm your account by clicking the link below:</p>
+
+<a href="http://localhost:9393/confirm/<%= @user.confirmation_key %>" title="Confirm my account">Confirm my account</a>

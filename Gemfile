@@ -10,6 +10,7 @@ gem "activesupport", :require => "active_support"
 gem "bcrypt-ruby", :require => "bcrypt"
 gem "resolv-ipv6favor", :require => "resolv"
 gem "sinatra-flash", :require => "sinatra/flash"
+gem 'pony'
 
 group :test do
 	gem 'rack-test', :require => 'rack/test'

@@ -13,6 +13,16 @@ configure :test do
 	DataMapper.setup(:default, "sqlite::memory:")
 end
 
+# Configure Padrino Mailer
+set :delivery_method, :smtp => {
+	:address              => "smtp.gmail.com",
+	:port                 => 587,
+	:user_name            => 'evans.brandon@gmail.com',
+	:password             => 'carsrcool',
+	:authentication       => :plain,
+	:enable_starttls_auto => true
+}
+
 class User
 	include DataMapper::Resource
 
@@ -25,8 +35,8 @@ class User
 	property :hashed_password, String
 	property :salt, String
 	property :permission_level, Integer, :default => 1
-	property :confirmed, Boolean, :default => false
-	property :confirmation_key, String, :default => lambda { generate_key }
+	property :confirmed_at, DateTime
+	property :confirmation_key, String, :default => lambda { |r,p| Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..10] }
 
 	timestamps :on
 
@@ -34,15 +44,6 @@ class User
 	validates_presence_of :email
 	validates_uniqueness_of :email
 	validates_presence_of :hashed_password, :message => "Password must be at least 8 characters with one number."
-
-	# Mail a confirmation email after a new user has been created
-	after :create do
-		# YourMailerObject.deliver_some_message()
-	end
-
-	def generate_key(length = 10)
-		Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..length]
-	end
 
 	def password=(pass)
 		if valid_password? pass
@@ -57,7 +58,12 @@ class User
 	end
 
 	def confirmed?
-		self.confirmed
+		!!confirmed_at
+	end
+
+	def confirm!
+		self.confirmation_key = nil
+		self.confirmed_at = Time.now.utc
 	end
 
 	def self.authenticate(email, pass)
@@ -173,6 +179,24 @@ helpers do
 	def remove_trailing_period(string)
 		str.chomp('.') if (str)
 	end
+
+	def send_confirmation_email(user)
+		@user = user
+		Pony.mail({
+			:to => 'evans.brandon@gmail.com',
+			:via => :smtp,
+			:via_options => {
+				:address              => 'smtp.gmail.com',
+				:port                 => '587',
+				:enable_starttls_auto => true,
+				:user_name            => 'evans.brandon@gmail.com',
+				:password             => 'carsrcool',
+    			:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
+    			:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
+			},
+			:html_body => erb(:confirmation_email, :layout => false)
+		})
+	end
 end
 
 get '/' do
@@ -251,8 +275,9 @@ post "/signup/?" do
 		user.email = params[:email]
 		user.password = params[:password]
 		if user.save
-			# Log in and redirect if everything went okay
-			session[:id] = user.id
+			# Flash confirmation info and redirect
+			send_confirmation_email user
+			flash[:notice] = "You've been sent a confirmation email to the address you provided, click the link inside to get started."
 			redirect "/"
 		else
 			user.errors.each do |e|

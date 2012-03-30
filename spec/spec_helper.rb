@@ -1,5 +1,6 @@
 Bundler.require(:default, :test)
 set :environment, :test
+set :delivery_method, :test
 require_relative '../standards.rb'
 
 module RSpecMixin
