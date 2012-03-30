@@ -51,7 +51,7 @@ $(document).ready(function() {
 	// 	}
 	// });
 
-	// Delete a task
+	// Delete a task modal
 	$(document).on("click", 'a.delete', function(e) {
 		$(this).siblings(".deleteModal").modal();
 	});
@@ -61,12 +61,14 @@ $(document).ready(function() {
 		var clicked = this;
 		e.preventDefault();
 		$.post(clicked.href, { _method: 'delete' }, function(data) {
-			if (window.location.pathname == "/edit") {
-				$(clicked).closest('tr').remove();
-			} else {
-				window.location.pathname = "/edit";
-			}
+				$(this).parents(".deleteModal").modal('hide');
+				window.location.pathname = "/";
 		}, "script");
+	});
+
+	// Set the delete button to be stateful
+	$(document).on("click", ".delete-confirm", function() {
+		$('.delete-confirm').button('loading');
 	});
 
 	// Complete a task

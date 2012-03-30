@@ -35,18 +35,18 @@
   	<div class="navbar navbar-fixed-top">
   		<div class="navbar-inner">
   			<div class="container">
-  				<% if !session[:email] %>
+  				<% if !session[:id] %>
   					<a class="btn pull-right" href="/login">Sign in</a>
           <% end %>
   				<a class="brand" href="/"><%= SITE_TITLE %></a>
   				<div class="nav-collapse">
-  					<% if session["email"] %>
+  					<% if session[:id] %>
   						<ul class="nav">
   							<li><a href="/new" title="New Task"><i class="icon-edit"></i></a></li>
   							<li><a href="" title="Stats"><i class="icon-bar-chart"></i></a></li>
   							<li><a href="" title="Settings"><i class="icon-cogs"></i></a></li>
   						</ul>
-              <% if session[:email] %>
+              <% if session[:id] %>
                   <ul class="nav pull-right">
                     <li><a href='/logout' title="Sign Out" class=""><i class="icon-signout"></i></a></li>
                   </ul>

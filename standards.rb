@@ -101,12 +101,12 @@ DataMapper.finalize.auto_upgrade!
 
 helpers do
 	def logged_in?
-		!!session[:email]
+		!!session[:id]
 	end
 
 	def current_user
-		if session[:email]
-			User.first :email => session[:email]
+		if session[:id]
+			User.get session[:id]
 		else
 			nil
 		end
@@ -123,10 +123,6 @@ helpers do
 		end
   end
 
-	def email
-		return session[:email]
-	end
-
 	def valid_email?(email)
 		if email =~ /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/
 			domain = email.match(/\@(.+)/)[1]
@@ -142,7 +138,7 @@ end
 
 get '/' do
 	if logged_in?
-		@user = User.first :email => session[:email]
+		@user = current_user
 		@tasks = @user.tasks
 		@checks = @user.checks
 		erb :home
@@ -151,24 +147,24 @@ get '/' do
 	end
 end
 
-post '/' do
-	login_required
-	@user = User.first :email => session[:email]
-	@task = Task.new
-	@task.title = params[:tasktitle]
-	@task.purpose = params[:taskpurpose]
-	@task.user = @user
-	@task.save
+# post '/' do
+# 	login_required
+# 	@user = User.first :email => session[:email]
+# 	@task = Task.new
+# 	@task.title = params[:tasktitle]
+# 	@task.purpose = params[:taskpurpose]
+# 	@task.user = @user
+# 	@task.save
 
-	erb :task_row_short, :layout => false
-end
+# 	erb :task_row_short, :layout => false
+# end
 
-get '/edit' do
-	login_required
-	@user = current_user
-	@tasks = @user.tasks
-	erb :edit
-end
+# get '/edit' do
+# 	login_required
+# 	@user = current_user
+# 	@tasks = @user.tasks
+# 	erb :edit
+# end
 
 get '/new' do
 	login_required
@@ -178,19 +174,19 @@ end
 
 post '/new' do
 	login_required
-	@user = current_user
-	@task = Task.new
-	@task.title = params[:tasktitle]
-	@task.purpose = params[:taskpurpose]
-	@task.user = @user
-	@task.save
+	user = current_user
+	task = user.tasks.create(:title => params[:tasktitle], :purpose => params[:taskpurpose])
+
+	task.errors.each do |e|
+		flash[:error] = e
+	end
 
 	redirect '/'
 end
 
 get '/stats/?' do
 	if logged_in?
-		@user = User.first :email => session[:email]
+		@user = current_user
 		@tasks = @user.tasks
 		@checks = @user.checks
 		erb :stats
@@ -217,7 +213,7 @@ post "/signup" do
 		user.password = params[:password]
 		if user.save
 			# Log in and redirect if everything went okay
-			session[:email] = params[:email]
+			session[:id] = user.id
 			redirect "/"
 		else
 			user.errors.each do |e|
@@ -245,7 +241,7 @@ end
 
 post "/login" do
 	if user = User.authenticate(params[:email], params[:password])
-		session[:email] = params[:email]
+		session[:id] = user.id
 		if session[:return_to]
 			redirect_url = session[:return_to]
 			session[:return_to] = false
@@ -259,7 +255,7 @@ post "/login" do
 end
 
 get "/logout" do
-  session[:email] = nil
+  session[:id] = nil
   redirect "/"
 end
 
@@ -274,7 +270,7 @@ end
 
 get '/:id' do
 	if logged_in?
-		@user = User.first :email => session[:email]
+		@user = current_user
 		@task = @user.tasks.get params[:id]
 		if @task
 			erb :task
@@ -291,7 +287,7 @@ end
 
 post '/:id/:date/complete' do
 	if logged_in?
-		user = User.first :email => session[:email]
+		user = current_user
 		t = user.tasks.get params[:id]
 		if t.checks(:date => params[:date]).count > 0
 			c = t.checks :date => params[:date]
@@ -311,7 +307,7 @@ end
 
 post '/:id/rename' do
 	if logged_in?
-		user = User.first :email => session[:email]
+		user = current_user
 		t = user.tasks.get params[:id]
 		if t != nil
 			t.title = params[:title]
@@ -333,12 +329,13 @@ end
 
 delete '/:id/delete' do
 	if logged_in?
-		user = User.first :email => session[:email]
-		t = user.tasks.get params[:id]
-		t.checks.destroy
-		t.destroy
-	else
-		erb :index
+		user = current_user
+		task = user.tasks.get params[:id]
+		task.checks.destroy
+		task.destroy
+
+		flash[:notice] = "Task deleted."
+		true
 	end
 end
 

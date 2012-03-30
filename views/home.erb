@@ -1,4 +1,4 @@
-<% if @tasks.length > 0 %>
+<% if !@tasks.empty? %>
 	<table>
 		<thead>
 			<th></th>
@@ -20,6 +20,6 @@
 <% else %>
 	<div class="hero-unit">
 		<h2>This is your home.</h2>
-		<p>Go to <em><a href="/edit">tasks</a></em> to get started.</p>
+		<p><a href="/new">Add</a> a task to get started.</p>
 	</div>
 <% end %>
