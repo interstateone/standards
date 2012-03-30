@@ -63,6 +63,16 @@ describe 'A user' do
 		@user.password = "asdfghjk4"
 		@user.save.should == true
 	end
+
+	it 'should not be able to log in until confirmed' do
+		@user.attributes = valid_user_attributes
+		@user.save.should == true
+		post '/login', {:email => @user.email, :password => valid_user_attributes['password']}
+		session[:id].should == nil
+	end
+	it 'should only be able to be confirmed once'
+	it 'should receive a confirmation email when created'
+	it 'should not be confirmed unless the link has been visited'
 end
 
 describe 'A task' do
@@ -97,46 +107,44 @@ describe 'A check' do
 	end
 
 	it 'should be invalid without a user'
-
 	it 'should be invalid without a task'
-
 	it 'should be invalid without a date'
 end
 
-# shared_examples_for "Standards" do
-# 	include UserSpecHelper
+shared_examples_for "Standards" do
+	include UserSpecHelper
 
-# 	before :each do
-# 		user = User.new valid_user_attributes
-# 		user.save
-# 	end
+	before :each do
+		user = User.new valid_user_attributes
+		user.save
+	end
 
-# 	it 'should have a title' do
-# 		get '/'
-# 		last_response.body.include? "Standards"
-# 	end
-# end
+	it 'should have a title' do
+		get '/'
+		last_response.body.include? "Standards"
+	end
+end
 
-# describe 'task pages' do
-# 	it_should_behave_like "Standards"
+describe 'task pages' do
+	it_should_behave_like "Standards"
 
-# 	before :each do
-# 		post "/login", {:email => "test@test.com", :password => "testtest123"}
-# 	end
+	before :each do
+		post "/login", {:email => "test@test.com", :password => "testtest123"}
+	end
 
-# 	it 'should throw an error if its not a valid task id' do
-# 		get '/23423423423423'
-# 		last_response.body.include? "That task can't be found."
-# 		# last_response.status.should be 404
-# 	end
+	it 'should throw an error if its not a valid task id' do
+		get '/23423423423423'
+		last_response.body.include? "That task can't be found."
+		# last_response.status.should be 404
+	end
 
-# 	it 'should load a task if its a valid task id' do
-# 		test = Task.new :id => 1, :title => "Test task"
-# 		test.save
-# 		get '/1'
-# 		last_response.body.include? "Test task"
-# 	end
-# end
+	it 'should load a task if its a valid task id' do
+		test = Task.new :id => 1, :title => "Test task"
+		test.save
+		get '/1'
+		last_response.body.include? "Test task"
+	end
+end
 
 # describe 'edit page' do
 # 	it_should_behave_like 'Standards'

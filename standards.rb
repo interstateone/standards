@@ -62,8 +62,13 @@ class User
 	end
 
 	def confirm!
-		self.confirmation_key = nil
-		self.confirmed_at = Time.now.utc
+		if !self.confirmed?
+			self.confirmation_key = nil
+			self.confirmed_at = Time.now.utc
+			true
+		else
+			false
+		end
 	end
 
 	def self.authenticate(email, pass)
@@ -299,8 +304,21 @@ post "/signup/?" do
 	end
 end
 
-get '/confirm/?' do
-
+get '/confirm/:key/?' do
+	user = User.get :confirmation_key => params[:key]
+	if !user.empty?
+		if user.confirm!
+			session[:id] = user.id
+			flash[:notice] = "You're ready to get started!"
+			redirect '/'
+		else
+			flash[:error] = "It seems like that email address has already been confirmed!"
+			redirect '/login'
+		end
+	else
+		flash[:error] = "That is not a valid confirmation link."
+		redirect '/'
+	end
 end
 
 get "/login/?" do

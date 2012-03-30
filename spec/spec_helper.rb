@@ -5,7 +5,9 @@ require_relative '../standards.rb'
 
 module RSpecMixin
   include Rack::Test::Methods
-  def app() Sinatra::Application end
+  def app
+  	Sinatra::Application
+  end
 end
 
 # Reset the database for each test
