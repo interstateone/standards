@@ -65,7 +65,7 @@ class User
 		if !self.confirmed?
 			self.confirmation_key = nil
 			self.confirmed_at = Time.now.utc
-			true
+			self.save
 		else
 			false
 		end
@@ -305,8 +305,8 @@ post "/signup/?" do
 end
 
 get '/confirm/:key/?' do
-	user = User.get :confirmation_key => params[:key]
-	if !user.empty?
+	user = User.first :confirmation_key => params[:key]
+	if !user.nil?
 		if user.confirm!
 			session[:id] = user.id
 			flash[:notice] = "You're ready to get started!"
