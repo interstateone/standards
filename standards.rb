@@ -25,6 +25,8 @@ class User
 	property :hashed_password, String
 	property :salt, String
 	property :permission_level, Integer, :default => 1
+	property :confirmed, Boolean, :default => false
+	property :confirmation_key, String, :default => lambda { generate_key }
 
 	timestamps :on
 
@@ -32,6 +34,15 @@ class User
 	validates_presence_of :email
 	validates_uniqueness_of :email
 	validates_presence_of :hashed_password, :message => "Password must be at least 8 characters with one number."
+
+	# Mail a confirmation email after a new user has been created
+	after :create do
+		# YourMailerObject.deliver_some_message()
+	end
+
+	def generate_key(length = 10)
+		Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..length]
+	end
 
 	def password=(pass)
 		if valid_password? pass
@@ -45,9 +56,14 @@ class User
 		self.permission_level == -1 || self.id == 1
 	end
 
+	def confirmed?
+		self.confirmed
+	end
+
 	def self.authenticate(email, pass)
 		user = first :email => email
 		return nil if user.nil?
+		return nil if !user.confirmed?
 		return user if User.encrypt(pass, user.salt) == user.hashed_password
 		nil
 	end
@@ -189,13 +205,13 @@ end
 # 	erb :edit
 # end
 
-get '/new' do
+get '/new/?' do
 	login_required
 	@user = current_user
 	erb :new
 end
 
-post '/new' do
+post '/new/?' do
 	login_required
 	user = current_user
 	task = user.tasks.create(:title => params[:tasktitle], :purpose => remove_trailing_period(params[:taskpurpose]))
@@ -218,11 +234,11 @@ get '/stats/?' do
 	end
 end
 
-get "/signup" do
+get "/signup/?" do
   erb :signup
 end
 
-post "/signup" do
+post "/signup/?" do
 	# Validate the fields first
 	# Don't worry about existing emails, we'll handle that later
 	if !valid_email? params[:email]
@@ -258,11 +274,15 @@ post "/signup" do
 	end
 end
 
-get "/login" do
+get '/confirm/?' do
+
+end
+
+get "/login/?" do
 	erb :login
 end
 
-post "/login" do
+post "/login/?" do
 	if user = User.authenticate(params[:email], params[:password])
 		session[:id] = user.id
 		if session[:return_to]
@@ -277,12 +297,12 @@ post "/login" do
 	erb :login
 end
 
-get "/logout" do
+get "/logout/?" do
   session[:id] = nil
   redirect "/"
 end
 
-post "/forgot" do
+post "/forgot/?" do
 	if !valid_email? params[:email]
 		flash.now[:error] = "Please enter an email address."
 		erb :login
@@ -291,75 +311,63 @@ post "/forgot" do
 	end
 end
 
-get '/:id' do
-	if logged_in?
-		@user = current_user
-		@task = @user.tasks.get params[:id]
-		if @task
-			erb :task
-		else
-			status 404
-			flash.now[:error] = "That task can't be found."
-			erb :home
-		end
+get '/:id/?' do
+	login_required
+	@user = current_user
+	@task = @user.tasks.get params[:id]
+	if @task
+		erb :task
 	else
-		flash.now[:error] = "Please log in to access that task."
-		erb :index
+		status 404
+		flash.now[:error] = "That task can't be found."
+		erb :home
 	end
 end
 
-post '/:id/:date/complete' do
-	if logged_in?
-		user = current_user
-		t = user.tasks.get params[:id]
-		if t.checks(:date => params[:date]).count > 0
-			c = t.checks :date => params[:date]
-			c.destroy
-		else
-			c = Check.new
-			c.date = params[:date]
-			c.task = t
-			c.user = user
-			c.save
-			t.save
-		end
+post '/:id/:date/complete/?' do
+	login_required
+	user = current_user
+	t = user.tasks.get params[:id]
+	if t.checks(:date => params[:date]).count > 0
+		c = t.checks :date => params[:date]
+		c.destroy
 	else
-		erb :index
+		c = Check.new
+		c.date = params[:date]
+		c.task = t
+		c.user = user
+		c.save
+		t.save
 	end
 end
 
-post '/:id/rename' do
-	if logged_in?
-		user = current_user
-		t = user.tasks.get params[:id]
-		if t != nil
-			t.title = params[:title]
-			if t.save
-				true
-			else
-				flash.now[:error] = "Something went wrong trying to rename that task."
-				erb :flash, :layout => false
-			end
+post '/:id/rename/?' do
+	login_required
+	user = current_user
+	t = user.tasks.get params[:id]
+	if t != nil
+		t.title = params[:title]
+		if t.save
+			true
 		else
-			flash.now[:error] = "That task doesn't exist."
+			flash.now[:error] = "Something went wrong trying to rename that task."
 			erb :flash, :layout => false
 		end
 	else
-		flash.now[:error] = "Please sign in to perform that action."
+		flash.now[:error] = "That task doesn't exist."
 		erb :flash, :layout => false
 	end
 end
 
 delete '/:id/delete' do
-	if logged_in?
-		user = current_user
-		task = user.tasks.get params[:id]
-		task.checks.destroy
-		task.destroy
+	login_required
+	user = current_user
+	task = user.tasks.get params[:id]
+	task.checks.destroy
+	task.destroy
 
-		flash[:notice] = "Task deleted."
-		true
-	end
+	flash[:notice] = "Task deleted."
+	true
 end
 
 not_found do
