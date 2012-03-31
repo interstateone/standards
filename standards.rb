@@ -181,7 +181,7 @@ helpers do
 		@user = user
 		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
 		Pony.mail({
-			:to => settings.email_target,
+			:to => settings.email_target || user.email,
 			:subject => "Confirm your Standards account",
 			:via => :smtp,
 			:via_options => {
