@@ -4,15 +4,16 @@ require 'yaml'
 
 SITE_TITLE = "Standards"
 
+use Rack::Session::Cookie, :expire_after => 2592000
+set :session_secret, ENV['SESSION_KEY'] || settings.session_secret
+set :environment, ENV['RACK_ENV']
+
 configure :development do
 	yaml = YAML.load_file("config.yaml")
 	yaml.each_pair do |key, value|
 		set(key.to_sym, value)
 	end
 end
-
-use Rack::Session::Cookie, :expire_after => 2592000
-set :session_secret, ENV['SESSION_KEY'] || settings.session_secret
 
 DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://" + settings.db_user + ":" + settings.db_password + "@" + settings.db_host + "/" + settings.db_name)
 
