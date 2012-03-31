@@ -1,7 +1,8 @@
 Bundler.require(:default, :test)
+require_relative '../standards.rb'
+
 set :environment, :test
 set :delivery_method, :test
-require_relative '../standards.rb'
 
 module RSpecMixin
   include Rack::Test::Methods
