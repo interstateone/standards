@@ -4223,6 +4223,10 @@ p.purpose {
     margin-left: 160px;
   }
 }
+.footer {
+  border-top: 1px solid #eeeeee;
+  padding-top: 2%;
+}
 .pull-right {
   float: right;
 }
