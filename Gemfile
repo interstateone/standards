@@ -4,6 +4,10 @@ source "https://rubygems.org"
 # gem "rails"
 gem "sinatra"
 gem "datamapper", :require => "data_mapper"
+gem 'dm-core'
+gem 'dm-validations'
+gem 'dm-aggregates'
+gem 'dm-pager'
 gem 'dm-postgres-adapter'
 gem "shotgun"
 gem "activesupport", :require => "active_support"
@@ -11,7 +15,7 @@ gem "bcrypt-ruby", :require => "bcrypt"
 gem "resolv-ipv6favor", :require => "resolv"
 gem "sinatra-flash", :require => "sinatra/flash"
 gem 'pony'
-require 'yaml'
+gem 'bowtie'
 
 group :test do
 	gem 'rack-test', :require => 'rack/test'

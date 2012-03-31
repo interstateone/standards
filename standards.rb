@@ -1,9 +1,17 @@
 require 'bundler/setup'
 Bundler.require(:default)
+require 'yaml'
 
 SITE_TITLE = "Standards"
 
 set :environment, :development
+
+configure :development do
+	yaml = YAML.load_file("config.yaml")[:development]
+	yaml.each_pair do |key, value|
+		set(key.to_sym, value)
+	end
+end
 
 use Rack::Session::Cookie, :expire_after => 2592000
 set :session_secret, ENV['SESSION_KEY'] || settings.session_secret
