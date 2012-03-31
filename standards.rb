@@ -152,7 +152,7 @@ helpers do
 		if current_user != nil
 			return true
 		else
-			session[:return_to] = request.url
+			session[:return_to] = request.fullpath
 			redirect '/login'
 			return false
 		end
@@ -398,6 +398,7 @@ post '/reset/?' do
 	user = User.first :password_reset_key => params[:key]
 	if !user.nil?
 		user.password = params[:password]
+		user.password_reset_key = nil
 		user.save
 		session[:id] = user.id
 		flash[:notice] = "Great! You're good to go."
