@@ -140,11 +140,8 @@ helpers do
 	end
 
 	def current_user
-		if session[:id]
-			User.get session[:id]
-		else
-			nil
-		end
+		user = User.get session[:id]
+		return user unless user.nil?
 	end
 
 	def login_required
