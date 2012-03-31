@@ -4,8 +4,6 @@ require 'yaml'
 
 SITE_TITLE = "Standards"
 
-set :environment, :development
-
 configure :development do
 	yaml = YAML.load_file("config.yaml")
 	yaml.each_pair do |key, value|
