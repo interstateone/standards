@@ -1,27 +1,26 @@
 require 'bundler/setup'
 Bundler.require(:default)
+require 'yaml'
 
 SITE_TITLE = "Standards"
 
-use Rack::Session::Cookie, :expire_after => 2592000
-set :session_secret, ENV['SESSION_KEY'] || "i_have_a_lovely_bunch_of_c0c0nu7s"
+set :environment, :development
+configure do
+    yaml = YAML.load_file("config/config.yaml")[settings.environment.to_s]
+    yaml.each_pair do |key, value|
+      set(key.to_sym, value)
+    end
+end
 
-DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://brandon:rb26dett@localhost/standards")
+use Rack::Session::Cookie, :expire_after => 2592000
+set :session_secret, ENV['SESSION_KEY'] || settings.session_secret
+
+DataMapper.setup(:default, ENV['DATABASE_URL'] || "postgres://" + settings.db_user + ":" + settings.db_password + "@" + settings.db_host + "/" + settings.db_name)
 
 # Configure test database
 configure :test do
 	DataMapper.setup(:default, "sqlite::memory:")
 end
-
-# Configure Padrino Mailer
-set :delivery_method, :smtp => {
-	:address              => "smtp.gmail.com",
-	:port                 => 587,
-	:user_name            => 'evans.brandon@gmail.com',
-	:password             => 'carsrcool',
-	:authentication       => :plain,
-	:enable_starttls_auto => true
-}
 
 class User
 	include DataMapper::Resource
@@ -188,14 +187,14 @@ helpers do
 	def send_confirmation_email(user)
 		@user = user
 		Pony.mail({
-			:to => 'evans.brandon@gmail.com',
+			:to => settings.email_target,
 			:via => :smtp,
 			:via_options => {
 				:address              => 'smtp.gmail.com',
 				:port                 => '587',
 				:enable_starttls_auto => true,
-				:user_name            => 'evans.brandon@gmail.com',
-				:password             => 'carsrcool',
+				:user_name            => settings.email_username,
+				:password             => settings.email_password,
     			:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
     			:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
 			},
@@ -309,10 +308,10 @@ get '/confirm/:key/?' do
 	if !user.nil?
 		if user.confirm!
 			session[:id] = user.id
-			flash[:notice] = "You're ready to get started!"
+			flash[:notice] = "Thanks! You're ready to get started."
 			redirect '/'
 		else
-			flash[:error] = "It seems like that email address has already been confirmed!"
+			flash[:error] = "It seems like that email address has already been confirmed."
 			redirect '/login'
 		end
 	else
