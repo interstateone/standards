@@ -533,3 +533,16 @@ AddCharset utf-8 .css .js .xml .json .rss .atom
 <IfModule php5_module>
   php_value session.cookie_httponly true
 </IfModule>
+
+###########################################################################
+#
+# Project-specific
+#
+###########################################################################
+
+# Remove trailing slash from URL
+
+#RewriteEngine On
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_URI} (.*)$
+#RewriteRule ^(.+)/$ /$1 [R=301,L]

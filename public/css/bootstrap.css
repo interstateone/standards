@@ -4172,6 +4172,9 @@ td.title p.purpose {
 .nav i {
   font-size: 150%;
 }
+.nav i.active {
+  color: #333333;
+}
 .rate {
   font-size: 200%;
 }
