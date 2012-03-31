@@ -39,6 +39,7 @@ class User
 	property :permission_level, Integer, :default => 1
 	property :confirmed_at, DateTime
 	property :confirmation_key, String, :default => lambda { |r,p| Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..10] }
+	property :timezone, String
 
 	timestamps :on
 
@@ -46,6 +47,10 @@ class User
 	validates_presence_of :email
 	validates_uniqueness_of :email
 	validates_presence_of :hashed_password, :message => "Password must be at least 8 characters with one number."
+
+	before :save do
+
+	end
 
 	def password=(pass)
 		if valid_password? pass
@@ -283,6 +288,7 @@ post "/signup/?" do
 		user.name = params[:name]
 		user.email = params[:email]
 		user.password = params[:password]
+		user.timezone = params[:timezone]
 		if user.save
 			# Flash confirmation info and redirect
 			send_confirmation_email user
@@ -335,6 +341,7 @@ post "/login/?" do
 		if session[:return_to]
 			redirect_url = session[:return_to]
 			session[:return_to] = false
+			Time.zone = user.timezone
 			redirect redirect_url
 		else
 			redirect '/'
