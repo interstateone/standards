@@ -186,7 +186,7 @@ helpers do
 
 	def send_confirmation_email(user)
 		@user = user
-		@url = settings.confirmation_callback_url
+		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
 		Pony.mail({
 			:to => settings.email_target,
 			:subject => "Confirm your Standards account",
@@ -195,8 +195,8 @@ helpers do
 				:address              => 'smtp.gmail.com',
 				:port                 => '587',
 				:enable_starttls_auto => true,
-				:user_name            => settings.email_username,
-				:password             => settings.email_password,
+				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
+				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
     			:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
     			:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
 			},
