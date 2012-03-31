@@ -281,6 +281,10 @@ get '/settings/?' do
 	erb :settings
 end
 
+get '/about/?' do
+	erb :about
+end
+
 get "/signup/?" do
   erb :signup
 end

@@ -4226,6 +4226,10 @@ p.purpose {
 .footer {
   border-top: 1px solid #eeeeee;
   padding-top: 2%;
+  margin-top: 5%;
+}
+p.about {
+  max-width: 700px;
 }
 .pull-right {
   float: right;
