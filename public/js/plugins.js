@@ -102,7 +102,6 @@ $(document).ready(function() {
 		e.preventDefault();
 		$(this).parents('form').attr("action", '/forgot');
 		$(this).parents('form').submit();
-		console.log("Click")
 	});
 
 	var editable = false;

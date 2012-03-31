@@ -39,7 +39,7 @@ class User
 	property :permission_level, Integer, :default => 1
 	property :confirmed_at, DateTime
 	property :confirmation_key, String, :default => lambda { |r,p| Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20] }
-	property :password_change_key, String
+	property :password_reset_key, String
 	property :timezone, String
 
 	timestamps :on
@@ -152,7 +152,7 @@ helpers do
 		if current_user != nil
 			return true
 		else
-			session[:return_to] = request.fullpath
+			session[:return_to] = request.url
 			redirect '/login'
 			return false
 		end
@@ -193,6 +193,11 @@ helpers do
 		string.chomp('.') if (string)
 	end
 
+	def pluralize(number, text)
+		return text.pluralize if number != 1
+		text
+	end
+
 	def send_confirmation_email(user)
 		@user = user
 		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
@@ -213,7 +218,7 @@ helpers do
 		})
 	end
 
-	def send_reset_email(user)
+	def send_password_reset_email(user)
 		@user = user
 		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
 		Pony.mail({
@@ -229,7 +234,7 @@ helpers do
     			:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
     			:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
 			},
-			:html_body => erb(:reset_email, :layout => false)
+			:html_body => erb(:reset_password_email, :layout => false)
 		})
 	end
 end
@@ -264,14 +269,19 @@ post '/new/?' do
 end
 
 get '/stats/?' do
-	if logged_in?
-		@user = current_user
-		@tasks = @user.tasks
-		@checks = @user.checks
-		erb :stats
-	else
-		erb :index
-	end
+	login_required
+	@user = current_user
+	@tasks = @user.tasks
+	@checks = @user.checks
+	erb :stats
+end
+
+get '/settings/?' do
+	login_required
+	@user = current_user
+	@task_count = @user.tasks.count
+	@check_count = @user.checks.count
+	erb :settings
 end
 
 get "/signup/?" do
@@ -343,7 +353,7 @@ post "/login/?" do
 		if session[:return_to]
 			redirect_url = session[:return_to]
 			session[:return_to] = false
-			Time.zone = user.timezone
+			# Time.zone = user.timezone
 			redirect redirect_url
 		else
 			redirect '/'
@@ -365,19 +375,19 @@ post "/forgot/?" do
 	else
 		user = User.first(:email => params[:email])
 		if !user.nil?
-			user.password_change_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
+			user.password_reset_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
 			user.save
-			send_reset_email user
-			flash[:notice] = "You've been sent a password change email to the address you provided, click the link inside to do so."
+			send_reset_password_email user
+			flash[:notice] = "You've been sent a password reset email to the address you provided, click the link inside to do so."
 			redirect "/"
 		end
 	end
 end
 
 get '/reset/:key/?' do
-	@user = User.first :password_change_key => params[:key]
+	@user = User.first :password_reset_key => params[:key]
 	if !@user.nil?
-		erb :reset
+		erb :reset_password
 	else
 		flash[:error] = "That is not a valid password reset link."
 		redirect '/'
@@ -385,7 +395,7 @@ get '/reset/:key/?' do
 end
 
 post '/reset/?' do
-	user = User.first :password_change_key => params[:key]
+	user = User.first :password_reset_key => params[:key]
 	if !user.nil?
 		user.password = params[:password]
 		user.save
@@ -393,12 +403,25 @@ post '/reset/?' do
 		flash[:notice] = "Great! You're good to go."
 		redirect '/'
 	else
-		flash[:error] = "That is not a valid password change link."
+		flash[:error] = "That is not a valid password reset link."
 		redirect '/'
 	end
 end
 
-# Login required for routes below #############################################
+get '/change/?' do
+	login_required
+	@user = current_user
+	erb :change_password
+end
+
+post '/change/?' do
+	login_required
+	user = current_user
+	user.password = params[:password]
+	user.save
+	flash[:notice] = "Your password has been changed!"
+	redirect '/'
+end
 
 get '/:id/?' do
 	login_required
