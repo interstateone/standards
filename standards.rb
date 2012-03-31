@@ -38,7 +38,7 @@ class User
 	property :salt, String
 	property :permission_level, Integer, :default => 1
 	property :confirmed_at, DateTime
-	property :confirmation_key, String, :default => lambda { |r,p| Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..10] }
+	property :confirmation_key, String, :default => lambda { |r,p| Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20] }
 	property :password_change_key, String
 	property :timezone, String
 
@@ -365,7 +365,7 @@ post "/forgot/?" do
 	else
 		user = User.first(:email => params[:email])
 		if !user.nil?
-			user.password_change_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..10]
+			user.password_change_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
 			user.save
 			send_reset_email user
 			flash[:notice] = "You've been sent a password change email to the address you provided, click the link inside to do so."
