@@ -186,8 +186,10 @@ helpers do
 
 	def send_confirmation_email(user)
 		@user = user
+		@url = settings.confirmation_callback_url
 		Pony.mail({
 			:to => settings.email_target,
+			:subject => "Confirm your Standards account",
 			:via => :smtp,
 			:via_options => {
 				:address              => 'smtp.gmail.com',
