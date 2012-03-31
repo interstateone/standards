@@ -147,7 +147,7 @@ helpers do
 			redirect '/login'
 			return false
 		end
-  end
+  	end
 
 	def valid_email?(email)
 		if email =~ /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/
@@ -181,7 +181,7 @@ helpers do
 	end
 
 	def remove_trailing_period(string)
-		str.chomp('.') if (str)
+		string.chomp('.') if (string)
 	end
 
 	def send_confirmation_email(user)
