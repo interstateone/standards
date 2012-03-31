@@ -39,6 +39,7 @@ class User
 	property :permission_level, Integer, :default => 1
 	property :confirmed_at, DateTime
 	property :confirmation_key, String, :default => lambda { |r,p| Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..10] }
+	property :password_change_key, String
 	property :timezone, String
 
 	timestamps :on
@@ -211,6 +212,26 @@ helpers do
 			:html_body => erb(:confirmation_email, :layout => false)
 		})
 	end
+
+	def send_reset_email(user)
+		@user = user
+		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
+		Pony.mail({
+			:to => user.email,
+			:subject => "Change your Standards account password",
+			:via => :smtp,
+			:via_options => {
+				:address              => 'smtp.gmail.com',
+				:port                 => '587',
+				:enable_starttls_auto => true,
+				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
+				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
+    			:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
+    			:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
+			},
+			:html_body => erb(:reset_email, :layout => false)
+		})
+	end
 end
 
 get '/' do
@@ -223,25 +244,6 @@ get '/' do
 		erb :index
 	end
 end
-
-# post '/' do
-# 	login_required
-# 	@user = User.first :email => session[:email]
-# 	@task = Task.new
-# 	@task.title = params[:tasktitle]
-# 	@task.purpose = params[:taskpurpose]
-# 	@task.user = @user
-# 	@task.save
-
-# 	erb :task_row_short, :layout => false
-# end
-
-# get '/edit' do
-# 	login_required
-# 	@user = current_user
-# 	@tasks = @user.tasks
-# 	erb :edit
-# end
 
 get '/new/?' do
 	login_required
@@ -358,12 +360,45 @@ end
 
 post "/forgot/?" do
 	if !valid_email? params[:email]
-		flash.now[:error] = "Please enter an email address."
-		erb :login
+		flash[:error] = "Please enter the email address you signed up with."
+		redirect '/login'
 	else
-
+		user = User.first(:email => params[:email])
+		if !user.nil?
+			user.password_change_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..10]
+			user.save
+			send_reset_email user
+			flash[:notice] = "You've been sent a password change email to the address you provided, click the link inside to do so."
+			redirect "/"
+		end
 	end
 end
+
+get '/reset/:key/?' do
+	@user = User.first :password_change_key => params[:key]
+	if !@user.nil?
+		erb :reset
+	else
+		flash[:error] = "That is not a valid password reset link."
+		redirect '/'
+	end
+end
+
+post '/reset/?' do
+	user = User.first :password_change_key => params[:key]
+	if !user.nil?
+		user.password = params[:password]
+		user.save
+		session[:id] = user.id
+		flash[:notice] = "Great! You're good to go."
+		redirect '/'
+	else
+		flash[:error] = "That is not a valid password change link."
+		redirect '/'
+	end
+end
+
+# Login required for routes below #############################################
 
 get '/:id/?' do
 	login_required
@@ -423,6 +458,8 @@ delete '/:id/delete' do
 	flash[:notice] = "Task deleted."
 	true
 end
+
+# Error routes #################################################################
 
 not_found do
 	status 404

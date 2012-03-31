@@ -1,0 +1,28 @@
+<form class="form-horizontal" method="post" action="/reset" name="reset">
+	<fieldset>
+		<legend>Change password</legend>
+		<div class="control-group">
+			<label class="control-label" for="name">Name</label>
+			<div class="controls">
+				<input type="text" class="input-xlarge disabled" id="name" name="name" placeholder="" value="<%= @user.name %>" disabled>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="email">Email</label>
+			<div class="controls">
+				<input type="text" class="input-xlarge disabled" id="email" name="email" placeholder="" value="<%= @user.email %>" disabled>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="password">Password</label>
+			<div class="controls">
+				<input type="password" class="input-xlarge" id="password" name="password" placeholder="">
+				<span class='help-block'>Minimum 8 characters with a number, please.</span>
+			</div>
+		</div>
+		<input type="hidden" id="key" name="key" value="<%= @user.password_change_key %>">
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary">Change password</button>
+		</div>
+	</fieldset>
+</form>

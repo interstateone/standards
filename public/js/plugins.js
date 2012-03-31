@@ -97,8 +97,12 @@ $(document).ready(function() {
 		});
 	});
 
+	// Let forgot password button make post to alternate route
 	$('button.forgot').click(function(e) {
 		e.preventDefault();
+		$(this).parents('form').attr("action", '/forgot');
+		$(this).parents('form').submit();
+		console.log("Click")
 	});
 
 	var editable = false;
