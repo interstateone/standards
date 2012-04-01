@@ -1,6 +1,7 @@
 require 'bundler/setup'
 Bundler.require(:default)
 require 'yaml'
+require 'redis'
 
 SITE_TITLE = "Standards"
 
@@ -21,8 +22,10 @@ configure :development do
 	set :session_secret, settings.session_secret
 end
 
-configure :test do
-	DataMapper.setup(:default, "sqlite::memory:")
+configure do
+	uri = URI.parse(ENV["REDISTOGO_URL"] || "redis://redistogo:442f5dade51e21393456f3b11017045f@herring.redistogo.com:9189/")
+	REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+	Resque.redis = REDIS
 end
 
 class User
@@ -134,9 +137,99 @@ end
 
 DataMapper.finalize.auto_upgrade!
 
+module HerokuResqueAutoScale
+	module Scaler
+		class << self
+			@@heroku = Heroku::Client.new(ENV['HEROKU_USER'], ENV['HEROKU_PASS'])
+
+			def workers
+				@@heroku.ps(ENV['HEROKU_APP']).count { |a| a["process"] =~ /worker/ }
+			end
+
+			def workers=(qty)
+				@@heroku.ps_scale(ENV['HEROKU_APP'], :type=>'worker', :qty=>qty)
+			end
+
+			def job_count
+				Resque.info[:pending].to_i
+			end
+		end
+	end
+
+	def after_perform_scale_down(*args)
+		# Nothing fancy, just shut everything down if we have no jobs
+		Scaler.workers = 0 if Scaler.job_count.zero?
+	end
+
+	def after_enqueue_scale_up(*args)
+		[
+			{
+				:workers => 1, # This many workers
+				:job_count => 1 # For this many jobs or more, until the next level
+			},
+			{
+				:workers => 2,
+				:job_count => 15
+			},
+			{
+				:workers => 3,
+				:job_count => 25
+			},
+			{
+				:workers => 4,
+				:job_count => 40
+			},
+			{
+				:workers => 5,
+				:job_count => 60
+			}
+		].reverse_each do |scale_info|
+		# Run backwards so it gets set to the highest value first
+		# Otherwise if there were 70 jobs, it would get set to 1, then 2, then 3, etc
+
+		# If we have a job count greater than or equal to the job limit for this scale info
+		if Scaler.job_count >= scale_info[:job_count]
+			# Set the number of workers unless they are already set to a level we want. Don't scale down here!
+			if Scaler.workers <= scale_info[:workers]
+				Scaler.workers = scale_info[:workers]
+			end
+			break # We've set or ensured that the worker count is high enough
+		end
+	end
+end
+end
+
+module ConfirmEmailJob
+	# extend HerokuResqueAutoScale
+
+	@queue = :confirmation_email
+
+	def self.perform(id)
+    	@user = User.get id
+		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
+		template  = File.read 'views/confirmation_email.erb'
+		Pony.mail({
+			:to => @user.email,
+			:subject => "Confirm your Standards account",
+			:via => :smtp,
+			:via_options => {
+				:address              => 'smtp.gmail.com',
+				:port                 => '587',
+				:enable_starttls_auto => true,
+				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
+				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
+				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
+				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
+			},
+			:html_body => ERB.new(template).result(binding)
+		}) unless :environment == :test
+	end
+end
+
 helpers do
 	def logged_in?
-		!!session[:id]
+		user = User.get session[:id]
+		!user.nil?
 	end
 
 	def current_user
@@ -153,7 +246,7 @@ helpers do
 			redirect '/login'
 			return false
 		end
-  	end
+	end
 
 	def valid_email?(email)
 		if email =~ /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/
@@ -208,11 +301,11 @@ helpers do
 				:enable_starttls_auto => true,
 				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
 				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
-    			:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
-    			:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
+				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
+				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
 			},
 			:html_body => erb(:confirmation_email, :layout => false)
-		})
+		}) unless :environment == :test
 	end
 
 	def send_password_reset_email(user)
@@ -228,11 +321,56 @@ helpers do
 				:enable_starttls_auto => true,
 				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
 				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
-    			:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
-    			:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
+				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
+				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
 			},
 			:html_body => erb(:reset_password_email, :layout => false)
-		})
+		}) unless :environment == :test
+	end
+
+	# Next two functions are not mine, probably easier than using ActiveSupport for it though
+	# From: https://github.com/toolmantim/bananajour/blob/master/lib/bananajour/helpers.rb
+	# Credit to https://github.com/toolmantim
+	def distance_of_time_in_words(from_time, to_time = 0, include_seconds = false)
+		from_time = from_time.to_time if from_time.respond_to?(:to_time)
+		to_time = to_time.to_time if to_time.respond_to?(:to_time)
+		distance_in_minutes = (((to_time - from_time).abs)/60).round
+		distance_in_seconds = ((to_time - from_time).abs).round
+
+		case distance_in_minutes
+		when 0..1
+			return (distance_in_minutes == 0) ? 'less than a minute' : '1 minute' unless include_seconds
+			case distance_in_seconds
+			when 0..4   then 'less than 5 seconds'
+			when 5..9   then 'less than 10 seconds'
+			when 10..19 then 'less than 20 seconds'
+			when 20..39 then 'half a minute'
+			when 40..59 then 'less than a minute'
+			else             '1 minute'
+			end
+
+		when 2..44           then "#{distance_in_minutes} minutes"
+		when 45..89          then 'about 1 hour'
+		when 90..1439        then "about #{(distance_in_minutes.to_f / 60.0).round} hours"
+		when 1440..2879      then '1 day'
+		when 2880..43199     then "#{(distance_in_minutes / 1440).round} days"
+		when 43200..86399    then 'about 1 month'
+		when 86400..525599   then "#{(distance_in_minutes / 43200).round} months"
+		when 525600..1051199 then 'about 1 year'
+		else                      "over #{(distance_in_minutes / 525600).round} years"
+		end
+	end
+
+	# Like distance_of_time_in_words, but where <tt>to_time</tt> is fixed to <tt>Time.now</tt>.
+	#
+	# ==== Examples
+	#   time_ago_in_words(3.minutes.from_now)       # => 3 minutes
+	#   time_ago_in_words(Time.now - 15.hours)      # => 15 hours
+	#   time_ago_in_words(Time.now)                 # => less than a minute
+	#
+	#   from_time = Time.now - 3.days - 14.minutes - 25.seconds     # => 3 days
+	def time_ago_in_words(from_time, include_seconds = false)
+		distance_of_time_in_words(from_time, Time.now, include_seconds)
 	end
 end
 
@@ -293,8 +431,8 @@ post "/signup/?" do
 	# Validate the fields first
 	# Don't worry about existing emails, we'll handle that later
 	if !valid_email? params[:email]
-		flash.now[:error] = "Please enter a valid email address."
-		erb :signup
+		flash[:error] = "Please enter a valid email address."
+		redirect '/signup'
 	else
 		# Try creating a new user
 		user = User.new
@@ -303,15 +441,17 @@ post "/signup/?" do
 		user.password = params[:password]
 		user.timezone = params[:timezone]
 		if user.save
+			# Send confirmation job through Resque
+			Resque.enqueue(ConfirmEmailJob, user.id)
+
 			# Flash confirmation info and redirect
-			send_confirmation_email user
 			flash[:notice] = "You've been sent a confirmation email to the address you provided, click the link inside to get started."
 			redirect "/"
 		else
 			user.errors.each do |e|
-				flash.now[:error] = e
+				flash[:error] = e
 			end
-			erb :signup
+			redirect '/signup'
 			# # If the user already exists, try logging them in
 			# if user = User.authenticate(params[:email], params[:password])
 			# 	session[:email] = params[:email]

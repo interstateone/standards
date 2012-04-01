@@ -10,12 +10,13 @@ gem 'dm-aggregates'
 gem 'dm-pager'
 gem 'dm-postgres-adapter'
 gem "shotgun"
-gem "activesupport", :require => "active_support"
 gem "bcrypt-ruby", :require => "bcrypt"
 gem "resolv-ipv6favor", :require => "resolv"
 gem "sinatra-flash", :require => "sinatra/flash"
 gem 'pony'
 gem 'bowtie'
+gem 'resque', '>= 1.10.0'
+gem 'heroku'
 
 group :test do
 	gem 'rack-test', :require => 'rack/test'
@@ -24,7 +25,3 @@ group :test do
 	gem 'growl'
 	gem 'dm-sqlite-adapter'
 end
-
-source "http://gems.github.com/"
-
-gem "googlecharts"

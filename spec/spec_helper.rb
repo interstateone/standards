@@ -1,14 +1,19 @@
 Bundler.require(:default, :test)
-require_relative '../standards.rb'
 
 set :environment, :test
-set :delivery_method, :test
+
+configure :test do
+	DataMapper.setup(:default, "sqlite::memory:")
+end
+
+require_relative '../standards.rb'
 
 module RSpecMixin
   include Rack::Test::Methods
   def app
   	Sinatra::Application
   end
+  set :views, settings.root + '/../views'
 end
 
 # Reset the database for each test

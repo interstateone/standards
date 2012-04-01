@@ -1,19 +1,22 @@
 <h2><%= @task.title.capitalize %></h2>
 <p>Remember! You're doing this because <%= switch_pronouns @task.purpose unless @task.purpose.empty? %>.</p>
 
-<% count = @task.checks.count %>
-<% if count > 0 %>
-	<p>You've done this <%= count %> <%= count == 1 ? "time" : "times" %> since <%= @task.created_on.strftime("%B %e, %Y") %>:</p>
-<% else %>
-	<p>You haven't done this since you started on <%= @task.created_on.strftime("%B %e, %Y") %>.</p>
-<% end %>
-<ul id="checks">
-	<% @task.checks(:order => :date.asc).each do |check| %>
-		<li><%= check.date.strftime("%B %e, %Y") %></li>
+<div class="well">
+	<% count = @task.checks.count %>
+	<% if count > 0 %>
+		<p>You've done this <%= count %> <%= count == 1 ? "time" : "times" %> since you started <%= time_ago_in_words @task.created_on.to_time %> ago (<%= @task.created_on.strftime("%B %e, %Y") %>):</p>
+	<% else %>
+		<p>You haven't done this since you started <%= time_ago_in_words @task.created_on.to_time %> ago (<%= @task.created_on.strftime("%B %e, %Y") %>).</p>
 	<% end %>
-</ul><!-- /checks -->
 
-<p>You're currently sitting at a <%= (count / (Date.today - @task.created_on + 1)).ceil %>% completion rate.</p>
+	<ul id="checks">
+		<% @task.checks(:order => :date.asc).each do |check| %>
+		<li><%= check.date.strftime("%B %e, %Y") %></li>
+		<% end %>
+	</ul><!-- /checks -->
+
+	<p>You're currently sitting at a <%= (count * 100 / (Date.today - @task.created_on + 1)).ceil %>% completion rate.</p>
+</div><!-- / -->
 
 <a href="/" title="" class="btn btn-standard">Back</a>
 <a class="delete btn btn-danger pull-right">Delete</a>
