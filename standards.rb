@@ -9,6 +9,9 @@ configure :production do
 	DataMapper.setup(:default, ENV['DATABASE_URL'])
 	use Rack::Session::Cookie, :expire_after => 2592000
 	set :session_secret, ENV['SESSION_KEY']
+
+	uri = URI.parse(ENV["REDISTOGO_URL"] || "redis://redistogo:442f5dade51e21393456f3b11017045f@herring.redistogo.com:9189/")
+	REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 end
 
 configure :development do
@@ -20,11 +23,11 @@ configure :development do
 	DataMapper.setup(:default, "postgres://" + settings.db_user + ":" + settings.db_password + "@" + settings.db_host + "/" + settings.db_name)
 	use Rack::Session::Cookie, :expire_after => 2592000
 	set :session_secret, settings.session_secret
+
+	REDIS = Redis.new()
 end
 
 configure do
-	uri = URI.parse(ENV["REDISTOGO_URL"] || "redis://redistogo:442f5dade51e21393456f3b11017045f@herring.redistogo.com:9189/")
-	REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 	Resque.redis = REDIS
 end
 
