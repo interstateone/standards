@@ -143,13 +143,13 @@ module HerokuResqueAutoScale
 			@@heroku = Heroku::Client.new(ENV['HEROKU_USER'], ENV['HEROKU_PASS'])
 
 			def workers
-				if (:environment == :production)
+				if production?
 					@@heroku.ps(ENV['HEROKU_APP']).count { |a| a["process"] =~ /worker/ }
 				end
 			end
 
 			def workers=(qty)
-				if (:environment == :production)
+				if production?
 					@@heroku.ps_scale(ENV['HEROKU_APP'], :type=>'worker', :qty=>qty)
 				end
 			end
