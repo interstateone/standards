@@ -379,6 +379,12 @@ helpers do
 	def time_ago_in_words(from_time, include_seconds = false)
 		distance_of_time_in_words(from_time, Time.now, include_seconds)
 	end
+
+	def link_to(url,text=url,opts={})
+		attributes = ""
+		opts.each { |key,value| attributes << key.to_s << "=\"" << value << "\" "}
+		"<a href=\"#{url}\" #{attributes}>#{text}</a>"
+	end
 end
 
 get '/' do
