@@ -475,17 +475,6 @@ post "/signup/?" do
 				flash[:error] = e
 			end
 			redirect '/signup'
-			# # If the user already exists, try logging them in
-			# if user = User.authenticate(params[:email], params[:password])
-			# 	session[:email] = params[:email]
-			# 	if session[:return_to]
-			# 		redirect_url = session[:return_to]
-			# 		session[:return_to] = false
-			# 		redirect redirect_url
-			# 	else
-			# 		redirect '/'
-			# 	end
-			# end
 		end
 	end
 end
