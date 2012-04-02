@@ -204,7 +204,7 @@ end
 end
 
 module ConfirmEmailJob
-	# extend HerokuResqueAutoScale
+	extend HerokuResqueAutoScale
 
 	@queue = :confirmation_email
 
