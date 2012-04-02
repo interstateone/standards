@@ -7,6 +7,13 @@ $(document).ready(function() {
 		window.location = $(this).attr("href");
 	});
 
+	// Subsitutes tap events for click events in supported browsers
+	if ('ontouchend' in window) {
+        $(document).delegate('body', 'click', function(e) {
+            $(e.target).trigger('tap');
+        });
+    }
+
 	// Name validator
 	$('input#name').keyup(function () {
 		if ($(this).val().length > 1) {
