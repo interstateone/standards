@@ -4,6 +4,8 @@ set :environment, :test
 
 configure :test do
 	DataMapper.setup(:default, "sqlite::memory:")
+	REDIS = Redis.new()
+	use Rack::Session::Cookie
 end
 
 require_relative '../standards.rb'

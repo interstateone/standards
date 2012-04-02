@@ -39,13 +39,6 @@ describe 'A user' do
 		@user.save.should == true
 	end
 
-	it 'should be invalid without a password' do
-		@user.attributes = valid_user_attributes.except(:password)
-		@user.save.should == false
-		@user.password = valid_user_attributes[:password]
-		@user.save.should == true
-	end
-
 	it 'should be invalid with a password less than 8 characters long' do
 		@user.attributes = valid_user_attributes.except(:password)
 		@user.save.should == false
@@ -64,10 +57,42 @@ describe 'A user' do
 		@user.save.should == true
 	end
 
-	it 'should not be able to log in until confirmed'
-	it 'should only be able to be confirmed once'
+	it 'should be confirmed after visiting the confirmation link' do
+		@user.attributes = valid_user_attributes
+		@user.save.should == true
+		get "/confirm/#{@user.confirmation_key}"
+		follow_redirect!
+		User.get(1).confirmation_key.should == nil
+		User.get(1).confirmed?.should == true
+	end
+
+	it 'should not be able to log in if not confirmed' do
+		@user.attributes = valid_user_attributes
+		@user.save.should == true
+		post "/login", valid_user_attributes
+		last_response.body.should_not include 'Logged in as'
+		get "/confirm/#{@user.confirmation_key}"
+		follow_redirect!
+		User.get(1).confirmation_key.should == nil
+		User.get(1).confirmed?.should == true
+		last_response.should be_ok
+		last_response.body.include? "Logged in as"
+	end
+
+	it 'should only be able to be confirmed once' do
+		@user.attributes = valid_user_attributes
+		@user.save.should == true
+		get "/confirm/#{@user.confirmation_key}"
+		follow_redirect!
+		User.get(1).confirmation_key.should == nil
+		last_response.should be_ok
+		last_response.body.include? "Logged in as"
+		get "/confirm/#{@user.confirmation_key}"
+		follow_redirect!
+		last_response.body.include? 'already been confirmed'
+	end
+
 	it 'should receive a confirmation email when created'
-	it 'should not be confirmed unless the link has been visited'
 end
 
 describe 'A task' do
@@ -120,10 +145,17 @@ describe 'when logged in as a user' do
 	before :each do
 		@user = User.new valid_user_attributes
 		@user.save
+		get "/confirm/#{@user.confirmation_key}"
+		follow_redirect!
 		post "/login", valid_user_attributes
 	end
 
 	it 'should show welcome message or list tasks' do
+		get '/'
+		last_response.body.include? "Add a task"
+	end
+
+	it 'should allow making a new task' do
 		get '/'
 		last_response.body.include? "Add a task"
 		@task = Task.create :title => 'Ride a bike', :user => @user
@@ -131,13 +163,47 @@ describe 'when logged in as a user' do
 		last_response.body.include? "Ride a bike"
 	end
 
-	it 'should allow making a new task'
-	it 'should allow visiting settings'
+	it 'should allow deleting a task' do
+		@task = Task.create :title => 'Ride a bike', :user => @user
+		delete '/1/'
+		# This is an AJAX request...
+		last_response.body.include? 'Task deleted'
+	end
 end
 
-describe 'when not logged in' do
-	it 'should only show the index'
-	it 'should not allow viewing a task'
+describe 'Unauthorized users' do
+	it_should_behave_like 'Standards'
+	include UserSpecHelper
+
+	before :each do
+		@user = User.new valid_user_attributes
+		@user.save
+		get "/confirm/#{@user.confirmation_key}"
+		follow_redirect!
+		get "/logout"
+		follow_redirect!
+	end
+
+	it 'should not be able to add tasks' do
+		get '/new'
+		last_response.body.should_not include 'New task'
+	end
+
+	it 'should not be able to view a task' do
+		@task = Task.create :title => 'Ride a bike', :user => @user
+		get '/1/'
+		last_response.body.should_not include 'Ride a bike'
+	end
+
+	it 'should not be able to view stats' do
+		get '/stats'
+		last_response.body.should_not include 'Stats'
+	end
+
+	it 'should not be able to view settings' do
+		get '/settings'
+		last_response.body.should_not include 'Settings'
+	end
 end
 
 # describe 'task pages' do

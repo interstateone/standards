@@ -2,6 +2,9 @@ require 'bundler/setup'
 Bundler.require(:default)
 require 'yaml'
 require 'redis'
+require 'active_support/core_ext/time/zones'
+require 'active_support/time_with_zone'
+require 'active_support/core_ext/time/conversions'
 
 SITE_TITLE = "Standards"
 
@@ -80,6 +83,7 @@ class User
 			self.confirmation_key = nil
 			self.confirmed_at = Time.now.utc
 			self.save
+			true
 		else
 			false
 		end
@@ -387,6 +391,12 @@ helpers do
 	end
 end
 
+before do
+	if logged_in?
+		Time.zone = current_user.timezone
+	end
+end
+
 get '/' do
 	if logged_in?
 		@user = current_user
@@ -507,7 +517,6 @@ post "/login/?" do
 		if session[:return_to]
 			redirect_url = session[:return_to]
 			session[:return_to] = false
-			# Time.zone = user.timezone
 			redirect redirect_url
 		else
 			redirect '/'
@@ -626,7 +635,7 @@ post '/:id/rename/?' do
 	end
 end
 
-delete '/:id/delete' do
+delete '/:id' do
 	login_required
 	user = current_user
 	task = user.tasks.get params[:id]
