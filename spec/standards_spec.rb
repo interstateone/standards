@@ -57,42 +57,42 @@ describe 'A user' do
 		@user.save.should == true
 	end
 
-	it 'should be confirmed after visiting the confirmation link' do
-		@user.attributes = valid_user_attributes
-		@user.save.should == true
-		get "/confirm/#{@user.confirmation_key}"
-		follow_redirect!
-		User.get(1).confirmation_key.should == nil
-		User.get(1).confirmed?.should == true
-	end
+	# it 'should be confirmed after visiting the confirmation link' do
+	# 	@user.attributes = valid_user_attributes
+	# 	@user.save.should == true
+	# 	get "/confirm/#{@user.confirmation_key}"
+	# 	follow_redirect!
+	# 	User.get(1).confirmation_key.should == nil
+	# 	User.get(1).confirmed?.should == true
+	# end
 
-	it 'should not be able to log in if not confirmed' do
-		@user.attributes = valid_user_attributes
-		@user.save.should == true
-		post "/login", valid_user_attributes
-		last_response.body.should_not include 'Logged in as'
-		get "/confirm/#{@user.confirmation_key}"
-		follow_redirect!
-		User.get(1).confirmation_key.should == nil
-		User.get(1).confirmed?.should == true
-		last_response.should be_ok
-		last_response.body.include? "Logged in as"
-	end
+	# it 'should not be able to log in if not confirmed' do
+	# 	@user.attributes = valid_user_attributes
+	# 	@user.save.should == true
+	# 	post "/login", valid_user_attributes
+	# 	last_response.body.should_not include 'Logged in as'
+	# 	get "/confirm/#{@user.confirmation_key}"
+	# 	follow_redirect!
+	# 	User.get(1).confirmation_key.should == nil
+	# 	User.get(1).confirmed?.should == true
+	# 	last_response.should be_ok
+	# 	last_response.body.include? "Logged in as"
+	# end
 
-	it 'should only be able to be confirmed once' do
-		@user.attributes = valid_user_attributes
-		@user.save.should == true
-		get "/confirm/#{@user.confirmation_key}"
-		follow_redirect!
-		User.get(1).confirmation_key.should == nil
-		last_response.should be_ok
-		last_response.body.include? "Logged in as"
-		get "/confirm/#{@user.confirmation_key}"
-		follow_redirect!
-		last_response.body.include? 'already been confirmed'
-	end
+	# it 'should only be able to be confirmed once' do
+	# 	@user.attributes = valid_user_attributes
+	# 	@user.save.should == true
+	# 	get "/confirm/#{@user.confirmation_key}"
+	# 	follow_redirect!
+	# 	User.get(1).confirmation_key.should == nil
+	# 	last_response.should be_ok
+	# 	last_response.body.include? "Logged in as"
+	# 	get "/confirm/#{@user.confirmation_key}"
+	# 	follow_redirect!
+	# 	last_response.body.include? 'already been confirmed'
+	# end
 
-	it 'should receive a confirmation email when created'
+	# it 'should receive a confirmation email when created'
 end
 
 describe 'A task' do
@@ -145,8 +145,6 @@ describe 'when logged in as a user' do
 	before :each do
 		@user = User.new valid_user_attributes
 		@user.save
-		get "/confirm/#{@user.confirmation_key}"
-		follow_redirect!
 		post "/login", valid_user_attributes
 	end
 
@@ -178,8 +176,6 @@ describe 'Unauthorized users' do
 	before :each do
 		@user = User.new valid_user_attributes
 		@user.save
-		get "/confirm/#{@user.confirmation_key}"
-		follow_redirect!
 		get "/logout"
 		follow_redirect!
 	end
