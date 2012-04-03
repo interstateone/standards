@@ -412,11 +412,15 @@ end
 
 post '/change/?' do
 	login_required
-	user = current_user
-	user.password = params[:password]
-	user.save
-	flash[:notice] = "Your password has been changed!"
-	redirect '/'
+	if user = User.authenticate(current_user.email, params[:current_password])
+		user.password = params[:new_password]
+		user.save
+		flash[:notice] = "Great! Your password has been changed."
+		redirect '/'
+	else
+		flash[:error] = "That password was incorrect."
+		redirect '/change'
+	end
 end
 
 get '/:id/?' do
