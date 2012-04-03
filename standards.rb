@@ -24,6 +24,11 @@ configure :development do
 	set :session_secret, settings.session_secret
 end
 
+IronWorker.configure do |config|
+	config.token = ENV['IRON_WORKER_TOKEN']
+	config.project_id = ENV['IRON_WORKER_PROJECT_ID']
+end
+
 class User
 	include DataMapper::Resource
 
@@ -116,6 +121,34 @@ end
 
 DataMapper.finalize.auto_upgrade!
 
+class EmailWorker < IronWorker::Base
+
+	attr_accessor :username, :password, :to, :from, :subject, :body
+
+	def run
+		send_mail
+	end
+
+	def send_mail
+		Pony.mail({
+			:to => to,
+			:from => from,
+			:subject => subject,
+			:via => :smtp,
+			:via_options => {
+				:address              => 'smtp.gmail.com',
+				:port                 => '587',
+				:enable_starttls_auto => true,
+				:user_name            => username,
+				:password             => password,
+				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
+				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
+			},
+			:html_body => body
+		}) unless test?
+	end
+end
+
 helpers do
 	def logged_in?
 		user = User.get session[:id]
@@ -176,26 +209,6 @@ helpers do
 	def pluralize(number, text)
 		return text.pluralize if number != 1
 		text
-	end
-
-	def send_password_reset_email(user)
-		@user = user
-		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
-		Pony.mail({
-			:to => user.email,
-			:subject => "Change your Standards account password",
-			:via => :smtp,
-			:via_options => {
-				:address              => 'smtp.gmail.com',
-				:port                 => '587',
-				:enable_starttls_auto => true,
-				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
-				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
-				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
-				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
-			},
-			:html_body => erb(:reset_password_email, :layout => false)
-		}) unless :environment == :test
 	end
 
 	# Next two functions are not mine, probably easier than using ActiveSupport for it though
@@ -323,9 +336,9 @@ post "/signup/?" do
 		user.password = params[:password]
 		user.timezone = params[:timezone]
 		if user.save
-			# Flash thank you and redirect
+			# Flash thank you, sign in and redirect
 			session[:id] = user.id
-			flash[:notice] = "Thanks for joining!"
+			flash[:notice] = "Thanks for signing up!"
 			redirect "/"
 		else
 			user.errors.each do |e|
@@ -367,9 +380,26 @@ post "/forgot/?" do
 	else
 		user = User.first(:email => params[:email])
 		if !user.nil?
-			user.password_reset_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
+			@key = user.password_reset_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
 			user.save
-			send_reset_password_email user
+
+			@name = user.name
+			@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
+
+			resetWorker = EmailWorker.new
+			resetWorker.username = ENV['EMAIL_USERNAME'] || settings.email_username
+			resetWorker.password = ENV['EMAIL_PASSWORD'] || settings.email_password
+			resetWorker.to = user.email
+			resetWorker.from = ENV['EMAIL_USERNAME'] || settings.email_username
+			resetWorker.subject = "Reset your Standards password"
+			resetWorker.body = erb :reset_password_email, :layout => false
+
+			if production?
+				resetWorker.run
+			else
+				resetWorker.run_local
+			end
+
 			flash[:notice] = "You've been sent a password reset email to the address you provided, click the link inside to do so."
 			redirect "/"
 		end
@@ -393,7 +423,7 @@ post '/reset/?' do
 		user.password_reset_key = nil
 		user.save
 		session[:id] = user.id
-		flash[:notice] = "Great! You're good to go."
+		flash[:notice] = "Great! You're password has been changed."
 		redirect '/'
 	else
 		flash[:error] = "That is not a valid password reset link."
