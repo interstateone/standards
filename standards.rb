@@ -1,5 +1,5 @@
 require 'bundler/setup'
-Bundler.require(:default)
+Bundler.require()
 require 'yaml'
 require 'active_support/core_ext/time/zones'
 require 'active_support/time_with_zone'

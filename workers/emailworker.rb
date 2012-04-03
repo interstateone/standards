@@ -1,7 +1,7 @@
-require 'pony'
-require 'iron_worker'
-
 class EmailWorker < IronWorker::Base
+
+	merge_gem 'iron_worker'
+	merge_gem 'pony'
 
 	attr_accessor :username, :password, :to, :from, :subject, :body
 
