@@ -25,6 +25,6 @@ class EmailWorker < IronWorker::Base
 				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
 			},
 			:html_body => body
-		}) unless test?
+		})
 	end
 end
