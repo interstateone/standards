@@ -395,7 +395,7 @@ post "/forgot/?" do
 			resetWorker.body = erb :reset_password_email, :layout => false
 
 			if production?
-				resetWorker.run
+				resetWorker.queue
 			else
 				resetWorker.run_local
 			end
