@@ -4,6 +4,7 @@ require 'yaml'
 require 'active_support/core_ext/time/zones'
 require 'active_support/time_with_zone'
 require 'active_support/core_ext/time/conversions'
+require_relative 'workers/emailworker'
 
 SITE_TITLE = "Standards"
 
@@ -120,34 +121,6 @@ class Check
 end
 
 DataMapper.finalize.auto_upgrade!
-
-class EmailWorker < IronWorker::Base
-
-	attr_accessor :username, :password, :to, :from, :subject, :body
-
-	def run
-		send_mail
-	end
-
-	def send_mail
-		Pony.mail({
-			:to => to,
-			:from => from,
-			:subject => subject,
-			:via => :smtp,
-			:via_options => {
-				:address              => 'smtp.gmail.com',
-				:port                 => '587',
-				:enable_starttls_auto => true,
-				:user_name            => username,
-				:password             => password,
-				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
-				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
-			},
-			:html_body => body
-		}) unless test?
-	end
-end
 
 helpers do
 	def logged_in?
