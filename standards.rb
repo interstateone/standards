@@ -1,7 +1,6 @@
 require 'bundler/setup'
 Bundler.require(:default)
 require 'yaml'
-require 'redis'
 require 'active_support/core_ext/time/zones'
 require 'active_support/time_with_zone'
 require 'active_support/core_ext/time/conversions'
@@ -12,9 +11,6 @@ configure :production do
 	DataMapper.setup(:default, ENV['DATABASE_URL'])
 	use Rack::Session::Cookie, :expire_after => 2592000
 	set :session_secret, ENV['SESSION_KEY']
-
-	uri = URI.parse(ENV["REDISTOGO_URL"] || "redis://redistogo:442f5dade51e21393456f3b11017045f@herring.redistogo.com:9189/")
-	REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 end
 
 configure :development do
@@ -26,12 +22,6 @@ configure :development do
 	DataMapper.setup(:default, "postgres://" + settings.db_user + ":" + settings.db_password + "@" + settings.db_host + "/" + settings.db_name)
 	use Rack::Session::Cookie, :expire_after => 2592000
 	set :session_secret, settings.session_secret
-
-	REDIS = Redis.new()
-end
-
-configure do
-	Resque.redis = REDIS
 end
 
 class User
@@ -46,8 +36,6 @@ class User
 	property :hashed_password, String
 	property :salt, String
 	property :permission_level, Integer, :default => 1
-	property :confirmed_at, DateTime
-	property :confirmation_key, String, :default => lambda { |r,p| Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20] }
 	property :password_reset_key, String
 	property :timezone, String
 
@@ -74,25 +62,9 @@ class User
 		self.permission_level == -1 || self.id == 1
 	end
 
-	def confirmed?
-		!!confirmed_at
-	end
-
-	def confirm!
-		if !self.confirmed?
-			self.confirmation_key = nil
-			self.confirmed_at = Time.now.utc
-			self.save
-			true
-		else
-			false
-		end
-	end
-
 	def self.authenticate(email, pass)
 		user = first :email => email
 		return nil if user.nil?
-		return nil if !user.confirmed?
 		return user if User.encrypt(pass, user.salt) == user.hashed_password
 		nil
 	end
@@ -143,99 +115,6 @@ class Check
 end
 
 DataMapper.finalize.auto_upgrade!
-
-module HerokuResqueAutoScale
-	module Scaler
-		class << self
-			@@heroku = Heroku::Client.new(ENV['HEROKU_USER'], ENV['HEROKU_PASS'])
-
-			def workers
-				if production?
-					@@heroku.ps(ENV['HEROKU_APP']).count { |a| a["process"] =~ /worker/ }
-				end
-			end
-
-			def workers=(qty)
-				if production?
-					@@heroku.ps_scale(ENV['HEROKU_APP'], :type=>'worker', :qty=>qty)
-				end
-			end
-
-			def job_count
-				Resque.info[:pending].to_i
-			end
-		end
-	end
-
-	def after_perform_scale_down(*args)
-		# Nothing fancy, just shut everything down if we have no jobs
-		Scaler.workers = 0 if Scaler.job_count.zero?
-	end
-
-	def after_enqueue_scale_up(*args)
-		[
-			{
-				:workers => 1, # This many workers
-				:job_count => 1 # For this many jobs or more, until the next level
-			},
-			{
-				:workers => 2,
-				:job_count => 15
-			},
-			{
-				:workers => 3,
-				:job_count => 25
-			},
-			{
-				:workers => 4,
-				:job_count => 40
-			},
-			{
-				:workers => 5,
-				:job_count => 60
-			}
-		].reverse_each do |scale_info|
-		# Run backwards so it gets set to the highest value first
-		# Otherwise if there were 70 jobs, it would get set to 1, then 2, then 3, etc
-
-		# If we have a job count greater than or equal to the job limit for this scale info
-		if Scaler.job_count >= scale_info[:job_count]
-			# Set the number of workers unless they are already set to a level we want. Don't scale down here!
-			if Scaler.workers <= scale_info[:workers]
-				Scaler.workers = scale_info[:workers]
-			end
-			break # We've set or ensured that the worker count is high enough
-		end
-	end
-end
-end
-
-module ConfirmEmailJob
-	extend HerokuResqueAutoScale
-
-	@queue = :confirmation_email
-
-	def self.perform(id)
-    	@user = User.get id
-		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
-		template  = File.read 'views/confirmation_email.erb'
-		Pony.mail({
-			:to => @user.email,
-			:subject => "Confirm your Standards account",
-			:via => :smtp,
-			:via_options => {
-				:address              => 'smtp.gmail.com',
-				:port                 => '587',
-				:enable_starttls_auto => true,
-				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
-				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
-				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
-				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
-			},
-			:html_body => ERB.new(template).result(binding)
-		}) unless :environment == :test
-	end
-end
 
 helpers do
 	def logged_in?
@@ -297,26 +176,6 @@ helpers do
 	def pluralize(number, text)
 		return text.pluralize if number != 1
 		text
-	end
-
-	def send_confirmation_email(user)
-		@user = user
-		@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
-		Pony.mail({
-			:to => user.email,
-			:subject => "Confirm your Standards account",
-			:via => :smtp,
-			:via_options => {
-				:address              => 'smtp.gmail.com',
-				:port                 => '587',
-				:enable_starttls_auto => true,
-				:user_name            => ENV['EMAIL_USERNAME'] || settings.email_username,
-				:password             => ENV['EMAIL_PASSWORD'] || settings.email_password,
-				:authentication       => :plain, # :plain, :login, :cram_md5, no auth by default
-				:domain               => "localhost.localdomain" # the HELO domain provided by the client to the server
-			},
-			:html_body => erb(:confirmation_email, :layout => false)
-		}) unless :environment == :test
 	end
 
 	def send_password_reset_email(user)
@@ -464,11 +323,9 @@ post "/signup/?" do
 		user.password = params[:password]
 		user.timezone = params[:timezone]
 		if user.save
-			# Send confirmation job through Resque
-			Resque.enqueue(ConfirmEmailJob, user.id)
-
-			# Flash confirmation info and redirect
-			flash[:notice] = "You've been sent a confirmation email to the address you provided, click the link inside to get started."
+			# Flash thank you and redirect
+			session[:id] = user.id
+			flash[:notice] = "Thanks for joining!"
 			redirect "/"
 		else
 			user.errors.each do |e|
@@ -476,23 +333,6 @@ post "/signup/?" do
 			end
 			redirect '/signup'
 		end
-	end
-end
-
-get '/confirm/:key/?' do
-	user = User.first :confirmation_key => params[:key]
-	if !user.nil?
-		if user.confirm!
-			session[:id] = user.id
-			flash[:notice] = "Thanks! You're ready to get started."
-			redirect '/'
-		else
-			flash[:error] = "It seems like that email address has already been confirmed."
-			redirect '/login'
-		end
-	else
-		flash[:error] = "That is not a valid confirmation link."
-		redirect '/'
 	end
 end
 
