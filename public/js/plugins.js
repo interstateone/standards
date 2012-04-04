@@ -7,6 +7,11 @@ $(document).ready(function() {
 		window.location = $(this).attr("href");
 	});
 
+	// Toggle stats
+	$('.stats').click(function () {
+			$("#stats").slideToggle();
+	});
+
 	// Subsitutes tap events for click events in supported browsers
 	if ('ontouchend' in window) {
         $(document).delegate('body', 'click', function(e) {

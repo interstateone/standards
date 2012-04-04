@@ -1,33 +1,3 @@
-<% if !@tasks.empty? %>
-	<div id="check-table">
-		<h1>Habits</h1>
-		<table>
-			<thead>
-				<th></th>
-				<% 7.times do |d| %>
-					<% todayAsDate = Time.zone.now.to_date %>
-					<% day = todayAsDate - todayAsDate.wday + d %>
-					<th class="
-						<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
-						<%= ' today' if todayAsDate.wday == d %>">
-						<%= day.strftime('%A') %></th>
-				<% end %>
-			</thead>
-			<tbody>
-				<% @tasks.each_with_index do |task, i| %>
-					<% @task = task %>
-					<%= erb :task_row, :layout => false %>
-				<% end %>
-			</tbody>
-		</table>
-	</div><!-- / -->
-<% else %>
-	<div class="hero-unit">
-		<h2>This is your home.</h2>
-		<p><a href="/new">Add</a> a task to get started.</p>
-	</div>
-<% end %>
-
 <div id="stats">
 	<%
 		# Finding the y values
@@ -56,9 +26,39 @@
 			height = 150;
 			var r = Raphael("stackedline", width, height);
 			r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30});
+
+			$("#stats").hide();
 		};
 	</script>
-	<h1>Stats</h1>
 	<h3>Completed tasks by day</h3>
 	<div id="stackedline"></div>
 </div><!-- / -->
+
+<% if !@tasks.empty? %>
+	<div id="check-table">
+		<table>
+			<thead>
+				<th></th>
+				<% 7.times do |d| %>
+					<% todayAsDate = Time.zone.now.to_date %>
+					<% day = todayAsDate - todayAsDate.wday + d %>
+					<th class="
+						<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
+						<%= ' today' if todayAsDate.wday == d %>">
+						<%= day.strftime('%A') %></th>
+				<% end %>
+			</thead>
+			<tbody>
+				<% @tasks.each_with_index do |task, i| %>
+					<% @task = task %>
+					<%= erb :task_row, :layout => false %>
+				<% end %>
+			</tbody>
+		</table>
+	</div><!-- / -->
+<% else %>
+	<div class="hero-unit">
+		<h2>This is your home.</h2>
+		<p><a href="/new">Add</a> a task to get started.</p>
+	</div>
+<% end %>
