@@ -3,10 +3,11 @@
 		<thead>
 			<th></th>
 			<% 7.times do |d| %>
-				<% day = Date.today - Date.today.wday + d %>
+				<% todayAsDate = Time.zone.now.to_date %>
+				<% day = todayAsDate - todayAsDate.wday + d %>
 				<th class="
-					<%= ' hidden-phone' if d < Date.today.wday - 1 || d > Date.today.wday + 1 %>
-					<%= ' today' if Date.today.wday == d %>">
+					<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
+					<%= ' today' if todayAsDate.wday == d %>">
 					<%= day.strftime('%A') %></th>
 			<% end %>
 		</thead>
