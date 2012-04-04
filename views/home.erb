@@ -27,7 +27,7 @@
 			var r = Raphael("stackedline", width, height);
 			r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30});
 
-			$("#stats").hide();
+			$("#stats").css({'margin-top': -$("#stats").height()});
 		};
 	</script>
 	<h3>Completed tasks by day</h3>
@@ -51,6 +51,8 @@
 			<tbody>
 				<% @tasks.each_with_index do |task, i| %>
 					<% @task = task %>
+					<% @rowNum = i %>
+					<% @taskCount = @tasks.count %>
 					<%= erb :task_row, :layout => false %>
 				<% end %>
 			</tbody>
