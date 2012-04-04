@@ -4226,10 +4226,50 @@ p.purpose {
 .footer {
   border-top: 1px solid #eeeeee;
   padding-top: 2%;
-  margin-top: 5%;
+  margin-top: 10%;
 }
 p.about {
   max-width: 700px;
+}
+.score {
+  color: #93ae79;
+  float: left;
+  display: block;
+  padding: 6px 10px;
+  font-size: 30px;
+  font-weight: 200;
+  line-height: 1;
+  font-family: "LeagueGothic";
+  text-transform: uppercase;
+}
+#check-table {
+  margin-top: -100px;
+}
+#check-table h1 {
+  color: #93ae79;
+  opacity: 0.3;
+  display: block;
+  padding: 6px 10px;
+  font-size: 200px;
+  font-weight: 200;
+  line-height: 1;
+  font-family: "LeagueGothic";
+  text-transform: uppercase;
+}
+#stats {
+  margin-top: 25%;
+  text-align: left;
+}
+#stats h1 {
+  color: #93ae79;
+  opacity: 0.3;
+  display: block;
+  padding: 6px 10px;
+  font-size: 200px;
+  font-weight: 200;
+  line-height: 1;
+  font-family: "LeagueGothic";
+  text-transform: uppercase;
 }
 .pull-right {
   float: right;

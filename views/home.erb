@@ -1,26 +1,64 @@
 <% if !@tasks.empty? %>
-	<table>
-		<thead>
-			<th></th>
-			<% 7.times do |d| %>
-				<% todayAsDate = Time.zone.now.to_date %>
-				<% day = todayAsDate - todayAsDate.wday + d %>
-				<th class="
-					<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
-					<%= ' today' if todayAsDate.wday == d %>">
-					<%= day.strftime('%A') %></th>
-			<% end %>
-		</thead>
-		<tbody>
-			<% @tasks.each_with_index do |task, i| %>
-				<% @task = task %>
-				<%= erb :task_row, :layout => false %>
-			<% end %>
-		</tbody>
-	</table>
+	<div id="check-table">
+		<h1>Habits</h1>
+		<table>
+			<thead>
+				<th></th>
+				<% 7.times do |d| %>
+					<% todayAsDate = Time.zone.now.to_date %>
+					<% day = todayAsDate - todayAsDate.wday + d %>
+					<th class="
+						<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
+						<%= ' today' if todayAsDate.wday == d %>">
+						<%= day.strftime('%A') %></th>
+				<% end %>
+			</thead>
+			<tbody>
+				<% @tasks.each_with_index do |task, i| %>
+					<% @task = task %>
+					<%= erb :task_row, :layout => false %>
+				<% end %>
+			</tbody>
+		</table>
+	</div><!-- / -->
 <% else %>
 	<div class="hero-unit">
 		<h2>This is your home.</h2>
 		<p><a href="/new">Add</a> a task to get started.</p>
 	</div>
 <% end %>
+
+<div id="stats">
+	<%
+		# Finding the y values
+		y1 = Array.new
+		@tasks.each_with_index do |task, t|
+			y1[t] = Array.new
+		end
+
+		14.downto(0) { |i|
+			@tasks.each_with_index do |task, t|
+				count = task.checks.count(:date => Date.today - i)
+				count += y1[t - 1].last unless t == 0
+				y1[t].push count
+			end
+		}
+
+		# X values
+		x1 = Array.new
+		(0..14).each do |x|
+			x1.push x
+		end
+	%>
+	<script>
+		window.onload = function () {
+			width = 300;
+			height = 150;
+			var r = Raphael("stackedline", width, height);
+			r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30});
+		};
+	</script>
+	<h1>Stats</h1>
+	<h3>Completed tasks by day</h3>
+	<div id="stackedline"></div>
+</div><!-- / -->
