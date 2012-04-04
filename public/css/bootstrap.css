@@ -4118,6 +4118,8 @@ td.title {
 }
 td.title a {
   text-decoration: none;
+  padding: 5% 0 5% 5%;
+  border-left: 5px solid;
 }
 td.title p {
   margin: 0;
@@ -4232,7 +4234,7 @@ p.about {
   max-width: 700px;
 }
 .score {
-  color: #93ae79;
+  color: #049cdb;
   float: left;
   display: block;
   padding: 6px 10px;
