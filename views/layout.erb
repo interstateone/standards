@@ -44,13 +44,10 @@
   						<ul class="nav">
   							<li><a href="/new" title="New Task" ><i class="icon-edit <%= ' active' if request.fullpath.chomp('/') == '/new' %>"></i></a></li>
   							<li><a href="/stats" title="Stats"><i class="icon-bar-chart <%= ' active' if request.fullpath.chomp('/') == '/stats' %>"></i></a></li>
-  							<li><a href="/settings" title="Settings"><i class="icon-cogs <%= ' active' if request.fullpath.chomp('/') == '/settings' %>"></i></a></li>
   						</ul>
-              <% if session[:id] %>
-                  <ul class="nav pull-right">
-                    <li><a href='/logout' title="Sign Out" class=""><i class="icon-signout"></i></a></li>
-                  </ul>
-                <% end %>
+              <ul class="nav pull-right">
+                <li><a href="/settings" title="Settings"><i class="icon-cogs <%= ' active' if request.fullpath.chomp('/') == '/settings' %>"></i></a></li>
+              </ul>
   					<% end %>
   				</div><!--/.nav-collapse -->
   			</div>
