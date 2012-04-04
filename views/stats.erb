@@ -1,35 +1,32 @@
 <%
-	data1 = Array.new
-	(((Date.today - @checks.first(:order => :date.asc, :date.gte => Date.today - 8*7).date) / 7).ceil).times do |week|
-		data1[week] = @checks.count(:date.gte => Date.today - Date.today.wday, :date.lt => Date.today)
+	# Finding the y values
+	y1 = Array.new
+	@tasks.each_with_index do |task, t|
+		y1[t] = Array.new
 	end
 
-	(8 - data1.length).times do |i|
-		data1.insert(i, 0)
-	end
+	14.downto(0) { |i|
+		@tasks.each_with_index do |task, t|
+			count = task.checks.count(:date => Date.today - i)
+			count += y1[t - 1].last unless t == 0
+			y1[t].push count
+		end
+	}
 
-	data2 = Array.new
-	data3 = Array.new
-	dataLabels = Array.new
-
-	colours = Array.new
-	totalCount = @checks.count
-	@tasks.all.each do |task|
-		data2.push task.checks.count * 100 / totalCount
-		dataLabels.push task.title
-
-		count = task.checks.count
-		data3.push count * 100 / (Date.today - task.date_created)
-	end
-
-	taskCount = @tasks.count
-	taskCount.times do |i|
-		colours.push("%06X" % ((i * 1.00000001 / taskCount) * 0xffffff))
+	# X values
+	x1 = Array.new
+	(0..14).each do |x|
+		x1.push x
 	end
 %>
+<script>
+	window.onload = function () {
+		width = 300;
+		height = 150;
+		var r = Raphael("stackedline", width, height);
+		r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30});
+	};
+</script>
 
-<ul id="stats">
-	<li><h3>Rate</h3><img src="<%= Gchart.line(:data => data1, :max_value => (taskCount * 3), :width => '200', :line_colors => '000000') %>" alt="Checks per week"></li>
-	<li><h3>Balance</h3><img src="<%= Gchart.pie(:data => data2, :legend => dataLabels, :legend_position => 'bottom', :slice_colors => colours, :width => '300') %>" alt=""></li>
-	<li><h3>Success</h3><img src="<%= Gchart.bar(:data => data3.each_cons(1).to_a, :legend => dataLabels, :bar_colors => colours, :stacked => false, :width => '200') %>" alt=""></li>
-</ul><!-- / -->
+<h3>Completed tasks by day</h3>
+<div id="stackedline"></div>
