@@ -18,6 +18,7 @@ gem "sinatra-flash", :require => "sinatra/flash"
 gem 'pony'
 gem 'bowtie'
 gem 'iron_worker'
+gem 'colorist'
 
 group :test do
 	gem 'rack-test', :require => 'rack/test'
