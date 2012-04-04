@@ -159,12 +159,9 @@
     padding-left: 20px;
     padding-right: 20px;
   }
-  .navbar-fixed-top {
-    margin-left: -20px;
-    margin-right: -20px;
-  }
-  .container {
+  body > .container {
     width: auto;
+    margin-top: 20%;
   }
   .row-fluid {
     width: 100%;
@@ -397,10 +394,6 @@
 @media (max-width: 767px) {
   body {
     padding-top: 0;
-  }
-  .navbar-fixed-top {
-    position: static;
-    margin-bottom: 18px;
   }
   .navbar-fixed-top .navbar-inner {
     padding: 5px;
