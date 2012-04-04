@@ -9,7 +9,12 @@ $(document).ready(function() {
 
 	// Toggle stats
 	$('.stats').click(function () {
-			$("#stats").slideToggle();
+		if ($("#stats").css('margin-top') == '20px') {
+			$("#stats").animate({'margin-top': -$("#stats").height()});
+		} else {
+			$("#stats").animate({'margin-top': 20});
+			$(".stats").toggleClass('active');
+		}
 	});
 
 	// Subsitutes tap events for click events in supported browsers
