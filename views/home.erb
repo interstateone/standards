@@ -26,15 +26,17 @@
 	<div id="check-table">
 		<table>
 			<thead>
-				<th></th>
-				<% 7.times do |d| %>
-					<% todayAsDate = Time.zone.now.to_date %>
-					<% day = todayAsDate - todayAsDate.wday + d %>
-					<th class="
-						<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
-						<%= ' today' if todayAsDate.wday == d %>">
-						<%= day.strftime('%A') %></th>
-				<% end %>
+				<tr>
+					<th></th>
+					<% 7.times do |d| %>
+						<% todayAsDate = Time.zone.now.to_date %>
+						<% day = todayAsDate - todayAsDate.wday + d %>
+						<th class="
+							<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
+							<%= ' today' if todayAsDate.wday == d %>">
+							<%= day.strftime('%A') %></th>
+					<% end %>
+				</tr>
 			</thead>
 			<tfoot>
 				<tr>
@@ -42,7 +44,7 @@
 						<a href="#" style="border-color: #CCC"><i class="icon-plus-sign"></i></a>
 					</td>
 					<% 7.times do |d| %>
-						<td style="height: 50px; width: 50px;"></td>
+						<td style="height: 50px;"></td>
 					<% end %>
 				</tr>
 			</tfoot>
