@@ -138,7 +138,7 @@ helpers do
 		if current_user != nil
 			return true
 		else
-			session[:return_to] = request.fullpath
+			session[:return_to] = request.url
 			redirect '/login'
 			return false
 		end
