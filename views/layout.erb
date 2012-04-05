@@ -41,9 +41,6 @@
   				<a class="brand" href="/"><%= SITE_TITLE %></a>
   				<div class="nav-collapse">
   					<% if session[:id] %>
-  						<ul class="nav">
-  							<li><a href="/new" title="New Task" ><i class="icon-edit <%= ' active' if request.fullpath.chomp('/') == '/new' %>"></i></a></li></i></a></li>
-  						</ul>
               <ul class="nav pull-right">
                 <li><a href="/settings" title="Settings"><i class="icon-cogs <%= ' active' if request.fullpath.chomp('/') == '/settings' %>"></i></a></li>
               </ul>
