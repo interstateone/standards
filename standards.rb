@@ -414,22 +414,26 @@ post '/reset/?' do
 	end
 end
 
-get '/change/?' do
+post '/change-info/?' do
 	login_required
-	@user = current_user
-	erb :change_password
+	user = current_user
+	user.name = params[:name]
+	user.email = params[:email]
+	user.save
+	flash[:notice] = "Great! Your info has been updated."
+	redirect '/settings'
 end
 
-post '/change/?' do
+post '/change-password/?' do
 	login_required
 	if user = User.authenticate(current_user.email, params[:current_password])
 		user.password = params[:new_password]
 		user.save
 		flash[:notice] = "Great! Your password has been changed."
-		redirect '/'
+		redirect '/settings'
 	else
 		flash[:error] = "That password was incorrect."
-		redirect '/change'
+		redirect '/settings'
 	end
 end
 
