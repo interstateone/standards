@@ -234,6 +234,16 @@ helpers do
 		opts.each { |key,value| attributes << key.to_s << "=\"" << value << "\" "}
 		"<a href=\"#{url}\" #{attributes}>#{text}</a>"
 	end
+
+	# Input: Seed number (i.e. task count)
+	# Output Array of color strings in CSS hex format e.g. #FFFFFF
+	def color_array(seed)
+		colors = Array.new
+		(0..seed-1).each do |i|
+			colors.push Colorist::Color.from_hsv(360 / (seed) * i + 15, 1, 0.8).to_s
+		end
+		return colors
+	end
 end
 
 before do
