@@ -7,16 +7,6 @@ $(document).ready(function() {
 		window.location = $(this).attr("href");
 	});
 
-	// Toggle stats
-	$('.stats').click(function () {
-		if ($("#stats").css('margin-top') == '20px') {
-			$("#stats").animate({'margin-top': -$("#stats").height()});
-		} else {
-			$("#stats").animate({'margin-top': 20});
-			$(".stats").toggleClass('active');
-		}
-	});
-
 	// Subsitutes tap events for click events in supported browsers
 	if ('ontouchend' in window) {
         $(document).delegate('body', 'click', function(e) {

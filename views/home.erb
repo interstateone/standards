@@ -22,21 +22,6 @@
 	end
 %>
 
-<div id="stats">
-	<script>
-		window.onload = function () {
-			width = 300;
-			height = 150;
-			var r = Raphael("stackedline", width, height);
-			r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30, colors: <%= @colorArray.reverse %>});
-
-			$("#stats").css({'margin-top': -$("#stats").height()});
-		};
-	</script>
-	<h3>Completed tasks by day</h3>
-	<div id="stackedline"></div>
-</div><!-- / -->
-
 <% if !@tasks.empty? %>
 	<div id="check-table">
 		<table>
@@ -59,6 +44,18 @@
 				<% end %>
 			</tbody>
 		</table>
+	</div><!-- / -->
+
+	<div id="stats">
+		<script>
+			window.onload = function () {
+				width = 300;
+				height = 150;
+				var r = Raphael("stackedline", width, height);
+				r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30, colors: <%= @colorArray.reverse %>});
+			};
+		</script>
+		<div id="stackedline"></div>
 	</div><!-- / -->
 <% else %>
 	<div class="hero-unit">

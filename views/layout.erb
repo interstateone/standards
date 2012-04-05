@@ -42,8 +42,7 @@
   				<div class="nav-collapse">
   					<% if session[:id] %>
   						<ul class="nav">
-  							<li><a href="/new" title="New Task" ><i class="icon-edit <%= ' active' if request.fullpath.chomp('/') == '/new' %>"></i></a></li>
-  							<li><a href="#" title="Stats" class="stats"><i class="icon-bar-chart <%= ' active' if request.fullpath.chomp('/') == '/stats' %>"></i></a></li>
+  							<li><a href="/new" title="New Task" ><i class="icon-edit <%= ' active' if request.fullpath.chomp('/') == '/new' %>"></i></a></li></i></a></li>
   						</ul>
               <ul class="nav pull-right">
                 <li><a href="/settings" title="Settings"><i class="icon-cogs <%= ' active' if request.fullpath.chomp('/') == '/settings' %>"></i></a></li>
