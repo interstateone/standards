@@ -4118,7 +4118,7 @@ td.title {
 }
 td.title a {
   text-decoration: none;
-  padding: 6px 5% 6px 10%;
+  padding: 6px 0 6px 10%;
   border-left: 5px solid;
 }
 td.title p {
