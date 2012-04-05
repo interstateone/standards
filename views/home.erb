@@ -1,31 +1,34 @@
-<div id="stats">
-	<%
-		# Finding the y values
-		y1 = Array.new
+<% @colorArray = color_array(@tasks.count) %>
+
+<%
+	# Finding the y values
+	y1 = Array.new
+	@tasks.each_with_index do |task, t|
+		y1[t] = Array.new
+	end
+
+	14.downto(0) { |i|
 		@tasks.each_with_index do |task, t|
-			y1[t] = Array.new
+			count = task.checks.count(:date => Date.today - i)
+			count += y1[t - 1].last unless t == 0
+			y1[t].push count
 		end
+	}
 
-		14.downto(0) { |i|
-			@tasks.each_with_index do |task, t|
-				count = task.checks.count(:date => Date.today - i)
-				count += y1[t - 1].last unless t == 0
-				y1[t].push count
-			end
-		}
+	# X values
+	x1 = Array.new
+	(0..14).each do |x|
+		x1.push x
+	end
+%>
 
-		# X values
-		x1 = Array.new
-		(0..14).each do |x|
-			x1.push x
-		end
-	%>
+<div id="stats">
 	<script>
 		window.onload = function () {
 			width = 300;
 			height = 150;
 			var r = Raphael("stackedline", width, height);
-			r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30});
+			r.linechart(10, 10, width, height, <%= x1 %>, <%= y1.reverse %>, { nostroke: true, shade: true, axis: "0 0 1 1", gutter: 30, colors: <%= @colorArray.reverse %>});
 
 			$("#stats").css({'margin-top': -$("#stats").height()});
 		};
@@ -52,7 +55,6 @@
 				<% @tasks.each_with_index do |task, i| %>
 					<% @task = task %>
 					<% @rowNum = i %>
-					<% @taskCount = @tasks.count %>
 					<%= erb :task_row, :layout => false %>
 				<% end %>
 			</tbody>
