@@ -240,7 +240,7 @@ helpers do
 	def color_array(seed)
 		colors = Array.new
 		(0..seed-1).each do |i|
-			colors.push Colorist::Color.from_hsv(360 / (seed) * i + 15, 1, 0.8).to_s
+			colors.push Colorist::Color.from_hsv(360 / (seed) * i + (seed * 6), 0.8, 1).to_s
 		end
 		return colors
 	end
