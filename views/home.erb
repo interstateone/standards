@@ -36,6 +36,16 @@
 						<%= day.strftime('%A') %></th>
 				<% end %>
 			</thead>
+			<tfoot>
+				<tr>
+					<td class="title add">
+						<a href="#" style="border-color: #CCC"><i class="icon-plus-sign"></i></a>
+					</td>
+					<% 7.times do |d| %>
+						<td style="height: 50px; width: 50px;"></td>
+					<% end %>
+				</tr>
+			</tfoot>
 			<tbody>
 				<% @tasks.each_with_index do |task, i| %>
 					<% @task = task %>
