@@ -90,12 +90,12 @@ $(document).ready(function() {
 		}, "script");
 	});
 
-	// Set the delete button to be stateful
+	// Set the delete button in the delete task modal to be stateful
 	$(document).on("click", ".delete-confirm", function() {
 		$('.delete-confirm').button('loading');
 	});
 
-	// Complete a task
+	// Check a task
 	$(document).on("click", 'a.target', function(e) {
 		var clicked = this;
 		e.preventDefault();
@@ -104,7 +104,7 @@ $(document).ready(function() {
 		});
 	});
 
-	// Let forgot password button make post to alternate route
+	// Let forgot password button make post to alternate route than submitting the login
 	$('button.forgot').click(function(e) {
 		e.preventDefault();
 		$(this).parents('form').attr("action", '/forgot');
