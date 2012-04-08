@@ -125,7 +125,8 @@ DataMapper.finalize.auto_upgrade!
 helpers do
 	def logged_in?
 		user = User.get session[:id]
-		!user.nil?
+		return true unless user.nil?
+		return false
 	end
 
 	def current_user
@@ -139,6 +140,7 @@ helpers do
 			return true
 		else
 			session[:return_to] = request.url
+			return false
 			redirect '/login'
 			return false
 		end

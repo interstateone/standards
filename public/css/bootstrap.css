@@ -3103,6 +3103,13 @@ input[type="submit"].btn.btn-mini {
   float: none;
   padding: 10px 10px 11px;
   line-height: 19px;
+  color: #333333;
+  text-decoration: none;
+}
+.navbar .nav > li > p {
+  float: none;
+  padding: 10px 10px 11px;
+  line-height: 19px;
   color: #999999;
   text-decoration: none;
 }
@@ -3118,12 +3125,11 @@ input[type="submit"].btn.btn-mini {
   background-color: #ffffff;
 }
 .navbar .divider-vertical {
-  height: 40px;
+  height: 26px;
   width: 1px;
-  margin: 0 9px;
+  margin: 7px 0px;
   overflow: hidden;
-  background-color: #ffffff;
-  border-right: 1px solid #333333;
+  border-right: 1px solid #999999;
 }
 .navbar .nav.pull-right {
   margin-left: 10px;
