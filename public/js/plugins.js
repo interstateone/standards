@@ -7,14 +7,32 @@ $(document).ready(function() {
 		window.location = $(this).attr("href");
 	});
 
+	$(document).on('tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', function (event) {
+		event.preventDefault();
+		window.location = $(this).attr("href");
+	});
+
 	// Subsitutes tap events for click events in supported browsers
 	if ('ontouchend' in window) {
-        $(document).delegate('body', 'click', function(e) {
-            $(e.target).trigger('tap');
-        });
-    }
+		$(document).delegate('body', 'click', function(e) {
+			$(e.target).trigger('tap');
+		});
+	}
+
+	// Add drop shadow to navbar when page is scrolled
+	var header = $('.navbar');
+	$(window).scroll(function(e){
+		if(header.offset().top !== 0){
+			if(!header.hasClass('nav-drop-shadow')){
+				header.addClass('nav-drop-shadow');
+			}
+		}else{
+			header.removeClass('nav-drop-shadow');
+		}
+	});
 
 	// Name validator
+	// Must be longer than one character
 	$('input#name').keyup(function () {
 		if ($(this).val().length > 1) {
 			if (!$(this).parents('.control-group').hasClass('success')) {
@@ -28,6 +46,7 @@ $(document).ready(function() {
 	});
 
 	// Email format validator
+	// at least one character followed by '@' followed by at least two characters, '.', at least two characters
 	$('input#email').keyup(function () {
 		var filter = /(.+)@(.+){2,}\.(.+){2,}/;
 		if (filter.test($(this).val())) {
@@ -42,6 +61,7 @@ $(document).ready(function() {
 	});
 
 	// Password length validator
+	// Must be at least 8 characters long
 	$('input#password').keyup(function () {
 		if ($(this).val().length >= 8) {
 			if (!$(this).parents('.control-group').hasClass('success')) {
@@ -54,26 +74,74 @@ $(document).ready(function() {
 		}
 	});
 
-	/*// Post a new task
-	$('#newtask').submit(function() {
-		$.post("/", $(this).serialize(), function(data){
-			$('tbody').append(data).children("tr").each( function (i, obj) {
-				obj = $(obj).children("td.title").children("p > span.title");
-				makeEditable(obj);
-			});
-			$('#newtask').each(function(){this.reset();});
-		}, "text");
-		return false;
-	});*/
+	// Map JS reset() function to jQuery
+	jQuery.fn.reset = function () {
+		$(this).each (function() { this.reset(); });
+	};
 
-	// // Submit a new task with the enter key
-	// $('#newtask > input').keypress(function(e){
-	// 	if(e.which === 13){
-	// 		e.preventDefault();
-	// 		$('form#newtask').submit();
-	// 		return false;
-	// 	}
-	// });
+	// Show new task form when user clicks the plus button
+	$('a.add').click( function (e) {
+		if (!$(this).children("i").hasClass("cancel")) {
+			$("input#title").focus();
+			$(this).children("i").animate({transform: 'rotate(45deg)'}, 'fast').toggleClass("cancel");
+			$(this).css('color', "red");
+			$(this).siblings('#newtask').animate({opacity: 1}, 'fast');
+		} else {
+			$(this).children("i").animate({transform: ''}, 'fast').toggleClass("cancel");
+			$(this).css('color', "#CCC");
+			$(this).siblings('#newtask').animate({opacity: 0}, 'fast', function() {
+				$(this).animate({transform: ''}, 'fast');
+				$(this).reset();
+			});
+		}
+	});
+
+	// Submit a new task with the enter key
+	$('#newtask > input#purpose').keypress(function(e){
+		if(e.which === 13){
+			e.preventDefault();
+			$('#newtask').submit();
+		}
+	});
+
+
+	function colorArray (numberOfRows) {
+		colors = [];
+		var hue, saturation, lightness, alpha;
+		for (var i = 0; i < numberOfRows; i++) {
+			hue = i * 340 / numberOfRows;
+			saturation = 0.8;
+			lightness = 0.5;
+			alpha = 1.0;
+			var color = $.Color({hue: hue, saturation: saturation, lightness: lightness, alpha: alpha}).toHslaString();
+			colors.push($.Color(color).toHexString());
+		}
+		return colors;
+	}
+
+	var updateColors = function () {
+		var rows = $('tbody').children();
+		colors = colorArray(rows.size());
+		$(rows).each( function (i) {
+			$(this).children('td.title').children('a').css("border-color", colors[i]);
+		});
+	};
+
+	updateColors();
+
+	// Post a new task
+	$('#newtask').submit(function(e) {
+		$.post("/new", $(this).serialize(), function(data){
+			$('tbody').append(data);
+			updateColors();
+			$('a.add').children('i').animate({transform: ''}, 'fast').toggleClass("cancel");
+			$('a.add').css('color', "#CCC")
+					.siblings('#newtask')
+					.animate({opacity: 0}, 'fast', function() {
+						$(this).reset();
+					});
+		}, "text");
+	});
 
 	// Delete a task modal
 	$(document).on("click", 'a.delete', function(e) {

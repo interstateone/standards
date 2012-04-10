@@ -274,13 +274,13 @@ end
 post '/new/?' do
 	login_required
 	user = current_user
-	task = user.tasks.create(:title => params[:tasktitle], :purpose => remove_trailing_period(params[:taskpurpose]))
+	@task = user.tasks.create(:title => params[:title], :purpose => remove_trailing_period(params[:purpose]))
 
-	task.errors.each do |e|
-		flash[:error] = e
+	if !@task.saved?
+		flash[:error] = @task.errors.to_a
 	end
 
-	redirect '/'
+	erb :task_row, :layout => false
 end
 
 get '/stats/?' do
