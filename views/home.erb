@@ -1,4 +1,16 @@
-<% @colorArray = color_array(@tasks.count) %>
+<%
+	y = []
+	length = @checks.last.date - @checks.first.date
+	length.to_i.downto(0) { |i|
+		day = []
+		@tasks.each_with_index do |task, t|
+			day.push(:day=> (Date.today - i).wday, :task => task.title, :count=> task.checks.count(:date => Date.today - i))
+		end
+		y[i] = day
+	}
+
+	y = y.to_json
+%>
 
 <% if !@tasks.empty? %>
 	<div id="check-table">
@@ -18,12 +30,14 @@
 			</thead>
 			<tfoot>
 				<tr>
-					<td class="title add">
-						<a href="/new" style="border-color: #CCC"><i class="icon-plus-sign"></i></a>
+					<td class="title add" style="height: 50px;" colspan="8">
+						<a class="add" style="border-color: #CCC"><i class="icon-plus-sign"></i></a>
+						<form id="newtask" class="form">
+							<input id="title" name="title" type="text" autocapitalize="sentence" autocorrect="true" placeholder="Task: Go for a bike ride"></input>
+							<input id="purpose" name="purpose" type="text" autocapitalize="sentence" autocorrect="true" placeholder="Purpose: I want to be healthier"></input>
+							<button type="submit" class="btn">Add it!</button>
+						</form>
 					</td>
-					<% 7.times do |d| %>
-						<td style="height: 50px;"></td>
-					<% end %>
 				</tr>
 			</tfoot>
 			<tbody>
