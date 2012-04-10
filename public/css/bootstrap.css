@@ -619,11 +619,8 @@ select,
 .uneditable-input {
   display: inline-block;
   width: 210px;
-  height: 18px;
   padding: 4px;
-  margin-bottom: 9px;
   font-size: 13px;
-  line-height: 18px;
   color: #555555;
   border: 1px solid #cccccc;
   -webkit-border-radius: 3px;
@@ -4124,7 +4121,7 @@ td.title {
 }
 td.title a {
   text-decoration: none;
-  padding: 6px 0 6px 10%;
+  padding: 6px 0 6px 10px;
   border-left: 5px solid;
 }
 td.title p {
@@ -4133,9 +4130,6 @@ td.title p {
 td.title p.purpose {
   text-indent: 5%;
 }
-td.add {
-  margin-top: 15px;
-}
 td.add a {
   font-size: 24px;
   margin: 0;
@@ -4143,10 +4137,25 @@ td.add a {
   padding-bottom: 0;
   color: #CCC;
 }
-@media (max-width: 480px) {
-  #edit-table {
-    width: 100%;
-  }
+td.add a i {
+  margin-top: 10px;
+}
+#newtask {
+  opacity: 0;
+  display: inline-block;
+  vertical-align: top;
+  margin: 6px 0 0 5px;
+  max-width: 85%;
+}
+#newtask input {
+  display: inline-block;
+  width: 200px;
+  margin: 0 5px 5px 0;
+}
+#newtask button {
+  display: inline-block;
+  margin: 0 25px 0 0;
+  vertical-align: top;
 }
 .today {
   color: #666;
