@@ -1,6 +1,6 @@
 <tr>
 	<td class="title">
-		<a href="/<%= @task.id %>" alt="<%= @task.title %>" title="<%= @task.purpose %>" style="border-color: <%= @colorArray[@rowNum] %> !important;"><%= @task.title.capitalize %></a>
+		<a href="/<%= @task.id %>" alt="<%= @task.title %>" title="<%= @task.purpose %>"><%= @task.title.capitalize %></a>
 	</td>
 	<% 7.times do |d| %>
 		<% todayAsDate = Time.zone.now.to_date %>
