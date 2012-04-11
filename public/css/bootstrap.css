@@ -4118,12 +4118,12 @@ td {
 }
 td.title {
   text-align: left;
-  white-space: nowrap;
 }
 td.title a {
   text-decoration: none;
   padding: 6px 0 6px 10px;
   border-left: 5px solid;
+  display: inline-block;
 }
 td.title p {
   margin: 0;
