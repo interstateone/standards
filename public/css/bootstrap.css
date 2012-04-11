@@ -4118,18 +4118,15 @@ td {
 }
 td.title {
   text-align: left;
+  vertical-align: middle;
 }
 td.title a {
   text-decoration: none;
   padding: 6px 0 6px 10px;
   border-left: 5px solid;
+  vertical-align: middle;
   display: inline-block;
-}
-td.title p {
-  margin: 0;
-}
-td.title p.purpose {
-  text-indent: 5%;
+  height: 100%;
 }
 td.add a {
   font-size: 24px;
@@ -4137,6 +4134,8 @@ td.add a {
   padding-top: 0;
   padding-bottom: 0;
   color: #CCC;
+  display: inline-block;
+  height: 100%;
 }
 td.add a i {
   margin-top: 10px;
