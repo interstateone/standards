@@ -1,4 +1,9 @@
-<% if !@tasks.empty? %>
+<% if @tasks.count == 0 %>
+	<div class="hero-unit">
+		<h2>This is your home.</h2>
+		<p><a href="/new">Add</a> a task to get started.</p>
+	</div>
+<% else %>
 	<table>
 		<thead>
 			<th></th>
@@ -18,9 +23,4 @@
 			<% end %>
 		</tbody>
 	</table>
-<% else %>
-	<div class="hero-unit">
-		<h2>This is your home.</h2>
-		<p><a href="/new">Add</a> a task to get started.</p>
-	</div>
 <% end %>
