@@ -131,6 +131,7 @@ $(document).ready(function() {
 
 	// Post a new task
 	$('#newtask').submit(function(e) {
+		e.preventDefault();
 		$.post("/new", $(this).serialize(), function(data){
 			$('tbody').append(data);
 			updateColors();
