@@ -4264,6 +4264,11 @@ p.about {
 ul.settings li {
   margin: 1% 0;
 }
+.nav-drop-shadow {
+  -webkit-box-shadow: 0 0 6px #888888;
+  -moz-box-shadow: 0 0 6px #888888;
+  box-shadow: 0 0 6px #888888;
+}
 .pull-right {
   float: right;
 }
