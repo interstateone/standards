@@ -4118,6 +4118,7 @@ td {
 }
 td.title {
   text-align: left;
+  white-space: nowrap;
 }
 td.title a {
   text-decoration: none;
