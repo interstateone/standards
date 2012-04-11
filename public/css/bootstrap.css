@@ -619,11 +619,8 @@ select,
 .uneditable-input {
   display: inline-block;
   width: 210px;
-  height: 18px;
   padding: 4px;
-  margin-bottom: 9px;
   font-size: 13px;
-  line-height: 18px;
   color: #555555;
   border: 1px solid #cccccc;
   -webkit-border-radius: 3px;
@@ -3103,6 +3100,13 @@ input[type="submit"].btn.btn-mini {
   float: none;
   padding: 10px 10px 11px;
   line-height: 19px;
+  color: #333333;
+  text-decoration: none;
+}
+.navbar .nav > li > p {
+  float: none;
+  padding: 10px 10px 11px;
+  line-height: 19px;
   color: #999999;
   text-decoration: none;
 }
@@ -3118,12 +3122,11 @@ input[type="submit"].btn.btn-mini {
   background-color: #eeeeee;
 }
 .navbar .divider-vertical {
-  height: 40px;
+  height: 26px;
   width: 1px;
-  margin: 0 9px;
+  margin: 7px 0px;
   overflow: hidden;
-  background-color: #eeeeee;
-  border-right: 1px solid #333333;
+  border-right: 1px solid #999999;
 }
 .navbar .nav.pull-right {
   margin-left: 10px;
@@ -4118,6 +4121,8 @@ td.title {
 }
 td.title a {
   text-decoration: none;
+  padding: 6px 0 6px 10px;
+  border-left: 5px solid;
 }
 td.title p {
   margin: 0;
@@ -4125,22 +4130,32 @@ td.title p {
 td.title p.purpose {
   text-indent: 5%;
 }
-#edit-table {
-  margin: 0 auto;
-  width: 70%;
-  max-width: 500px;
+td.add a {
+  font-size: 24px;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  color: #CCC;
 }
-#edit-table tr {
-  border-bottom: 1px solid #AAA;
-  vertical-align: baseline;
+td.add a i {
+  margin-top: 10px;
 }
-#edit-table tr td {
-  padding: 20px 0 10px 0;
+#newtask {
+  opacity: 0;
+  display: inline-block;
+  vertical-align: top;
+  margin: 6px 0 0 5px;
+  max-width: 85%;
 }
-@media (max-width: 480px) {
-  #edit-table {
-    width: 100%;
-  }
+#newtask input {
+  display: inline-block;
+  width: 200px;
+  margin: 0 5px 5px 0;
+}
+#newtask button {
+  display: inline-block;
+  margin: 0 25px 0 0;
+  vertical-align: top;
 }
 .today {
   color: #666;
@@ -4226,10 +4241,28 @@ p.purpose {
 .footer {
   border-top: 1px solid #eeeeee;
   padding-top: 2%;
-  margin-top: 5%;
+  margin-top: 10%;
 }
 p.about {
   max-width: 700px;
+}
+.score {
+  color: #049cdb;
+  float: left;
+  display: block;
+  padding: 6px 10px;
+  font-size: 30px;
+  font-weight: 200;
+  line-height: 1;
+  font-family: "LeagueGothic";
+  text-transform: uppercase;
+}
+#stats {
+  text-align: left;
+  margin-top: 15%;
+}
+ul.settings li {
+  margin: 1% 0;
 }
 .pull-right {
   float: right;

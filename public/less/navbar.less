@@ -216,12 +216,19 @@
   float: none;
   padding: 10px 10px 11px;
   line-height: 19px;
+  color: @grayDark;
+  text-decoration: none;
+}
+.navbar .nav > li > p {
+  float: none;
+  padding: 10px 10px 11px;
+  line-height: 19px;
   color: @navbarLinkColor;
   text-decoration: none;
 }
 // Hover
 .navbar .nav > li > a:hover {
-  background-color: @navbarLinkBackgroundHover; // "transparent" is default to differentiate :hover from .active
+  background-color: transparent; // "transparent" is default to differentiate :hover from .active
   color: @navbarLinkColorHover;
   text-decoration: none;
 }
@@ -236,12 +243,11 @@
 
 // Dividers (basically a vertical hr)
 .navbar .divider-vertical {
-  height: @navbarHeight;
+  height: @navbarHeight - 14;
   width: 1px;
-  margin: 0 9px;
+  margin: 7px 0px;
   overflow: hidden;
-  background-color: @navbarBackground;
-  border-right: 1px solid @navbarBackgroundHighlight;
+  border-right: 1px solid @navbarLinkColor;
 }
 
 // Secondary (floated right) nav in topbar

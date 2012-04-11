@@ -18,7 +18,6 @@
 	<p>You're currently sitting at a <%= (count * 100 / (Date.today - @task.created_on + 1)).ceil %>% completion rate.</p>
 </div><!-- / -->
 
-<a href="/" title="" class="btn btn-standard">Back</a>
 <a class="delete btn btn-danger pull-right">Delete</a>
 
 <%= erb :delete_modal, :layout => false %>

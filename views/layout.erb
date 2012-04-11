@@ -16,7 +16,7 @@
 		padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 	}
 	</style>
-	<link href="/css/responsive.css" rel="stylesheet">
+  <link href="/css/responsive.css" rel="stylesheet">
 
 	<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
@@ -41,11 +41,9 @@
   				<a class="brand" href="/"><%= SITE_TITLE %></a>
   				<div class="nav-collapse">
   					<% if session[:id] %>
-  						<ul class="nav">
-  							<li><a href="/new" title="New Task" ><i class="icon-edit <%= ' active' if request.fullpath.chomp('/') == '/new' %>"></i></a></li>
-  							<li><a href="/stats" title="Stats"><i class="icon-bar-chart <%= ' active' if request.fullpath.chomp('/') == '/stats' %>"></i></a></li>
-  						</ul>
               <ul class="nav pull-right">
+                <li><p title="Logged in as <%= current_user.name %>"><%= current_user.name %></p></li>
+                <!-- <li class="divider-vertical"></li> -->
                 <li><a href="/settings" title="Settings"><i class="icon-cogs <%= ' active' if request.fullpath.chomp('/') == '/settings' %>"></i></a></li>
               </ul>
   					<% end %>
@@ -70,7 +68,6 @@
   		<%= yield %>
 
       <footer class="footer">
-        <p><%= "Logged in as " + current_user.name unless !logged_in? %></p>
         <a href="/about">Learn more</a> about this project by <a href="http://brandonevans.ca">Brandon Evans</a>.
       </footer>
   	</div> <!-- /container -->
@@ -91,6 +88,8 @@
     <script src="/js/bootstrap-collapse.js"></script>
     <script src="/js/bootstrap-carousel.js"></script>
     <script src="/js/bootstrap-typeahead.js"></script>
+    <script src="/js/jquery.transform2d.js"></script>
+    <script src="/js/jquery.color.js"></script>
     <script src="/js/plugins.min.js"></script>
     <script src="/js/raphael.js"></script>
     <script src="/js/g.raphael-min.js"></script>

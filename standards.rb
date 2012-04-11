@@ -125,7 +125,8 @@ DataMapper.finalize.auto_upgrade!
 helpers do
 	def logged_in?
 		user = User.get session[:id]
-		!user.nil?
+		return true unless user.nil?
+		return false
 	end
 
 	def current_user
@@ -138,7 +139,8 @@ helpers do
 		if current_user != nil
 			return true
 		else
-			session[:return_to] = request.fullpath
+			session[:return_to] = request.url
+			return false
 			redirect '/login'
 			return false
 		end
@@ -234,6 +236,16 @@ helpers do
 		opts.each { |key,value| attributes << key.to_s << "=\"" << value << "\" "}
 		"<a href=\"#{url}\" #{attributes}>#{text}</a>"
 	end
+
+	# Input: Seed number (i.e. task count)
+	# Output Array of color strings in CSS hex format e.g. #FFFFFF
+	def color_array(seed)
+		colors = Array.new
+		(0..seed-1).each do |i|
+			colors.push Colorist::Color.from_hsv(360 / (seed) * i + (seed * 6), 0.8, 1).to_s
+		end
+		return colors
+	end
 end
 
 before do
@@ -262,13 +274,13 @@ end
 post '/new/?' do
 	login_required
 	user = current_user
-	task = user.tasks.create(:title => params[:tasktitle], :purpose => remove_trailing_period(params[:taskpurpose]))
+	@task = user.tasks.create(:title => params[:title], :purpose => remove_trailing_period(params[:purpose]))
 
-	task.errors.each do |e|
-		flash[:error] = e
+	if !@task.saved?
+		flash[:error] = @task.errors.to_a
 	end
 
-	redirect '/'
+	erb :task_row, :layout => false
 end
 
 get '/stats/?' do
@@ -404,22 +416,26 @@ post '/reset/?' do
 	end
 end
 
-get '/change/?' do
+post '/change-info/?' do
 	login_required
-	@user = current_user
-	erb :change_password
+	user = current_user
+	user.name = params[:name]
+	user.email = params[:email]
+	user.save
+	flash[:notice] = "Great! Your info has been updated."
+	redirect '/settings'
 end
 
-post '/change/?' do
+post '/change-password/?' do
 	login_required
 	if user = User.authenticate(current_user.email, params[:current_password])
 		user.password = params[:new_password]
 		user.save
 		flash[:notice] = "Great! Your password has been changed."
-		redirect '/'
+		redirect '/settings'
 	else
 		flash[:error] = "That password was incorrect."
-		redirect '/change'
+		redirect '/settings'
 	end
 end
 

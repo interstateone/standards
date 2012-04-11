@@ -8,6 +8,7 @@ GEM
     bcrypt-ruby (3.0.1)
     bowtie (0.5.1)
       sinatra (>= 0.9.4)
+    colorist (0.0.2)
     data_objects (0.10.8)
       addressable (~> 2.1)
     datamapper (1.2.0)
@@ -138,6 +139,7 @@ DEPENDENCIES
   activesupport
   bcrypt-ruby
   bowtie
+  colorist
   datamapper
   dm-aggregates
   dm-core

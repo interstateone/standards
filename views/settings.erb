@@ -1,4 +1,48 @@
-<h2><%= @user.name %>'s Settings</h2>
+<h2>
+	<%= @user.name %>'s Settings
+	<a href='/logout' title="Sign Out" class="btn pull-right">Sign Out</a>
+</h2>
 
-<a href='/logout' title="Sign Out" class="btn"><i class="icon-signout"></i> Sign Out</a>
-<a href="/change" title="Change Password" class="btn btn-warning">Change Password</a>
+<!-- Change name form -->
+<form class="form-horizontal" method="post" action="/change-info" name="change">
+	<fieldset>
+		<legend>Info</legend>
+		<div class="control-group">
+			<label class="control-label" for="name">Name</label>
+			<div class="controls">
+				<input type="text" class="input-xlarge" id="name" name="name" placeholder="" value="<%= @user.name %>">
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="email">Email</label>
+			<div class="controls">
+				<input type="text" class="input-xlarge" id="email" name="email" placeholder="" value="<%= @user.email %>">
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary">Update Info</button>
+		</div>
+	</fieldset>
+</form>
+
+<form class="form-horizontal" method="post" action="/change-password" name="change">
+	<fieldset>
+		<legend>Password</legend>
+		<div class="control-group">
+			<label class="control-label" for="password">Current Password</label>
+			<div class="controls">
+				<input type="password" class="input-xlarge" id="current_password" name="current_password" placeholder="">
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="password">New Password</label>
+			<div class="controls">
+				<input type="password" class="input-xlarge" id="new_password" name="new_password" placeholder="">
+				<span class='help-block'>Minimum 8 characters with a number, please.</span>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-warning">Change password</button>
+		</div>
+	</fieldset>
+</form>
