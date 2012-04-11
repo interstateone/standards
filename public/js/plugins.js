@@ -99,7 +99,12 @@ $(document).ready(function() {
 	$(document).on("click", 'a.target', function(e) {
 		var clicked = this;
 		e.preventDefault();
-		$.post(clicked.href, null, function() {
+		$(clicked).children('img').toggleClass("complete");
+		$.post(clicked.href, null, function(data) {
+			if (data !== '') {
+				$(clicked).children('img').toggleClass("complete");
+			}
+		}).error( function() {
 			$(clicked).children('img').toggleClass("complete");
 		});
 	});
