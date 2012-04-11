@@ -85,12 +85,12 @@ $(document).ready(function() {
 			$("input#title").focus();
 			$(this).children("i").animate({transform: 'rotate(45deg)'}, 'fast').toggleClass("cancel");
 			$(this).css('color', "red");
-			$(this).siblings('#newtask').animate({opacity: 1}, 'fast');
+			$(this).siblings('#newtask').animate({opacity: 1}, 'fast').css("visibility", "visible");
 		} else {
 			$(this).children("i").animate({transform: ''}, 'fast').toggleClass("cancel");
 			$(this).css('color', "#CCC");
 			$(this).siblings('#newtask').animate({opacity: 0}, 'fast', function() {
-				$(this).animate({transform: ''}, 'fast');
+				$(this).css("visibility", "hidden");
 				$(this).reset();
 			});
 		}
