@@ -3115,14 +3115,14 @@ input[type="submit"].btn.btn-mini {
 .navbar .nav .active > a:hover {
   color: #000000;
   text-decoration: none;
-  background-color: #ffffff;
+  background-color: #eeeeee;
 }
 .navbar .divider-vertical {
   height: 40px;
   width: 1px;
   margin: 0 9px;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: #eeeeee;
   border-right: 1px solid #333333;
 }
 .navbar .nav.pull-right {
