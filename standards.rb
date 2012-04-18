@@ -143,7 +143,6 @@ helpers do
 			return true
 		else
 			session[:return_to] = request.url
-			return false
 			redirect '/login'
 			return false
 		end
