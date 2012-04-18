@@ -9,8 +9,11 @@
 			<thead>
 				<tr>
 					<th></th>
+					<% todayAsDate = Time.zone.now.to_date %>
 					<% 7.times do |d| %>
-						<% todayAsDate = Time.zone.now.to_date %>
+						<% if todayAsDate.wday == 0 %>
+							<% d = d - 1 %>
+						<% end %>
 						<% day = todayAsDate - todayAsDate.wday + d %>
 						<th class="
 							<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>

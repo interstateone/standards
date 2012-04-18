@@ -2,8 +2,11 @@
 	<td class="title">
 		<a href="/<%= @task.id %>" alt="<%= @task.title %>" title="<%= @task.purpose %>"><%= @task.title.capitalize %></a>
 	</td>
+	<% todayAsDate = Time.zone.now.to_date %>
 	<% 7.times do |d| %>
-		<% todayAsDate = Time.zone.now.to_date %>
+		<% if todayAsDate.wday == 0 %>
+			<% d = d - 1 %>
+		<% end %>
 		<% day = todayAsDate - todayAsDate.wday + d %>
 		<% if d <= todayAsDate.wday %>
 			<td class="
