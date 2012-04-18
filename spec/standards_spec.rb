@@ -155,10 +155,9 @@ describe 'when logged in as a user' do
 
 	it 'should allow making a new task' do
 		get '/'
-		last_response.body.include? "Add a task"
+		last_response.body.include? "Add it!"
 		@task = Task.create :title => 'Ride a bike', :user => @user
-		get '/'
-		last_response.body.include? "Ride a bike"
+		@task.errors.should be_empty
 	end
 
 	it 'should allow deleting a task' do
@@ -176,18 +175,18 @@ describe 'Unauthorized users' do
 	before :each do
 		@user = User.new valid_user_attributes
 		@user.save
+		@task = Task.create :title => 'Ride a bike', :user => @user
 		get "/logout"
 		follow_redirect!
 	end
 
 	it 'should not be able to add tasks' do
 		get '/new'
-		last_response.body.should_not include 'New task'
+		last_response.body.should_not include 'Add it'
 	end
 
 	it 'should not be able to view a task' do
-		@task = Task.create :title => 'Ride a bike', :user => @user
-		get '/1/'
+		get '/1'
 		last_response.body.should_not include 'Ride a bike'
 	end
 
