@@ -56,43 +56,6 @@ describe 'A user' do
 		@user.password = "asdfghjk4"
 		@user.save.should == true
 	end
-
-	# it 'should be confirmed after visiting the confirmation link' do
-	# 	@user.attributes = valid_user_attributes
-	# 	@user.save.should == true
-	# 	get "/confirm/#{@user.confirmation_key}"
-	# 	follow_redirect!
-	# 	User.get(1).confirmation_key.should == nil
-	# 	User.get(1).confirmed?.should == true
-	# end
-
-	# it 'should not be able to log in if not confirmed' do
-	# 	@user.attributes = valid_user_attributes
-	# 	@user.save.should == true
-	# 	post "/login", valid_user_attributes
-	# 	last_response.body.should_not include 'Logged in as'
-	# 	get "/confirm/#{@user.confirmation_key}"
-	# 	follow_redirect!
-	# 	User.get(1).confirmation_key.should == nil
-	# 	User.get(1).confirmed?.should == true
-	# 	last_response.should be_ok
-	# 	last_response.body.include? "Logged in as"
-	# end
-
-	# it 'should only be able to be confirmed once' do
-	# 	@user.attributes = valid_user_attributes
-	# 	@user.save.should == true
-	# 	get "/confirm/#{@user.confirmation_key}"
-	# 	follow_redirect!
-	# 	User.get(1).confirmation_key.should == nil
-	# 	last_response.should be_ok
-	# 	last_response.body.include? "Logged in as"
-	# 	get "/confirm/#{@user.confirmation_key}"
-	# 	follow_redirect!
-	# 	last_response.body.include? 'already been confirmed'
-	# end
-
-	# it 'should receive a confirmation email when created'
 end
 
 describe 'A task' do
@@ -138,7 +101,7 @@ shared_examples_for "Standards" do
 	end
 end
 
-describe 'when logged in as a user' do
+describe 'When logged in as a user' do
 	it_should_behave_like 'Standards'
 	include UserSpecHelper
 
@@ -201,33 +164,33 @@ describe 'Unauthorized users' do
 	end
 end
 
-# describe 'task pages' do
-# 	it_should_behave_like "Standards"
-# 	include UserSpecHelper
+describe 'task pages' do
+	it_should_behave_like "Standards"
+	include UserSpecHelper
 
-# 	before :each do
-# 		post "/login", valid_user_attributes
-# 	end
+	before :each do
+		post "/login", valid_user_attributes
+	end
 
-# 	it 'should throw an error if its not a valid task id' do
-# 		get '/23423423423423'
-# 		last_response.body.include? "That task can't be found."
-# 		# last_response.status.should be 404
-# 	end
+	it 'should throw an error if its not a valid task id' do
+		get '/23423423423423'
+		last_response.body.include? "That task can't be found."
+		# last_response.status.should be 404
+	end
 
-# 	it 'should load a task if its a valid task id' do
-# 		test = Task.new :id => 1, :title => "Test task"
-# 		test.save
-# 		get '/1'
-# 		last_response.body.include? "Test task"
-# 	end
-# end
+	it 'should load a task if its a valid task id' do
+		test = Task.new :id => 1, :title => "Test task"
+		test.save
+		get '/1'
+		last_response.body.include? "Test task"
+	end
+end
 
-# describe 'not logged in' do
-# 	it_should_behave_like "Standards"
+describe 'not logged in' do
+	it_should_behave_like "Standards"
 
-# 	it 'should flash an error' do
-# 		get '/home'
-# 		last_response.body.include? 'You must be logged in'
-# 	end
-# end
+	it 'should flash an error' do
+		get '/home'
+		last_response.body.include? 'You must be logged in'
+	end
+end
