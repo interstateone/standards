@@ -1,5 +1,5 @@
-<h2><%= @task.title.capitalize %></h2>
-<p>Remember! You're doing this because <%= switch_pronouns @task.purpose unless @task.purpose.empty? %>.</p>
+<h2><%= h @task.title.capitalize %></h2>
+<p>Remember! You're doing this because <%= switch_pronouns h @task.purpose unless @task.purpose.empty? %>.</p>
 
 <div class="well">
 	<% count = @task.checks.count %>

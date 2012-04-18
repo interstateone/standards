@@ -123,6 +123,9 @@ end
 DataMapper.finalize.auto_upgrade!
 
 helpers do
+	include Rack::Utils
+	alias_method :h, :escape_html
+
 	def logged_in?
 		user = User.get session[:id]
 		return true unless user.nil?

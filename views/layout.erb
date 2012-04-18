@@ -42,7 +42,7 @@
   				<div class="nav-collapse">
   					<% if session[:id] %>
               <ul class="nav pull-right">
-                <li><p title="Logged in as <%= current_user.name %>"><%= current_user.name %></p></li>
+                <li><p title="Logged in as <%= current_user.name %>"><%= h current_user.name %></p></li>
                 <!-- <li class="divider-vertical"></li> -->
                 <li><a href="/settings" title="Settings"><i class="icon-cogs <%= ' active' if request.fullpath.chomp('/') == '/settings' %>"></i></a></li>
               </ul>

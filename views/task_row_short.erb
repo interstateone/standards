@@ -1,11 +1,11 @@
 <tr>
 	<td class="title">
 		<p>
-			<span href="/<%= @task.id %>/rename" class="title"><%= @task.title %></span>
+			<span href="/<%= @task.id %>/rename" class="title"><%= h @task.title %></span>
 		</p>
 		<p class="purpose">
 			<% if @task.purpose %>
-				because <%= @task.purpose %>
+				because <%= h @task.purpose %>
 			<% end %>
 		</p>
 	</td>
