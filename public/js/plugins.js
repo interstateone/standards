@@ -31,6 +31,12 @@ $(document).ready(function() {
 		}
 	});
 
+	// Set the timezone dropdown to the current value
+	var $select = $('select#timezone');
+	if ($select.data("zone") !== null) {
+		$select.val($select.data("zone"));
+	}
+
 	// Name validator
 	// Must be longer than one character
 	$('input#name').keyup(function () {
