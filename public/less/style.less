@@ -60,7 +60,6 @@ td.title {
 	a {
 		text-decoration: none;
 		padding: 6px 0 6px 10px;
-		border-left: 5px solid;
 		vertical-align: middle;
 		display: inline-block;
 		height: 100%;
@@ -232,4 +231,19 @@ ul.settings {
 
 .nav-drop-shadow {
 	.box-shadow(0 0 6px lighten(@gray, 20%));
+}
+
+.ministat {
+	width: 5px;
+	height: 50px;
+	float: left;
+	background-color: #CCC;
+	position: relative;
+
+	.minibar {
+		position: absolute;
+		bottom: 0;
+		width: 5px;
+		background-color: rgba(0,0,0,0.2);
+	}
 }

@@ -111,13 +111,13 @@ $(document).ready(function() {
 	});
 
 
-	function colorArray (numberOfRows) {
+	function colorArray (numberOfRows, lightness) {
 		colors = [];
 		var hue, saturation, lightness, alpha;
 		for (var i = 0; i < numberOfRows; i++) {
 			hue = i * 340 / (numberOfRows + 2);
-			saturation = 0.8;
-			lightness = 0.5;
+			saturation = 0.8
+			// lightness = 0.5;
 			alpha = 1.0;
 			var color = $.Color({hue: hue, saturation: saturation, lightness: lightness, alpha: alpha}).toHslaString();
 			colors.push($.Color(color).toHexString());
@@ -127,13 +127,38 @@ $(document).ready(function() {
 
 	var updateColors = function () {
 		var rows = $('tbody').children();
-		colors = colorArray(rows.size());
+		colors = colorArray(rows.size(), 0.8);
 		$(rows).each( function (i) {
-			$(this).children('td.title').children('a').css("border-color", colors[i]);
+			$(this).children('td.title').children('.ministat').css("background-color", colors[i]);
 		});
 	};
-
 	updateColors();
+
+	var renderHeight = function () {
+		var rows = $('tbody').children();
+		colors = colorArray(rows.size(), 0.6);
+		$(rows).each( function (i) {
+			var $bar = $(this).children('td.title').children('.ministat').children('.minibar');
+			var count = $bar.data('count');
+			var total = $bar.data('total');
+			$bar.css({"height": 50 * count / total, "background-color": colors[i]});
+		});
+	};
+	renderHeight();
+
+	var incrementHeight = function (target) {
+		var $bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar');
+		$bar.data('count', $bar.data('count') + 1);
+		console.log($bar.data('count'));
+		renderHeight();
+	};
+
+	var decrementHeight = function (target) {
+		var $bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar');
+		$bar.data('count', $bar.data('count') - 1);
+		console.log($bar.data('count'));
+		renderHeight();
+	};
 
 	// Post a new task
 	$('#newtask').submit(function(e) {
@@ -175,9 +200,19 @@ $(document).ready(function() {
 		var clicked = this;
 		e.preventDefault();
 		$(clicked).children('img').toggleClass("complete");
+		if ($(clicked).children('img').hasClass("complete")) {
+			incrementHeight(clicked);
+		} else {
+			decrementHeight(clicked);
+		}
 		$.post(clicked.href, null, function(data) {
 			if (data !== '') {
 				$(clicked).children('img').toggleClass("complete");
+				if ($(clicked).children('img').hasClass("complete")) {
+					incrementHeight(clicked);
+				} else {
+					decrementHeight(clicked);
+				}
 			}
 		}).error( function() {
 			$(clicked).children('img').toggleClass("complete");
