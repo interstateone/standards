@@ -149,14 +149,12 @@ $(document).ready(function() {
 	var incrementHeight = function (target) {
 		var $bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar');
 		$bar.data('count', $bar.data('count') + 1);
-		console.log($bar.data('count'));
 		renderHeight();
 	};
 
 	var decrementHeight = function (target) {
 		var $bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar');
 		$bar.data('count', $bar.data('count') - 1);
-		console.log($bar.data('count'));
 		renderHeight();
 	};
 
