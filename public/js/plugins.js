@@ -20,16 +20,18 @@ $(document).ready(function() {
 	}
 
 	// Add drop shadow to navbar when page is scrolled
-	var header = $('.navbar');
-	$(window).scroll(function(e){
-		if(header.offset().top !== 0){
-			if(!header.hasClass('nav-drop-shadow')){
-				header.addClass('nav-drop-shadow');
-			}
-		}else{
+	window.onscroll = addDropShadow;
+	// Use the touchmove event for touch devices because onscroll isn't fired until the scrolling/panning stops
+	window.addEventListener('touchmove', addDropShadow, false);
+
+	function addDropShadow () {
+		var header = $('.navbar');
+		if (window.pageYOffset > 0) {
+			header.addClass('nav-drop-shadow');
+		} else {
 			header.removeClass('nav-drop-shadow');
 		}
-	});
+	}
 
 	// Set the timezone dropdown to the current value
 	var $select = $('select#timezone');
