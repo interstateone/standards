@@ -144,7 +144,7 @@ $(document).ready(function() {
 			var data = $bar.data();
 			var count = data.count;
 			var total = data.total;
-			$bar.css("height", 50 * count / total);
+			$bar.css("height", Math.min(50 * count / total, 50));
 		});
 	};
 	renderHeight();
