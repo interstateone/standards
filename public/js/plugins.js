@@ -172,7 +172,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		$.post("/new", $(this).serialize(), function(data){
 			$('tbody').append(data);
-			updateColors();
+			renderColors();
 			$('a.add').children('i').animate({transform: ''}, 'fast').toggleClass("cancel");
 			$('a.add').css('color', "#CCC")
 					.siblings('#newtask')
