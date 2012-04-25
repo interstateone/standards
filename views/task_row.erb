@@ -15,7 +15,7 @@
 		<% day = todayAsDate - todayAsDate.wday + d %>
 		<% if d <= todayAsDate.wday %>
 			<td class="
-				<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
+				<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday %>
 				<%= ' today' if todayAsDate.wday == d %>"><a href="/<%= @task.id %>/<%= day %>/complete" class="target"><img src="img/x.gif" class="check <%= 'complete' if @task.checks(:date => day).count > 0 %>" alt=""></a></td>
 		<% end %>
 	<% end %>

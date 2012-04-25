@@ -16,7 +16,7 @@
 						<% end %>
 						<% day = todayAsDate - todayAsDate.wday + d %>
 						<th class="
-							<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday + 1 %>
+							<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday %>
 							<%= ' today' if todayAsDate.wday == d %>">
 							<%= day.strftime('%A') %></th>
 					<% end %>
