@@ -125,36 +125,45 @@ $(document).ready(function() {
 		return colors;
 	}
 
-	var updateColors = function () {
+	var renderColors = function () {
 		var rows = $('tbody').children();
-		colors = colorArray(rows.size(), 0.8);
+		bgColors = colorArray(rows.size(), 0.8);
+		barColors = colorArray(rows.size(), 0.6);
 		$(rows).each( function (i) {
-			$(this).children('td.title').children('.ministat').css("background-color", colors[i]);
+			var $ministat = $(this).children('td.title').children('.ministat');
+			$ministat.css("background-color", bgColors[i]);
+			$ministat.children('.minibar').css("background-color", colors[i]);
 		});
 	};
-	updateColors();
+	renderColors();
 
 	var renderHeight = function () {
 		var rows = $('tbody').children();
-		colors = colorArray(rows.size(), 0.6);
 		$(rows).each( function (i) {
 			var $bar = $(this).children('td.title').children('.ministat').children('.minibar');
-			var count = $bar.data('count');
-			var total = $bar.data('total');
-			$bar.css({"height": 50 * count / total, "background-color": colors[i]});
+			var data = $bar.data();
+			var count = data.count;
+			var total = data.total;
+			$bar.css("height", 50 * count / total);
 		});
 	};
 	renderHeight();
 
 	var incrementHeight = function (target) {
 		var $bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar');
-		$bar.data('count', $bar.data('count') + 1);
+		// Caching the data object is faster than calling it twice (http://api.jquery.com/data/)
+		var data = $bar.data();
+		data.count += 1;
+		// Rerender the bar heights
 		renderHeight();
 	};
 
 	var decrementHeight = function (target) {
 		var $bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar');
-		$bar.data('count', $bar.data('count') - 1);
+		// Caching the data object is faster than calling it twice (http://api.jquery.com/data/)
+		var data = $bar.data();
+		data.count -= 1;
+		// Rerender the bar heights
 		renderHeight();
 	};
 
