@@ -44,6 +44,7 @@ class User
 	property :permission_level, Integer, :default => 1
 	property :password_reset_key, String
 	property :timezone, String
+	property :email_permission, Boolean, :default => false
 
 	timestamps :on
 
@@ -424,6 +425,7 @@ post '/change-info/?' do
 	user.name = params[:name]
 	user.email = params[:email]
 	user.timezone = params[:timezone]
+	user.email_permission = params[:email_permission]
 	user.save
 	flash[:notice] = "Great! Your info has been updated."
 	redirect '/settings'

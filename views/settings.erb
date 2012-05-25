@@ -426,6 +426,12 @@
 				</select>
 			</div>
 		</div>
+		<div class="control-group">
+			<label class="control-label" for="email_permission">Do you want to receive email updates about Standards?</label>
+			<div class="controls">
+				<input type="checkbox" class="input-xlarge" id="email_permission" name="email_permission" placeholder="" value="true" <%= "checked" if @user.email_permission %>>
+			</div>
+		</div>
 		<div class="form-actions">
 			<button type="submit" class="btn btn-primary">Update Info</button>
 		</div>
