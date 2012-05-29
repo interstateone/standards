@@ -5935,16 +5935,21 @@ ul.settings li {
   box-shadow: 0 0 6px #888888;
 }
 .ministat {
-  width: 5px;
   height: 50px;
   float: left;
   background-color: #CCC;
   position: relative;
+  text-align: center;
+  margin-right: 5px;
+}
+.ministat .ministreak {
+  color: white;
+  padding: 5px;
 }
 .ministat .minibar {
   position: absolute;
   bottom: 0;
-  width: 5px;
+  width: 100%;
   background-color: rgba(0, 0, 0, 0.2);
 }
 .pull-right {
