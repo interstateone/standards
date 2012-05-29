@@ -2,10 +2,14 @@
 // ---------
 
 .hero-unit {
-  padding: 60px;
+  padding: 30px 60px 60px 60px;
   margin-bottom: 30px;
   background-color: @white;
   .border-radius(6px);
+  .center-container {
+    width: 100%;
+    text-align: center;
+  }
   h1 {
     margin-bottom: 0;
     font-size: 60px;
@@ -18,5 +22,9 @@
     font-weight: 200;
     line-height: @baseLineHeight * 1.5;
     color: @heroUnitLeadColor;
+  }
+  img {
+    max-width: 100%;
+    max-height: 500px;
   }
 }

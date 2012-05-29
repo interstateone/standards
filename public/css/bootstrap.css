@@ -4056,12 +4056,16 @@ a.thumbnail:hover {
   color: #ffffff;
 }
 .hero-unit {
-  padding: 60px;
+  padding: 30px 60px 60px 60px;
   margin-bottom: 30px;
   background-color: #ffffff;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
+}
+.hero-unit .center-container {
+  width: 100%;
+  text-align: center;
 }
 .hero-unit h1 {
   margin-bottom: 0;
@@ -4075,6 +4079,10 @@ a.thumbnail:hover {
   font-weight: 200;
   line-height: 27px;
   color: inherit;
+}
+.hero-unit img {
+  max-width: 100%;
+  max-height: 500px;
 }
 @font-face {
   font-family: 'LeagueGothic';
