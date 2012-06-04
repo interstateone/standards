@@ -280,8 +280,7 @@ post '/new/?' do
 	@task = user.tasks.create(:title => params[:title], :purpose => remove_trailing_period(params[:purpose]))
 
 	# Record new task event
-	gabba = Gabba::Gabba.new(
-"UA-30914801-1", "http://mystandards.herokuapp.com")
+	gabba = Gabba::Gabba.new("UA-30914801-1", "http://mystandards.herokuapp.com")
 	gabba.identify_user(session[:__utma])
 	gabba.event("Tasks", "New")
 
@@ -331,8 +330,7 @@ post "/signup/?" do
 		user.timezone = params[:timezone]
 		if user.save
 			# Record signup event
-			gabba = Gabba::Gabba.new(
-"UA-30914801-1", "http://mystandards.herokuapp.com")
+			gabba = Gabba::Gabba.new("UA-30914801-1", "http://mystandards.herokuapp.com")
 			gabba.identify_user(session[:__utma])
 			gabba.event("Users", "Signup")
 
@@ -478,8 +476,7 @@ post '/:id/:date/complete/?' do
 		c.destroy
 	else
 		# Record check event
-		gabba = Gabba::Gabba.new(
-"UA-30914801-1", "http://mystandards.herokuapp.com")
+		gabba = Gabba::Gabba.new("UA-30914801-1", "http://mystandards.herokuapp.com")
 		gabba.identify_user(session[:__utma])
 		gabba.event("Checks", "Complete")
 
