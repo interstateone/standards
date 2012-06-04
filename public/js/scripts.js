@@ -2194,6 +2194,7 @@ $(document).ready(function() {
 		if(e.which === 13){
 			e.preventDefault();
 			$('#newtask').submit();
+			_gaq.push(['_trackEvent', 'task', 'create'])
 		}
 	});
 
@@ -2296,8 +2297,10 @@ $(document).ready(function() {
 		$(clicked).children('img').toggleClass("complete");
 		if ($(clicked).children('img').hasClass("complete")) {
 			incrementHeight(clicked);
+			_gaq.push(['_trackEvent', 'check', 'complete']);
 		} else {
 			decrementHeight(clicked);
+			_gaq.push(['_trackEvent', 'check', 'uncomplete']);
 		}
 		$.post(clicked.href, null, function(data) {
 			if (data !== '') {
