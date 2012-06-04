@@ -279,6 +279,12 @@ post '/new/?' do
 	user = current_user
 	@task = user.tasks.create(:title => params[:title], :purpose => remove_trailing_period(params[:purpose]))
 
+	# Record new task event
+	gabba = Gabba::Gabba.new(
+"UA-30914801-1", "http://mystandards.herokuapp.com")
+	gabba.identify_user(session[:__utma])
+	gabba.event("Tasks", "New")
+
 	if !@task.saved?
 		flash[:error] = @task.errors.to_a
 	end
@@ -324,6 +330,12 @@ post "/signup/?" do
 		user.password = params[:password]
 		user.timezone = params[:timezone]
 		if user.save
+			# Record signup event
+			gabba = Gabba::Gabba.new(
+"UA-30914801-1", "http://mystandards.herokuapp.com")
+			gabba.identify_user(session[:__utma])
+			gabba.event("Users", "Signup")
+
 			# Flash thank you, sign in and redirect
 			session[:id] = user.id
 			flash[:notice] = "Thanks for signing up!"
@@ -465,6 +477,12 @@ post '/:id/:date/complete/?' do
 		c = t.checks :date => params[:date]
 		c.destroy
 	else
+		# Record check event
+		gabba = Gabba::Gabba.new(
+"UA-30914801-1", "http://mystandards.herokuapp.com")
+		gabba.identify_user(session[:__utma])
+		gabba.event("Checks", "Complete")
+
 		c = Check.new
 		c.date = params[:date]
 		c.task = t

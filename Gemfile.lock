@@ -73,6 +73,7 @@ GEM
     foreman (0.27.0)
       term-ansicolor (~> 1.0.5)
       thor (>= 0.13.6)
+    gabba (0.3.0)
     growl (1.0.3)
     guard (1.0.1)
       ffi (>= 0.5.0)
@@ -158,6 +159,7 @@ DEPENDENCIES
   dm-sqlite-adapter
   dm-validations
   foreman (= 0.27.0)
+  gabba
   growl
   guard-rspec
   iron_worker
