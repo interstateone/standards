@@ -8,4 +8,4 @@ I found that when I wanted to build better habits, it helped me if there was a w
 Foundation
 ----------
 
-Standards is built on top of [Sinatra](http://www.sinatrarb.com), [DataMapper](http://www.datamapper.org), [Bootstrap](http://twitter.github.com/bootstrap) and uses a bunch of different gems and services like IronWorker. It's hosted on Heroku [here](http://standard.herokuapp.com), try it out!
+Standards is built on top of [Sinatra](http://www.sinatrarb.com), [DataMapper](http://www.datamapper.org), [Bootstrap](http://twitter.github.com/bootstrap) and uses a bunch of different gems and services like IronWorker. It's hosted on Heroku [here](http://mystandards.herokuapp.com), try it out!
