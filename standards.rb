@@ -452,9 +452,8 @@ get '/:id/?' do
 	if @task
 		erb :task
 	else
-		status 404
-		flash.now[:error] = "That task can't be found."
-		erb :home
+		flash[:error] = "That task can't be found."
+		redirect '/'
 	end
 end
 
