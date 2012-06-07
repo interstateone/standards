@@ -12,7 +12,7 @@ gem 'dm-aggregates'
 gem 'dm-pager'
 gem 'dm-postgres-adapter'
 gem "shotgun"
-gem "bcrypt-ruby", :require => "bcrypt"
+gem 'bowtie'
 gem "resolv-ipv6favor", :require => "resolv"
 gem "sinatra-flash", :require => "sinatra/flash"
 gem 'pony'
