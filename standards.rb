@@ -43,7 +43,7 @@ class User
 	property :salt, String
 	property :permission_level, Integer, :default => 1
 	property :password_reset_key, String
-	property :timezone, String
+	property :timezone, String, :default => "Mountain Time (US & Canada)"
 	property :email_permission, Boolean, :default => false
 
 	timestamps :on
@@ -322,7 +322,6 @@ post "/signup/?" do
 		user.name = params[:name]
 		user.email = params[:email]
 		user.password = params[:password]
-		user.timezone = params[:timezone]
 		if user.save
 
 			# Flash thank you, sign in and redirect
