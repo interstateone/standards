@@ -425,7 +425,7 @@ post '/change-info/?' do
 	user.name = params[:name]
 	user.email = params[:email]
 	user.timezone = params[:timezone]
-	user.email_permission = params[:email_permission]
+	user.email_permission = params[:email_permission] || false
 	user.save
 	flash[:notice] = "Great! Your info has been updated."
 	redirect '/settings'
