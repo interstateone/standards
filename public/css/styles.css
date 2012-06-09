@@ -2565,7 +2565,7 @@ li[class*=" icon-"].icon-large:before {
   *z-index: 1000;
 }
 .dropdown.open .dropdown-toggle {
-  color: #ffffff;
+  color: #000000;
   background: #ccc;
   background: rgba(0, 0, 0, 0.3);
 }
@@ -4522,8 +4522,8 @@ input[type="submit"].btn.btn-mini {
 }
 .navbar .nav .dropdown-toggle .caret,
 .navbar .nav .open.dropdown .caret {
-  border-top-color: #ffffff;
-  border-bottom-color: #ffffff;
+  border-top-color: #000000;
+  border-bottom-color: #000000;
 }
 .navbar .nav .active .caret {
   opacity: 1;
