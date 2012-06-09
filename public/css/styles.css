@@ -5765,6 +5765,8 @@ header hr {
 }
 table {
   width: 100%;
+}
+#check-table table {
   margin-top: 5%;
 }
 th {
@@ -5949,6 +5951,35 @@ ul.settings li {
 }
 .sign-up {
   margin: 5% 0;
+}
+.large-stat {
+  font-size: 3em;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: block;
+  margin: 10% 0;
+}
+.weekday-heatmap {
+  color: #ffffff;
+}
+.weekday-heatmap td {
+  padding: 2% 0;
+}
+.weekday-heatmap td:first-child {
+  -webkit-border-top-left-radius: 4px;
+  -webkit-border-bottom-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+.weekday-heatmap td:last-child {
+  -webkit-border-top-right-radius: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  -moz-border-radius-bottomright: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 .pull-right {
   float: right;

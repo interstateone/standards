@@ -1,22 +1,58 @@
 <h2><%= h @task.title.capitalize %></h2>
 <p>Remember! You're doing this because <%= switch_pronouns h @task.purpose unless @task.purpose.empty? %>.</p>
 
-<div class="well">
-	<% count = @task.checks.count %>
-	<% if count > 0 %>
-		<p>You've done this <%= count %> <%= count == 1 ? "time" : "times" %> since you started <%= time_ago_in_words @task.created_on.to_time.in_time_zone(@user.timezone) %> ago (<%= @task.created_on.strftime("%B %e, %Y") %>):</p>
-	<% else %>
-		<p>You haven't done this since you started on <%= @task.created_on.strftime("%B %e, %Y") %> (<%= time_ago_in_words @task.created_on %> ago).</p>
-	<% end %>
+<% count = @task.checks.count %>
 
-	<ul id="checks">
-		<% @task.checks(:order => :date.asc).each do |check| %>
-		<li><%= check.date.strftime("%B %e, %Y") %></li>
-		<% end %>
-	</ul><!-- /checks -->
+<div class="row-fluid">
+	<div class="span3">
+		<div class="well">
+			<span class="large-stat"><%= (count * 100 / (Date.today - @task.created_on + 1)).ceil %>%</span>
+			<p>Completion</p>
+		</div>
+	</div>
+	<div class="span3">
+		<div class="well">
+			<% if count > 0 %>
+				<% time_ago = time_ago_in_words @task.created_on.to_time.in_time_zone(@user.timezone) %>
+				<% start_date = @task.created_on.strftime("%B %e, %Y") %>
+				<p>You've done this <span class="large-stat"><%= count %></span> <%= count == 1 ? "time" : "times" %> since you started <%= time_ago %> ago.</p>
+			<% else %>
+				<p>You haven't done this since you started <%= time_ago %>.</p>
+			<% end %>
+		</div>
+	</div>
+	<div class="span6">
+		<div class="well">
+			<h3>Weekday Heatmap</h3>
+			<table class="weekday-heatmap">
+				<thead>
+					<tr>
+						<% todayAsDate = Time.zone.now.to_date %>
+						<% 7.times do |d| %>
+							<% day = todayAsDate - todayAsDate.wday + d %>
+							<th class="
+								<%= ' today' if todayAsDate.wday == d %>">
+								<%= day.strftime('%A').chr %></th>
+						<% end %>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<% for temp in @weekdayTemperatures do %>
+							<% heat = Color.new(0xFFFF00) %>
+							<% heat = heat - 0x00FF00 * temp / @maxTemp %>
+							<td style="background-color: <%= heat %>"><%= temp %></td>
+						<% end %>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
 
-	<p>You're currently sitting at a <%= (count * 100 / (Date.today - @task.created_on + 1)).ceil %>% completion rate.</p>
-</div><!-- / -->
+<div class="row-fluid">
+	
+</div>
 
 <a class="delete btn btn-danger pull-right">Delete</a>
 

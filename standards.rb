@@ -5,6 +5,7 @@ require 'active_support/core_ext/time/zones'
 require 'active_support/time_with_zone'
 require 'active_support/core_ext/time/conversions'
 require_relative 'workers/emailworker'
+include Colorist
 
 SITE_TITLE = "Standards"
 
@@ -449,6 +450,17 @@ get '/:id/?' do
 	@user = current_user
 	@task = @user.tasks.get params[:id]
 	if @task
+		# Make an array of checks sorted by weekday
+		@weekdayTemperatures = [0,0,0,0,0,0,0]
+		@maxTemp = 0;
+		@task.checks(:order => :date.asc).each do |check|
+			weekdayIndex = check.date.wday
+			@weekdayTemperatures[weekdayIndex] += 1
+			if @weekdayTemperatures[weekdayIndex] > @maxTemp
+				@maxTemp += 1
+			end
+		end
+
 		erb :task
 	else
 		flash[:error] = "That task can't be found."
