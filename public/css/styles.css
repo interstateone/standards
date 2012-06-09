@@ -5947,6 +5947,9 @@ ul.settings li {
   width: 5px;
   background-color: rgba(0, 0, 0, 0.2);
 }
+.sign-up {
+  margin: 5% 0;
+}
 .pull-right {
   float: right;
 }
