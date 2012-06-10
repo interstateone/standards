@@ -150,7 +150,11 @@ $(document).ready(function() {
 			$bar.css("height", Math.min(50 * count / total, 50));
 		});
 	};
-	renderHeight();
+
+	// If this is the homepage, call renderHeight() once
+	if ($('td.title').length) {
+		renderHeight();
+	}
 
 	var incrementHeight = function (target) {
 		var $bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar');
