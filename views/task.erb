@@ -12,8 +12,8 @@
 	</div>
 	<div class="span3">
 		<div class="well">
+			<% time_ago = time_ago_in_words @task.created_on.to_time.in_time_zone(@user.timezone) %>
 			<% if count > 0 %>
-				<% time_ago = time_ago_in_words @task.created_on.to_time.in_time_zone(@user.timezone) %>
 				<% start_date = @task.created_on.strftime("%B %e, %Y") %>
 				<p>You've done this <span class="large-stat"><%= count %></span> <%= count == 1 ? "time" : "times" %> since you started <%= time_ago %> ago.</p>
 			<% else %>
