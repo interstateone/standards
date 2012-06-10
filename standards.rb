@@ -453,12 +453,14 @@ get '/:id/?' do
 		# Make an array of checks sorted by weekday
 		@weekdayTemperatures = [0,0,0,0,0,0,0]
 		@maxTemp = 0;
+		@minTemp = 0;
 		@task.checks(:order => :date.asc).each do |check|
 			weekdayIndex = check.date.wday
 			@weekdayTemperatures[weekdayIndex] += 1
 			if @weekdayTemperatures[weekdayIndex] > @maxTemp
 				@maxTemp += 1
 			end
+			@minTemp = @weekdayTemperatures.sort.first
 		end
 
 		erb :task

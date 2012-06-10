@@ -40,7 +40,7 @@
 					<tr>
 						<% for temp in @weekdayTemperatures do %>
 							<% heat = Color.new(0xFFFF00) %>
-							<% heat = heat - 0x00FF00 * temp / @maxTemp %>
+							<% heat = heat - 0x00FF00 * (temp - @minTemp) / @maxTemp %>
 							<td style="background-color: <%= heat %>"><%= temp %></td>
 						<% end %>
 					</tr>
