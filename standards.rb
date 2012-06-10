@@ -460,6 +460,9 @@ get '/:id/?' do
 			if @weekdayTemperatures[weekdayIndex] > @maxTemp
 				@maxTemp += 1
 			end
+			if @maxTemp == 0
+				@maxTemp = 1
+			end
 			@minTemp = @weekdayTemperatures.sort.first
 		end
 
