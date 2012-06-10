@@ -277,8 +277,8 @@ end
 
 post '/new/?' do
 	login_required
-	user = current_user
-	@task = user.tasks.create(:title => params[:title], :purpose => remove_trailing_period(params[:purpose]))
+	@user = current_user
+	@task = @user.tasks.create(:title => params[:title], :purpose => remove_trailing_period(params[:purpose]))
 
 	if !@task.saved?
 		flash[:error] = @task.errors.to_a
