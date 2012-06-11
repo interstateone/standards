@@ -2291,17 +2291,16 @@ $(document).ready(function() {
 		if(e.which === 13){
 			e.preventDefault();
 			$('#newtask').submit();
-			_gaq.push(['_trackEvent', 'task', 'create'])
+			_gaq.push(['_trackEvent', 'task', 'create']);
 		}
 	});
 
-
 	function colorArray (numberOfRows, lightness) {
 		colors = [];
-		var hue, saturation, lightness, alpha;
+		var hue, saturation, alpha;
 		for (var i = 0; i < numberOfRows; i++) {
 			hue = i * 340 / (numberOfRows + 2);
-			saturation = 0.8
+			saturation = 0.8;
 			// lightness = 0.5;
 			alpha = 1.0;
 			var color = $.Color({hue: hue, saturation: saturation, lightness: lightness, alpha: alpha}).toHslaString();
@@ -2360,7 +2359,12 @@ $(document).ready(function() {
 	$('#newtask').submit(function(e) {
 		e.preventDefault();
 		$.post("/new", $(this).serialize(), function(data){
+			// Append the new task row
 			$('tbody').append(data);
+
+			// Remove welcome message after submitting first task
+			$('.hero-unit').hide();
+
 			renderColors();
 			$('a.add').children('i').animate({transform: ''}, 'fast').toggleClass("cancel");
 			$('a.add').css('color', "#CCC")
