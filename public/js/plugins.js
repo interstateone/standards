@@ -83,6 +83,7 @@ $(document).ready(function() {
 	});
 
 	// If this is the settings page, handle the weekday radio buttons
+	// Credit: http://dan.doezema.com/2012/03/twitter-bootstrap-radio-button-form-inputs/
 	if($('div.btn-group[data-toggle-name=*]').length) {
 		$('div.btn-group[data-toggle-name=*]').each(function(){
 			var group   = $(this);
