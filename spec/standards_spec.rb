@@ -12,7 +12,7 @@ end
 
 module UserSpecHelper
 	def valid_user_attributes
-		{ :email => 'test@gmail.com',
+		{ :email => 'Test@gmail.com',
 		:name => 'Mike',
 		:password => 'Tes7yasdf' }
 	end
@@ -98,6 +98,40 @@ shared_examples_for "Standards" do
 	it 'should have a title' do
 		get '/'
 		last_response.body.include? "Standards"
+	end
+end
+
+describe 'When signing up' do
+	include UserSpecHelper
+
+	before :each do
+		@user = User.create valid_user_attributes
+	end
+
+	it 'existing users should be logged in' do
+		post "/signup", valid_user_attributes
+		last_response.body.include? valid_user_attributes[:name]
+		get '/logout'
+		post '/login', { :email => valid_user_attributes[:email].upcase, :password => valid_user_attributes[:password] }
+		last_response.body.include? valid_user_attributes[:name]
+	end
+
+	it 'new users should be created' do
+		post "/signup", { :name => 'newtest', :email => 'newtest@gmail.com', :password => 'abcdefghijk' }
+		last_response.body.include? 'newtest'
+	end
+end
+
+describe 'When logging in' do
+	include UserSpecHelper
+
+	it 'emails should be case-insensitive' do
+		@user = User.create valid_user_attributes
+		post '/login', { :email => valid_user_attributes[:email], :password => valid_user_attributes[:password] }
+		last_response.body.should_not include "Email and password don't match."
+		get '/logout'
+		post '/login', { :email => valid_user_attributes[:email].upcase, :password => valid_user_attributes[:password] }
+		last_response.body.should_not include "Email and password don't match."
 	end
 end
 

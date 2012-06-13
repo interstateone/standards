@@ -31,6 +31,34 @@ IronWorker.configure do |config|
 	config.project_id = ENV['IRON_WORKER_PROJECT_ID']
 end
 
+# Get ILIKE support (case-insensitive like) for Postgres
+module DataMapper
+  module Adapters
+
+    class PostgresAdapter < DataObjectsAdapter
+
+      module SQL #:nodoc:
+        private
+
+        # @api private
+        def supports_returning?
+          true
+        end
+
+        def like_operator(operand)
+          'ILIKE'
+        end
+      end
+
+      include SQL
+
+    end
+
+    const_added(:PostgresAdapter)
+
+  end
+end
+
 class User
 	include DataMapper::Resource
 
@@ -71,7 +99,7 @@ class User
 	end
 
 	def self.authenticate(email, pass)
-		user = first :email => email
+		user = first(:email.like => email)
 		return nil if user.nil?
 		return user if User.encrypt(pass, user.salt) == user.hashed_password
 		nil
@@ -323,12 +351,27 @@ post "/signup/?" do
 		user.name = params[:name]
 		user.email = params[:email]
 		user.password = params[:password]
-		if user.save
+
+		# If user already exists, sign them in
+		if existing_user = User.authenticate(params[:email], params[:password])
+			session[:id] = existing_user.id
+			if session[:return_to]
+				redirect_url = session[:return_to]
+				session[:return_to] = false
+				redirect redirect_url
+			else
+				redirect '/'
+			end
+
+		# If user doesn't exist but is a valid new user, sign them up
+		elsif user.save
 
 			# Flash thank you, sign in and redirect
 			session[:id] = user.id
 			flash[:notice] = "Thanks for signing up!"
 			redirect "/"
+
+		# If user doesn't exists and is not a valid new user, throw errors
 		else
 			user.errors.each do |e|
 				flash[:error] = e
