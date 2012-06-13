@@ -10,14 +10,22 @@
 				<tr>
 					<th></th>
 					<% todayAsDate = Time.zone.now.to_date %>
-					<% 7.times do |d| %>
-						<% if todayAsDate.wday == 0 %>
-							<% d = d - 1 %>
+					<% first_day = todayAsDate - todayAsDate.wday %>
+					<% if @user.starting_weekday > todayAsDate.wday %>
+						<% first_day = first_day - (7 - @user.starting_weekday) %>
+					<% elsif @user.starting_weekday == todayAsDate.wday %>
+						<% first_day = first_day + @user.starting_weekday + 1 %>
+					<% else %>
+						<% first_day = first_day + @user.starting_weekday + 1 %>
+					<% end %>
+					<% date_range = (first_day..(first_day + 6)).to_a %>
+					<% date_range.each do |day| %>
+						<% if todayAsDate.wday == @user.starting_weekday %>
+							<% day = day - 1 # show yesterday if we're at the start of the week %>
 						<% end %>
-						<% day = todayAsDate - todayAsDate.wday + d %>
 						<th class="
-							<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday %>
-							<%= ' today' if todayAsDate.wday == d %>">
+							<%= ' hidden-phone' if day < todayAsDate - 1 || day > todayAsDate %>
+							<%= ' today' if todayAsDate == day %>">
 							<%= day.strftime('%A') %></th>
 					<% end %>
 				</tr>
@@ -51,14 +59,22 @@
 				<tr>
 					<th></th>
 					<% todayAsDate = Time.zone.now.to_date %>
-					<% 7.times do |d| %>
-						<% if todayAsDate.wday == 0 %>
-							<% d = d - 1 %>
+					<% first_day = todayAsDate - todayAsDate.wday %>
+					<% if @user.starting_weekday > todayAsDate.wday %>
+						<% first_day = first_day - (7 - @user.starting_weekday) %>
+					<% elsif @user.starting_weekday == todayAsDate.wday %>
+						<% first_day = first_day + @user.starting_weekday + 1 %>
+					<% else %>
+						<% first_day = first_day + @user.starting_weekday %>
+					<% end %>
+					<% date_range = (first_day..(first_day + 6)).to_a %>
+					<% date_range.each do |day| %>
+						<% if todayAsDate.wday == @user.starting_weekday %>
+							<% day = day - 1 # show yesterday if we're at the start of the week %>
 						<% end %>
-						<% day = todayAsDate - todayAsDate.wday + d %>
 						<th class="
-							<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday %>
-							<%= ' today' if todayAsDate.wday == d %>">
+							<%= ' hidden-phone' if day < todayAsDate - 1 || day > todayAsDate %>
+							<%= ' today' if todayAsDate == day %>">
 							<%= day.strftime('%A') %></th>
 					<% end %>
 				</tr>

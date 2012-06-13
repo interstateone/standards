@@ -88,10 +88,6 @@ describe 'A check' do
 		@user = User.new valid_user_attributes
 		@task = Task.new :title => 'Ride a bike', :user => @user
 	end
-
-	it 'should be invalid without a user'
-	it 'should be invalid without a task'
-	it 'should be invalid without a date'
 end
 
 shared_examples_for "Standards" do

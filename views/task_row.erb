@@ -8,19 +8,27 @@
 		<a href="/<%= @task.id %>" alt="<%= h @task.title %>" title="<%= h @task.purpose %>"><%= h @task.title.capitalize %></a>
 	</td>
 	<% todayAsDate = Time.zone.now.to_date %>
-	<% 7.times do |d| %>
-		<% if todayAsDate.wday == 0 %>
-			<% d = d - 1 %>
+	<% first_day = todayAsDate - todayAsDate.wday %>
+	<% if @user.starting_weekday > todayAsDate.wday %>
+		<% first_day = first_day - (7 - @user.starting_weekday) %>
+	<% elsif @user.starting_weekday == todayAsDate.wday %>
+		<% first_day = first_day + @user.starting_weekday + 1 %>
+	<% else %>
+		<% first_day = first_day + @user.starting_weekday %>
+	<% end %>
+	<% date_range = (first_day..(first_day + 6)).to_a %>
+	<% date_range.each do |day| %>
+		<% if todayAsDate.wday == @user.starting_weekday %>
+			<% day = day - 1 # show yesterday if we're at the start of the week %>
 		<% end %>
-		<% day = todayAsDate - todayAsDate.wday + d %>
-		<% if day >= @task.created_on.to_time.in_time_zone(@user.timezone).to_date && d <= todayAsDate.wday %>
+		<% if day >= @task.created_on.to_time.in_time_zone(@user.timezone).to_date && day <= todayAsDate %>
 			<td class="
-				<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday %>
-				<%= ' today' if todayAsDate.wday == d %>"><a href="/<%= @task.id %>/<%= day %>/complete" class="target"><img src="img/x.gif" class="check <%= 'complete' if @task.checks(:date => day).count > 0 %>" alt=""></a></td>
+				<%= ' hidden-phone' if day < todayAsDate - 1 || day > todayAsDate %>
+				<%= ' today' if todayAsDate == day %>"><a href="/<%= @task.id %>/<%= day %>/complete" class="target"><img src="img/x.gif" class="check <%= 'complete' if @task.checks(:date => day).count > 0 %>" alt=""></a></td>
 		<% else %>
 			<td class="
-				<%= ' hidden-phone' if d < todayAsDate.wday - 1 || d > todayAsDate.wday %>
-				<%= ' today' if todayAsDate.wday == d %>"></td>
+				<%= ' hidden-phone' if day < todayAsDate - 1 || day > todayAsDate %>
+				<%= ' today' if todayAsDate == day %>"></td>
 		<% end %>
 	<% end %>
 </tr>

@@ -19,6 +19,17 @@
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label" for="starting_weekday">Weeks start on</label>
+			<div class="controls">
+				<div class="btn-group" data-toggle="buttons-radio" data-toggle-name="starting_weekday" name="starting_weekday">
+					<% (0..6).each do |wday| %>
+						<button type="button" class="btn" value="<%= wday %>" data-toggle="button"><%= (Date.commercial(2012, 1, wday + 1) - 1).strftime('%A') %></button>
+					<% end %>
+				</div>
+			</div>
+			<input type="hidden" name="starting_weekday" value="<%= @user.starting_weekday %>">
+		</div>
+		<div class="control-group">
 			<label class="control-label" for="email">Time Zone</label>
 			<div class="controls">
 				<select class="input-xlarge" id="timezone" name="timezone" placeholder="" data-zone="<%= Time.zone.name %>">

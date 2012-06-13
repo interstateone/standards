@@ -74,6 +74,7 @@ class User
 	property :password_reset_key, String
 	property :timezone, String, :default => "Mountain Time (US & Canada)"
 	property :email_permission, Boolean, :default => false
+	property :starting_weekday, Integer, :default => 0
 
 	timestamps :on
 
@@ -468,6 +469,7 @@ post '/change-info/?' do
 	user = current_user
 	user.name = params[:name]
 	user.email = params[:email]
+	user.starting_weekday = params[:starting_weekday]
 	user.timezone = params[:timezone]
 	user.email_permission = params[:email_permission] || false
 	user.save
