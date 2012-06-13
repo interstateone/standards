@@ -2545,6 +2545,14 @@ li[class*=" icon-"].icon-large:before {
   *width: 100%;
   *margin: -5px 0 5px;
 }
+.dropdown-menu p {
+  display: block;
+  padding: 3px 15px;
+  clear: both;
+  font-weight: normal;
+  line-height: 18px;
+  white-space: nowrap;
+}
 .dropdown-menu a {
   display: block;
   padding: 3px 15px;
