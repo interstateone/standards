@@ -2284,6 +2284,149 @@ $(document).ready(function() {
 		});
 	}
 
+	// Timezone stuff
+	// Is it DST?
+	// Credit: http://www.mresoftware.com/simpleDST.htm
+	var isDST = function () {
+		var today = new Date();
+		var yr = today.getFullYear();
+		var jan = new Date(yr,0);	// January 1
+		var jul = new Date(yr,6);	// July 1
+		// northern hemisphere test
+		if (jan.getTimezoneOffset() > jul.getTimezoneOffset() && today.getTimezoneOffset() != jan.getTimezoneOffset()){
+			return true;
+		}
+		// southern hemisphere test
+		if (jan.getTimezoneOffset() < jul.getTimezoneOffset() && today.getTimezoneOffset() != jul.getTimezoneOffset()){
+			return true;
+		}
+		// if we reach this point, DST is not in effect on the client computer.
+		return false;
+	};
+
+	// Update the time in chosen zone
+	updateTimePreview = function (offset) {
+		var date = new Date();
+
+		// Find the offset in hours and minutes (retains sign)
+		var hourOffset = Math.floor(offset);
+		var minuteOffset = (offset % 1) * 60;
+
+		// calculate the hours and minutes
+		var hours = date.getUTCHours() + hourOffset;
+		var minutes = date.getUTCMinutes() + minuteOffset;
+
+		// make sure they are within bounds (0-23, 0-59)
+		if (hours < 0) {
+			hours += 24;
+		} else if (hours > 23) {
+			hours -= 24;
+		}
+
+		if (minutes < 0) {
+			minutes += 60;
+			hours -= 1;
+		} else if (minutes > 59) {
+			minutes -= 60;
+			hours += 1;
+		}
+
+		// Format as 12h, with PM if necessary
+		var isPM = false;
+		if (hours > 11) {
+			hours -= 11;
+			isPM = true;
+		}
+
+		// pad the minutes to two digits
+
+		// display
+		var timeString = hours + ":" + minutes;
+		if (isPM) {
+			timeString = timeString + " PM";
+		} else {
+			timeString = timeString + " AM";
+		}
+
+		$('label[for="timezone"]').text(timeString);
+	};
+
+	// Bind the change event of the timezone list to update the time preview
+	$('select[name="timezone"]').change( function (event) {
+		var selectedData = $('select[name="timezone"] option:selected').data();
+		var offset = 0;
+
+		if (isDST()) {
+			offset = selectedData.dstOffset;
+		} else {
+			offset = selectedData.offset;
+		}
+
+		updateTimePreview(offset);
+	});
+
+	// Fire the change event once so the label has an initial value
+	$('select[name="timezone"]').change();
+
+	// Check for browser support of geolocation
+	if (navigator.geolocation) {
+		// Display the gelocate button
+		$('select[name="timezone"]').parent().append('<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>');
+		var $button = $('button.geolocate');
+
+		// Find the timezone when the button is clicked
+		$('button.geolocate').click( function () {
+			// Find the current location
+			navigator.geolocation.getCurrentPosition(
+				// success function
+				function (position) {
+					// change to function later
+					// lookup in geonames
+					var lat = position.coords.latitude;
+					var long = position.coords.longitude;
+
+					var urlbase = "http://api.geonames.org/timezoneJSON?";
+					var username = "interstateone";
+
+					var url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username;
+
+					$.get(url, function (data) {
+						// display time in zone in label
+						updateTimePreview(data.dstOffset);
+
+						// success state for geolocate button
+						$button.css('color', 'green');
+
+						// select the proper option in the menu
+						$('select[name="timezone"]').val(data.timezoneId);
+					})
+					.error( function () {
+						// error state for geolocate button
+						$button.css('color', 'red');
+					});
+				},
+				// error function
+				function (error){
+					switch(error.code){
+						case error.TIMEOUT:
+							alert ('Timeout');
+							break;
+						case error.POSITION_UNAVAILABLE:
+							alert ('Position unavailable');
+							break;
+						case error.PERMISSION_DENIED:
+							alert ('Permission denied');
+							break;
+						case error.UNKNOWN_ERROR:
+							alert ('Unknown error');
+							break;
+					}
+				}
+			);
+		});
+
+	}
+
 	// Map JS reset() function to jQuery
 	jQuery.fn.reset = function () {
 		$(this).each (function() { this.reset(); });
