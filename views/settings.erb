@@ -23,7 +23,7 @@
 			<div class="controls">
 				<div class="btn-group" data-toggle="buttons-radio" data-toggle-name="starting_weekday" name="starting_weekday">
 					<% (0..6).each do |wday| %>
-						<button type="button" class="btn" value="<%= wday %>" data-toggle="button"><%= (Date.commercial(2012, 1, wday + 1) - 1).strftime('%A') %></button>
+						<button type="button" class="btn" value="<%= wday %>" data-toggle="button"><%= (Date.commercial(2012, 1, wday + 1) - 1).strftime('%A').chr %></button>
 					<% end %>
 				</div>
 			</div>
