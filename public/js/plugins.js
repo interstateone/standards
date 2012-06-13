@@ -103,88 +103,13 @@ $(document).ready(function() {
 	}
 
 	// Timezone stuff
-	// Is it DST?
-	// Credit: http://www.mresoftware.com/simpleDST.htm
-	var isDST = function () {
-		var today = new Date();
-		var yr = today.getFullYear();
-		var jan = new Date(yr,0);	// January 1
-		var jul = new Date(yr,6);	// July 1
-		// northern hemisphere test
-		if (jan.getTimezoneOffset() > jul.getTimezoneOffset() && today.getTimezoneOffset() != jan.getTimezoneOffset()){
-			return true;
-		}
-		// southern hemisphere test
-		if (jan.getTimezoneOffset() < jul.getTimezoneOffset() && today.getTimezoneOffset() != jul.getTimezoneOffset()){
-			return true;
-		}
-		// if we reach this point, DST is not in effect on the client computer.
-		return false;
-	};
-
-	// Update the time in chosen zone
-	updateTimePreview = function (offset) {
-		var date = new Date();
-
-		// Find the offset in hours and minutes (retains sign)
-		var hourOffset = Math.floor(offset);
-		var minuteOffset = (offset % 1) * 60;
-
-		// calculate the hours and minutes
-		var hours = date.getUTCHours() + hourOffset;
-		var minutes = date.getUTCMinutes() + minuteOffset;
-
-		// make sure they are within bounds (0-23, 0-59)
-		if (hours < 0) {
-			hours += 24;
-		} else if (hours > 23) {
-			hours -= 24;
-		}
-
-		if (minutes < 0) {
-			minutes += 60;
-			hours -= 1;
-		} else if (minutes > 59) {
-			minutes -= 60;
-			hours += 1;
-		}
-
-		// Format as 12h, with PM if necessary
-		var isPM = false;
-		if (hours > 11) {
-			hours -= 11;
-			isPM = true;
-		}
-
-		// pad the minutes to two digits
-
-		// display
-		var timeString = hours + ":" + minutes;
-		if (isPM) {
-			timeString = timeString + " PM";
-		} else {
-			timeString = timeString + " AM";
-		}
-
-		$('label[for="timezone"]').text(timeString);
-	};
-
-	// Bind the change event of the timezone list to update the time preview
+	// If the selection is manually changed, turn the button to it's regular color
 	$('select[name="timezone"]').change( function (event) {
-		var selectedData = $('select[name="timezone"] option:selected').data();
-		var offset = 0;
-
-		if (isDST()) {
-			offset = selectedData.dstOffset;
-		} else {
-			offset = selectedData.offset;
+		var $button = $('button.geolocate');
+		if ($button.length) {
+			$button.css('color', '#333333');
 		}
-
-		updateTimePreview(offset);
 	});
-
-	// Fire the change event once so the label has an initial value
-	$('select[name="timezone"]').change();
 
 	// Check for browser support of geolocation
 	if (navigator.geolocation) {
@@ -209,9 +134,6 @@ $(document).ready(function() {
 					var url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username;
 
 					$.get(url, function (data) {
-						// display time in zone in label
-						updateTimePreview(data.dstOffset);
-
 						// success state for geolocate button
 						$button.css('color', 'green');
 
