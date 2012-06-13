@@ -34,7 +34,9 @@
 			<div class="controls">
 				<select class="input-xlarge" id="timezone" name="timezone" placeholder="" data-zone="<%= Time.zone.name %>">
 					<% TZInfo::Timezone.all.each do |zone| %>
-						<option value="<%= zone.identifier %>"><%= zone %></option>
+						<option value="<%= zone.identifier %>"
+								<%= "selected" if Time.zone.name == zone.identifier %>
+								><%= zone %></option>
 					<% end %>
 				</select>
 			</div>
