@@ -5995,6 +5995,9 @@ ul.settings li {
     margin-top: 2% !important;
   }
 }
+a[href="#"] {
+  -webkit-touch-callout: none;
+}
 .pull-right {
   float: right;
 }
