@@ -16,7 +16,6 @@ gem 'bowtie'
 gem "resolv-ipv6favor", :require => "resolv"
 gem "sinatra-flash", :require => "sinatra/flash"
 gem 'pony'
-gem 'bowtie'
 gem 'iron_worker'
 gem 'colorist'
 gem 'foreman', '0.27.0'

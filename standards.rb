@@ -96,7 +96,7 @@ class User
 	end
 
 	def admin?
-		self.permission_level == -1 || self.id == 1
+		self.permission_level == 10
 	end
 
 	def self.authenticate(email, pass)
@@ -487,6 +487,16 @@ post '/change-password/?' do
 	else
 		flash[:error] = "That password was incorrect."
 		redirect '/settings'
+	end
+end
+
+get '/admin/?' do
+	login_required
+	@user = current_user
+	if @user.admin?
+		erb :admin
+	else
+		redirect '/'
 	end
 end
 
