@@ -29,4 +29,5 @@ group :test do
 	gem 'rspec'
 	gem 'growl'
 	gem 'dm-sqlite-adapter'
+	gem 'timecop'
 end

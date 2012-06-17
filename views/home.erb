@@ -60,18 +60,20 @@
 					<th></th>
 					<% todayAsDate = Time.zone.now.to_date %>
 					<% first_day = todayAsDate - todayAsDate.wday %>
+					<%# show yesterday if we're at the start of the week %>
+					<% if todayAsDate.wday == @user.starting_weekday %>
+						<% first_day = first_day - 1 %>
+					<% end %>
+					<%# if the starting weekday is ahead of the current weekday, start in the previous week %>
 					<% if @user.starting_weekday > todayAsDate.wday %>
 						<% first_day = first_day - (7 - @user.starting_weekday) %>
-					<% elsif @user.starting_weekday == todayAsDate.wday %>
-						<% first_day = first_day + @user.starting_weekday + 1 %>
+					<%# otherwise just start in the current week during the defined weekday %>
 					<% else %>
 						<% first_day = first_day + @user.starting_weekday %>
 					<% end %>
+					<%# build the table headers %>
 					<% date_range = (first_day..(first_day + 6)).to_a %>
 					<% date_range.each do |day| %>
-						<% if todayAsDate.wday == @user.starting_weekday %>
-							<% day = day - 1 # show yesterday if we're at the start of the week %>
-						<% end %>
 						<th class="
 							<%= ' hidden-phone' if day < todayAsDate - 1 || day > todayAsDate %>
 							<%= ' today' if todayAsDate == day %>">

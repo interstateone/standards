@@ -159,6 +159,20 @@ describe 'When logged in as a user' do
 		# This is an AJAX request...
 		last_response.body.include? 'Task deleted'
 	end
+
+	it 'if first day of week should still show yesterday' do
+		# The current weekday index
+		today = Date.today
+		today_wday = Date.today.wday
+
+		# Move to Sunday using the index
+		sunday = today - today_wday
+		saturday = sunday - 1
+		Timecop.freeze(sunday) do
+			get '/'
+			last_response.body.include? saturday.strftime('%F')
+		end
+	end
 end
 
 describe 'Unauthorized users' do
