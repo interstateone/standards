@@ -524,14 +524,16 @@ get '/admin/?' do
 		checks_this_week = Check.all(:created_at.gte => (Date.today - 7))
 		@new_checks_this_week = checks_this_week.count
 		# users that have checked in the last week
+		# inject returns array of unique users
 		seen = Set.new
-		checks_this_week.users.inject([]) do |unique, user|
+		unique_users = checks_this_week.users.inject([]) do |unique, user|
 			unless seen.include?(user.id)
-				unique.push user.name
+				unique << user
 				seen << user.id
 			end
-			@active_users_this_week = unique.count
+			unique
 		end
+		@active_users_this_week = unique_users.length
 
 		erb :admin
 	else
