@@ -520,10 +520,18 @@ get '/admin/?' do
 		# Grab DB metrics
 		@user_count = User.all.count
 		@new_users_this_week = User.all(:created_on.gte => (Date.today - 7)).count
-		# users that have checked in the last week
-		@active_users_this_week = User.all(User.checks.created_at.gte => (Date.today - 7)).count
 		@check_count = Check.all.count
-		@new_checks_this_week = Check.all(:created_at.gte => (Date.today - 7)).count
+		checks_this_week = Check.all(:created_at.gte => (Date.today - 7))
+		@new_checks_this_week = checks_this_week.count
+		# users that have checked in the last week
+		seen = Set.new
+		checks_this_week.users.inject([]) do |unique, user|
+			unless seen.include?(user.id)
+				unique.push user.name
+				seen << user.id
+			end
+			@active_users_this_week = unique.count
+		end
 
 		erb :admin
 	else
