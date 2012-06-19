@@ -20,7 +20,7 @@ gem 'iron_worker'
 gem 'colorist'
 gem 'foreman', '0.27.0'
 gem 'thin'
-gem 'gabba'
+gem 'garb'
 
 group :test do
 	gem 'rack-test', :require => 'rack/test'
