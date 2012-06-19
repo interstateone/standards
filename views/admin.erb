@@ -1,0 +1,76 @@
+<h2>Admin</h2>
+<div class="row-fluid">
+	<div class="span3">
+		<div class="well">
+			<h2>Visitors</h2>
+
+			<dt>Last 30 days</dt>
+			<dd><%= @visitors_month %></dd>
+
+			<dt>Last 7 days</dt>
+			<dd><%= @visitors_week %></dd>
+
+			<dt>Today</dt>
+			<dd><%= @visitors_today %></dd>
+		</div>
+	</div>
+	<div class="span3">
+		<div class="well">
+			<h2>Pageviews</h2>
+
+			<dt>Last 30 days</dt>
+			<dd><%= @pageviews_month %></dd>
+
+			<dt>Last 7 days</dt>
+			<dd><%= @pageviews_week %></dd>
+
+			<dt>Today</dt>
+			<dd><%= @pageviews_today %></dd>
+		</div>
+	</div>
+	<div class="span3">
+		<div class="well">
+			<h2>Users</h2>
+
+			<dt>Total</dt>
+			<dd><%= @user_count %></dd>
+
+			<dt>New last 7 days</dt>
+			<dd><%= @new_users_this_week %></dd>
+
+			<dt>Active last 7 days</dt>
+			<dd><%= @active_users_this_week %></dd>
+		</div>
+	</div>
+	<div class="span3">
+		<div class="well">
+			<h2>Checks</h2>
+
+			<dt>Total</dt>
+			<dd><%= @check_count %></dd>
+
+			<dt>New last 7 days</dt>
+			<dd><%= @new_checks_this_week %></dd>
+		</div>
+	</div>
+</div>
+<div class="row-fluid">
+	<div class="span6">
+		<div class="well">
+			<h2>Referral sources</h2>
+
+			<dt>Last 30 days</dt>
+			<dd><%=  %></dd>
+
+			<dt>Last 7 days</dt>
+		</div>
+	</div>
+	<div class="span6">
+		<div class="well">
+			<h2>Location</h2>
+
+			<dt>Top 10 in last 30 days</dt>
+			<dd><%= %></dd>
+		</div>
+	</div>
+</div>

@@ -96,7 +96,7 @@ class User
 	end
 
 	def admin?
-		self.permission_level == -1 || self.id == 1
+		self.permission_level == 10
 	end
 
 	def self.authenticate(email, pass)
@@ -487,6 +487,47 @@ post '/change-password/?' do
 	else
 		flash[:error] = "That password was incorrect."
 		redirect '/settings'
+	end
+end
+
+get '/admin/?' do
+	login_required
+	@user = current_user
+	if @user.admin?
+		# Garb Setup
+		Garb::Session.login(ENV['ANALYTICS_USERNAME'] || settings.analytics_username, ENV['ANALYTICS_PASSWORD'] || settings.analytics_password)
+		profile = Garb::Management::Profile.all.detect {|p| p.web_property_id == 'UA-30914801-1'}
+
+		class Exits
+			extend Garb::Model
+
+			metrics :pageviews, :visitors
+			dimensions :page_path, :referral_path, :city
+		end
+
+		month = profile.exits
+		week = profile.exits(:start_date => (Date.today - 7), :end_date => Date.today)
+		today = profile.exits(:start_date => Date.today)
+
+		# Grab GA metrics
+		@visitors_month = month.inject(0) {|sum, record| sum + record.visitors.to_i}
+		@visitors_week = week.inject(0) {|sum, record| sum + record.visitors.to_i}
+		@visitors_today = today.inject(0) {|sum, record| sum + record.visitors.to_i}
+		@pageviews_month = month.inject(0) {|sum, record| sum + record.pageviews.to_i}
+		@pageviews_week = week.inject(0) {|sum, record| sum + record.pageviews.to_i}
+		@pageviews_today = today.inject(0) {|sum, record| sum + record.pageviews.to_i}
+
+		# Grab DB metrics
+		@user_count = User.all.count
+		@new_users_this_week = User.all(:created_on.gte => (Date.today - 7)).count
+		# users that have checked in the last week
+		@active_users_this_week = User.all(User.checks.created_at.gte => (Date.today - 7)).count
+		@check_count = Check.all.count
+		@new_checks_this_week = Check.all(:created_at.gte => (Date.today - 7)).count
+
+		erb :admin
+	else
+		redirect '/'
 	end
 end
 
