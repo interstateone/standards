@@ -505,9 +505,10 @@ get '/admin/?' do
 			dimensions :page_path, :referral_path, :city
 		end
 
+		today_in_time_zone = Time.zone.now.to_date
 		month = profile.exits
-		week = profile.exits(:start_date => (Date.today - 7), :end_date => Date.today)
-		today = profile.exits(:start_date => Date.today)
+		week = profile.exits(:start_date => (today_in_time_zone - 7), :end_date => today_in_time_zone)
+		today = profile.exits(:start_date => today_in_time_zone)
 
 		# Grab GA metrics
 		@visitors_month = month.inject(0) {|sum, record| sum + record.visitors.to_i}
@@ -519,9 +520,9 @@ get '/admin/?' do
 
 		# Grab DB metrics
 		@user_count = User.all.count
-		@new_users_this_week = User.all(:created_on.gte => (Date.today - 7)).count
+		@new_users_this_week = User.all(:created_on.gte => (today_in_time_zone - 7)).count
 		@check_count = Check.all.count
-		checks_this_week = Check.all(:created_at.gte => (Date.today - 7))
+		checks_this_week = Check.all(:created_at.gte => (today_in_time_zone - 7))
 		@new_checks_this_week = checks_this_week.count
 		# users that have checked in the last week
 		# inject returns array of unique users
