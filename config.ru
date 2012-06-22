@@ -6,6 +6,10 @@ map "/bowtie" do
 	run Bowtie::Admin
 end
 
+map "/api" do
+	run API::Application
+end
+
 map '/' do
 	run Sinatra::Application
 end
