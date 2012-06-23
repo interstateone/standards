@@ -1,5 +1,5 @@
 require './standards'
-# require './api'
+require './api'
 require 'bowtie'
 
 map "/bowtie" do
@@ -7,10 +7,10 @@ map "/bowtie" do
 	run Bowtie::Admin
 end
 
-# map "/api" do
-# 	run API::Application
-# end
+map "/api" do
+	run API
+end
 
 map '/' do
-	run Sinatra::Application
+	run Standards
 end
