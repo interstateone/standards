@@ -177,7 +177,7 @@ $ ->
 		$(rows).each (row) ->
 			$ministat = $(this).children('td.title').children('.ministat')
 			$ministat.css("background-color", bgColors[row])
-			$ministat.children('.minibar').css("background-color", colors[row])
+			$ministat.children('.minibar').css("background-color", barColors[row])
 
 	renderColors()
 
