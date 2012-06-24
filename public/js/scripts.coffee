@@ -16,10 +16,9 @@ $ ->
 			event.preventDefault()
 			window.location = $(this).attr "href"
 
-	# Subsitutes tap events for click events in supported browsers
-	if 'ontouchend' in window
-		$(document).delegate 'body', 'click', (e) ->
-			$(e.target).trigger -> 'tap'
+	# Disable do-nothing links
+	$('section [href^=#]').click (e) ->
+		e.preventDefault()
 
 	# Add drop shadow to navbar when page is scrolled
 	window.onscroll = addDropShadow
