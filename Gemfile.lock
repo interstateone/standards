@@ -175,6 +175,7 @@ DEPENDENCIES
   growl
   guard-rspec
   iron_worker
+  json
   pony
   rack-test
   resolv-ipv6favor
