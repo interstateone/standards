@@ -33,13 +33,43 @@ class API < Sinatra::Base
 	end
 
 	require './models/init'
-	require './helpers/app_helpers'
-	helpers Sinatra::AppHelpers
+	require './helpers/api_helpers'
+	helpers Sinatra::ApiHelpers
 
 	before do
 		if logged_in?
 			Time.zone = current_user.timezone
 		end
+	end
+
+	# ------------------------------------------------
+	#
+	# Authentication Routes
+	#
+	# ------------------------------------------------
+
+	# Sign In
+
+	post "/sign-in/?" do
+		content_type :json
+
+		# Try authenticating that email/pass combo
+		if user = User.authenticate(params[:email], params[:password])
+			# If it succeeds then set the session id to this user
+			session[:id] = user.id
+			# and then return the user
+			user.to_json
+		else
+			# If it doesn't authenticate then return a 401 status
+			status 401
+		end
+	end
+
+	get "/sign-out/?" do
+		content_type :json
+
+		# Delete the session id
+		session[:id] = nil
 	end
 
 	# ------------------------------------------------
@@ -51,11 +81,13 @@ class API < Sinatra::Base
 	# Create User ------------------------------------
 
 	post "/user/?" do
-		# Validate the fields first
-		# Don't worry about existing emails, we'll handle that later
+		content_type :json
+
+		# Validate the email field
 		if !valid_email? params[:email]
-			flash[:error] = "Please enter a valid email address."
-			redirect '/signup'
+			# invalid input status
+			status 422
+			{ :error => "Please enter a valid email address." }.to_json
 		else
 			# Try creating a new user
 			user = User.new
@@ -65,29 +97,23 @@ class API < Sinatra::Base
 
 			# If user already exists, sign them in
 			if existing_user = User.authenticate(params[:email], params[:password])
+
 				session[:id] = existing_user.id
-				if session[:return_to]
-					redirect_url = session[:return_to]
-					session[:return_to] = false
-					redirect redirect_url
-				else
-					redirect '/'
-				end
+				existing_user.to_json
 
 			# If user doesn't exist but is a valid new user, sign them up
 			elsif user.save
 
-				# Flash thank you, sign in and redirect
+				# Set the session id to the new user and return it
 				session[:id] = user.id
-				flash[:notice] = "Thanks for signing up!"
-				redirect "/"
+				user.to_json
 
 			# If user doesn't exists and is not a valid new user, throw errors
 			else
-				user.errors.each do |e|
-					flash[:error] = e
-				end
-				redirect '/signup'
+				# Invalid input status
+				status 422
+				# Return the errors
+				user.errors.to_json
 			end
 		end
 	end
@@ -96,37 +122,77 @@ class API < Sinatra::Base
 
 	get "/user/:id/?" do
 
+		login_required
+
+		# If the authenticated user is the one we're looking for, return it
+		if session[:id] == params[:id]
+			content_type :json
+			current_user.to_json
+		else
+			# Otherwise the authenticated user is not authorized to view the requested user
+			status 401
+		end
+
 	end
 
 	# Update User ------------------------------------
 
 	put "/user/:id/?" do
-		login_required
-		user = current_user
-		user.name = params[:name]
-		user.email = params[:email]
-		user.starting_weekday = params[:starting_weekday]
-		user.timezone = params[:timezone]
-		user.email_permission = params[:email_permission] || false
-		user.save
-		flash[:notice] = "Great! Your info has been updated."
-		redirect '/settings'
 
 		login_required
-		if user = User.authenticate(current_user.email, params[:current_password])
-			user.password = params[:new_password]
+
+		# If the authenticated user is the one we're looking for, update it and return it
+		if session[:id] == params[:id]
+
+			# Update info
+			user = current_user
+			user.name = params[:name]
+			user.email = params[:email]
+			user.starting_weekday = params[:starting_weekday]
+			user.timezone = params[:timezone]
+			user.email_permission = params[:email_permission] || false
+
+			# Update password if necessary
+			if params[:new_password] != ""
+
+				# Make sure the current password was entered correctly
+				if user = User.authenticate(current_user.email, params[:current_password])
+					user.password = params[:new_password]
+				else
+					# Unauthorized status, don't proceed in the route
+					halt 401
+				end
+			end
+
 			user.save
-			flash[:notice] = "Great! Your password has been changed."
-			redirect '/settings'
+
+			user.to_json
 		else
-			flash[:error] = "That password was incorrect."
-			redirect '/settings'
+			status 401
 		end
 	end
 
 	# Delete User ------------------------------------
 
 	delete "/user/:id/?" do
+
+		login_required
+
+		# If the authenticated user is the one we're looking for, delete it
+		if session[:id] == params[:id]
+			user = current_user
+
+			# Destroy the associated checks and tasks, and then the user
+			user.checks.destroy
+			user.tasks.destroy
+			User.get(user.id).destroy
+
+			# Destroy the session
+			session[:id] = nil
+		else
+			# Otherwise return an unauthorized status
+			status 401
+		end
 
 	end
 
@@ -200,27 +266,6 @@ class API < Sinatra::Base
 
 	get "/signup/?" do
 	  erb :signup
-	end
-
-
-
-	get "/login/?" do
-		erb :login
-	end
-
-	post "/login/?" do
-		if user = User.authenticate(params[:email], params[:password])
-			session[:id] = user.id
-			if session[:return_to]
-				redirect_url = session[:return_to]
-				session[:return_to] = false
-				redirect redirect_url
-			else
-				redirect '/'
-			end
-		end
-		flash.now[:error] = "Email and password don't match."
-		erb :login
 	end
 
 	get "/logout/?" do
