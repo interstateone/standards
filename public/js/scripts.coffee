@@ -276,7 +276,7 @@ $ ->
 		$(this).parents('form').submit()
 
 	# Submit timezone with signup
-	timezone = jstz.determine_timezone()
+	timezone = jstz.determine()
 	name = timezone.name()
 	$('input#timezone').val(name)
 

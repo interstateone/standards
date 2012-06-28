@@ -202,6 +202,14 @@ class API < Sinatra::Base
 	#
 	# ------------------------------------------------
 
+	get '/tasks/?' do
+		content_type :json
+
+		login_required
+
+		current_user.tasks.to_json
+	end
+
 	# ------------------------------------------------
 	#
 	# Check Routes

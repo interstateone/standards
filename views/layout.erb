@@ -53,6 +53,30 @@
            and (orientation: landscape)
            and (-webkit-device-pixel-ratio: 2)"
         href="apple-touch-startup-image-1496x2048.png">
+
+  <script type="text/template" id="task-template">
+    <td class="title">
+      <a href="/{{ id }}" alt="{{ title }}" title="{{ purpose }}">{{ title }}</a>
+    </td>
+  </script>
+
+  <script type="text/template" id="tasks-template">
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td class="title add" style="height: 50px;" colspan="8">
+          </td>
+        </tr>
+      </tfoot>
+      <tbody>
+      </tbody>
+    </table>
+  </script>
 </head>
 
   <body>
@@ -101,28 +125,15 @@
         </div>
       <% end %>
 
-  		<%= yield %>
+  		<%#= yield %>
   	</div> <!-- /container -->
 
     <!-- Javascript -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="/js/lib/jquery-1.7.2.min.js"><\/script>')</script>
     <script src="/js/lib/underscore.js"></script>
     <script src="/js/lib/backbone.js"></script>
+    <script src="/js/lib/backbone.marionette.js"></script>
     <script src="/js/plugins.js"></script>
     <script src="/js/app.js"></script>
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-30914801-1']);
-      _gaq.push(['_trackPageview']);
-
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-
-      new FastClick(document.body);
-    </script>
 </body>
 </html>
