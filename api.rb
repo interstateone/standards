@@ -120,18 +120,12 @@ class API < Sinatra::Base
 
 	# Read User --------------------------------------
 
-	get "/user/:id/?" do
+	get "/user/info/?" do
 
 		login_required
 
-		# If the authenticated user is the one we're looking for, return it
-		if session[:id] == params[:id]
-			content_type :json
-			current_user.to_json
-		else
-			# Otherwise the authenticated user is not authorized to view the requested user
-			status 401
-		end
+		content_type :json
+		current_user.to_json
 
 	end
 

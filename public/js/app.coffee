@@ -4,16 +4,22 @@ Standards.addRegions
   container: "body > .container"
 
 Standards.addInitializer (options) ->
-  tasks = new Tasks()
-  tasks.fetch
+  @tasks = new Tasks()
+  @tasks.fetch
     success: (collection, response) ->
       tasksView = new TasksView {collection}
       Standards.container.show tasksView
+  @user = new User
+  @user.fetch
+    success: (collection, response) =>
+      console.log @user
 
 _.templateSettings =
   interpolate: /\{\{([\s\S]+?)\}\}/g
 
 class User extends Backbone.Model
+  url: '/api/user/info'
+
   isSignedIn: ->
     !this.isNew()
 
