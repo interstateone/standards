@@ -43,6 +43,9 @@ class Tasks extends Backbone.Collection
   model: Task
   url: '/api/tasks'
 
+class WeekDayHeader extends Backbone.View
+  template: '#weekday-header-template'
+
 class TaskView extends Backbone.Marionette.ItemView
   tagName: 'tr'
   template: '#task-template'
