@@ -1,6 +1,7 @@
 Standards = new Backbone.Marionette.Application
 
 Standards.addRegions
+  navigation: "body > .navigation"
   container: "body > .container"
 
 Standards.addInitializer (options) ->
@@ -12,9 +13,11 @@ Standards.addInitializer (options) ->
   @user = new User
   @user.fetch
     success: (collection, response) =>
+      Standards.navigation.show @navigation = new NavBarView
       console.log @user
 
 _.templateSettings =
+  evaluate: /\{\[([\s\S]+?)\]\}/g,
   interpolate: /\{\{([\s\S]+?)\}\}/g
 
 class User extends Backbone.Model
@@ -78,9 +81,18 @@ class CheckView extends Backbone.View
     $(@el).html renderedContent
     @
 
+class NavBarView extends Backbone.View
+  initialize: ->
+    @template = _.template $('#navbar-template').html()
+
+  render: ->
+    renderedContent = @template
+    $(@el).html renderedContent
+    @
+
 class StandardsRouter extends Backbone.Router
-  routes:
-    "": "index"
+  # routes:
+  #   "": "index"
 
   index: ->
     tasks = new Tasks

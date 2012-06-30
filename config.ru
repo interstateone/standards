@@ -1,5 +1,5 @@
-require './standards'
-require './api'
+require './src/server/standards'
+require './src/server/api'
 require 'bowtie'
 
 map "/bowtie" do

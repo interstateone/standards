@@ -26,8 +26,8 @@ module DataMapper
   end
 end
 
-require './models/user'
-require './models/task'
-require './models/check'
+require_relative 'user'
+require_relative 'task'
+require_relative 'check'
 
 DataMapper.finalize.auto_upgrade!

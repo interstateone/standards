@@ -13,14 +13,14 @@ configure :test do
 	set :session_secret, settings.session_secret
 end
 
-require_relative '../standards.rb'
+require_relative '../src/server/standards.rb'
 
 module RSpecMixin
   include Rack::Test::Methods
   def app
   	Sinatra::Application
   end
-  set :views, settings.root + '/../views'
+  set :views, settings.root + '/../src/server/views'
 end
 
 # Reset the database for each test

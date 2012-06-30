@@ -8,8 +8,8 @@ class Standards < Sinatra::Base
 	require 'active_support/core_ext/time/zones'
 	require 'active_support/time_with_zone'
 	require 'active_support/core_ext/time/conversions'
-	require_relative 'workers/emailworker'
 	include Colorist
+	require_relative 'workers/emailworker'
 	register Sinatra::Flash
 
 	SITE_TITLE = "Standards"
@@ -36,8 +36,8 @@ class Standards < Sinatra::Base
 		config.project_id = ENV['IRON_WORKER_PROJECT_ID']
 	end
 
-	require './models/init'
-	require './helpers/app_helpers'
+	require_relative 'models/init'
+	require_relative 'helpers/app_helpers'
 	helpers Sinatra::AppHelpers
 
 	before do

@@ -1,5 +1,11 @@
 require 'sinatra/base'
 
+class Hash
+	def only(*whitelist)
+		reject {|key, value| !whitelist.include?(key) }
+	end
+end
+
 class API < Sinatra::Base
 
 	require 'bundler/setup'
@@ -32,8 +38,8 @@ class API < Sinatra::Base
 		config.project_id = ENV['IRON_WORKER_PROJECT_ID']
 	end
 
-	require './models/init'
-	require './helpers/api_helpers'
+	require_relative 'models/init'
+	require_relative 'helpers/api_helpers'
 	helpers Sinatra::ApiHelpers
 
 	before do
@@ -125,7 +131,7 @@ class API < Sinatra::Base
 		login_required
 
 		content_type :json
-		current_user.to_json
+		current_user.attributes.only(:id, :name, :email, :starting_weekday).to_json
 
 	end
 
