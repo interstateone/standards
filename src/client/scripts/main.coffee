@@ -1,14 +1,20 @@
-require
+require.config
   paths:
     jquery: 'lib/jquery'
     underscore: 'lib/underscore'
     backbone: 'lib/backbone'
-    plugins: 'plugins'
+    marionette: 'lib/backbone.marionette'
+    # plugins: 'plugins'
     app: 'app'
-  [
-    'jquery'
-    'underscore'
-    'backbone'
-    'plugins'
-    'app'
-  ]
+  shim:
+    'backbone':
+      deps: ['jquery', 'underscore']
+      exports: 'Backbone'
+    'marionette':
+      deps: ['backbone']
+      exports: 'Marionette'
+
+require ['jquery', 'app'], ($) ->
+  $ ->
+    app = new StandardsApp
+    app.initialize()
