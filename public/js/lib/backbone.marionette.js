@@ -6,7 +6,23 @@
 // Documentation and Full License Available at:
 // http://github.com/derickbailey/backbone.marionette
 
-Backbone.Marionette = (function(Backbone, _, $){
+(function (root, factory) {
+  if (typeof exports === 'object') {
+
+    var jquery = require('jquery');
+    var underscore = require('underscore');
+    var backbone = require('backbone');
+
+    module.exports = factory(jquery, underscore, backbone);
+
+  } else if (typeof define === 'function' && define.amd) {
+
+    define(['jquery', 'underscore', 'backbone'], factory);
+
+  } 
+}(this, function ($, _, Backbone) {
+
+  Backbone.Marionette = (function(Backbone, _, $){
   var Marionette = {};
 
 // BindTo: Event Binding
@@ -1146,3 +1162,6 @@ var slice = Array.prototype.slice;
   return Marionette;
 })(Backbone, _, window.jQuery || window.Zepto || window.ender);
 
+  return Backbone.Marionette; 
+
+}));
