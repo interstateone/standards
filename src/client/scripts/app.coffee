@@ -1,24 +1,24 @@
-Standards = new Backbone.Marionette.Application
+class StandardsApp extends Backbone.Marionette.Application
+  initialize: ->
+    # Setup up initial state
+    console.log 'test'
+    @user = new User
+    @layout = new AppLayout
+    @router = new StandardsRouter
+    @tasks = new Tasks
 
-Standards.addRegions
-  navigation: "body > .navigation"
-  container: "body > .container"
+    _.templateSettings =
+      evaluate: /\{\[([\s\S]+?)\]\}/g,
+      interpolate: /\{\{([\s\S]+?)\}\}/g
 
-Standards.addInitializer (options) ->
-  @tasks = new Tasks()
-  @tasks.fetch
-    success: (collection, response) ->
-      tasksView = new TasksView {collection}
-      Standards.container.show tasksView
-  @user = new User
-  @user.fetch
-    success: (collection, response) =>
-      Standards.navigation.show @navigation = new NavBarView
-      console.log @user
+    @layout.navigation.show @navigation = new NavBarView
+    @layout.container.show @tasksView = new TasksView {collection}
 
-_.templateSettings =
-  evaluate: /\{\[([\s\S]+?)\]\}/g,
-  interpolate: /\{\{([\s\S]+?)\}\}/g
+class StandardsRouter extends Backbone.Marionette.AppRouter
+  routes:
+    "": "index"
+
+  index: ->
 
 class User extends Backbone.Model
   url: '/api/user/info'
@@ -48,9 +48,17 @@ class User extends Backbone.Model
 class Task extends Backbone.Model
   url: "/task"
 
+class Check extends Backbone.Model
+  url: "/check"
+
 class Tasks extends Backbone.Collection
   model: Task
   url: '/api/tasks'
+
+class AppLayout extends Backbone.Marionette.AppLayout
+  regions:
+    navigation: "body > .navigation"
+    container: "body > .container"
 
 class WeekDayHeader extends Backbone.View
   template: '#weekday-header-template'
@@ -68,10 +76,7 @@ class TasksView extends Backbone.Marionette.CompositeView
   appendHtml: (collectionView, itemView) ->
     collectionView.$("tbody").append(itemView.el);
 
-class Check extends Backbone.Model
-  url: "/check"
-
-class CheckView extends Backbone.View
+class CheckView extends Backbone.Marionette.ItemView
   tagname: 'a'
   initialize: ->
     @template = _.template $('#check-template').html()
@@ -81,7 +86,7 @@ class CheckView extends Backbone.View
     $(@el).html renderedContent
     @
 
-class NavBarView extends Backbone.View
+class NavBarView extends Backbone.Marionette.Layout
   initialize: ->
     @template = _.template $('#navbar-template').html()
 
@@ -89,17 +94,3 @@ class NavBarView extends Backbone.View
     renderedContent = @template
     $(@el).html renderedContent
     @
-
-class StandardsRouter extends Backbone.Router
-  # routes:
-  #   "": "index"
-
-  index: ->
-    tasks = new Tasks
-    tasks.fetch
-      success: (collection, response) ->
-        tasksView = new TasksView { collection }
-        $('body').append tasksView.render().el
-
-$ ->
-  Standards.start()
