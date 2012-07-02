@@ -10,6 +10,10 @@
       app: 'app'
     },
     shim: {
+      'underscore': {
+        deps: ['jquery'],
+        exports: '_'
+      },
       'backbone': {
         deps: ['jquery', 'underscore'],
         exports: 'Backbone'
@@ -21,12 +25,8 @@
     }
   });
 
-  require(['jquery', 'app'], function($) {
-    return $(function() {
-      var app;
-      app = new StandardsApp;
-      return app.initialize();
-    });
+  require(['app'], function(app) {
+    return app.initialize();
   });
 
 }).call(this);

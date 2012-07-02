@@ -7,6 +7,9 @@ require.config
     # plugins: 'plugins'
     app: 'app'
   shim:
+    'underscore':
+      deps: ['jquery']
+      exports: '_'
     'backbone':
       deps: ['jquery', 'underscore']
       exports: 'Backbone'
@@ -14,7 +17,5 @@ require.config
       deps: ['backbone']
       exports: 'Marionette'
 
-require ['jquery', 'app'], ($) ->
-  $ ->
-    app = new StandardsApp
-    app.initialize()
+require ['app'], (app) ->
+  app.initialize()
