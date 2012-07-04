@@ -21,7 +21,14 @@
       User.prototype.url = '/api/user/info';
 
       User.prototype.isSignedIn = function() {
-        return !this.isNew();
+        return this.fetch({
+          success: function() {
+            return true;
+          },
+          error: function() {
+            return false;
+          }
+        });
       };
 
       User.prototype.signIn = function(email, password, onFail, onSucceed) {
@@ -180,13 +187,6 @@
         return this.template = _.template($('#check-template').html());
       };
 
-      CheckView.prototype.render = function() {
-        var renderedContent;
-        renderedContent = this.template(this.model.toJSON());
-        $(this.el).html(renderedContent);
-        return this;
-      };
-
       return CheckView;
 
     })(Backbone.Marionette.ItemView);
@@ -200,20 +200,20 @@
 
       NavBarView.prototype.template = require('text!templates/navbar.html');
 
+      NavBarView.prototype.initialize = function() {
+        app.vent.on('scroll:window', this.addDropShadow, this);
+        return this.model.bind('change', this.render, this);
+      };
+
       NavBarView.prototype.render = function() {
-        this.$el.html(_.template(this.template, this.serializeData()));
+        this.$el.html(_.template(this.template, this.model.toJSON()));
         return this;
       };
 
       NavBarView.prototype.serializeData = function() {
         return {
-          title: app.title,
           name: this.model.get('name')
         };
-      };
-
-      NavBarView.prototype.initialize = function() {
-        return app.vent.on('scroll:window', this.addDropShadow, this);
       };
 
       NavBarView.prototype.addDropShadow = function() {
@@ -260,9 +260,11 @@
       };
 
       App.prototype.showTasks = function() {
-        return this.layout.body.show(this.tasksView = new TasksView({
+        this.user.fetch();
+        this.layout.body.show(this.tasksView = new TasksView({
           model: this.tasks = new Tasks
         }));
+        return this.tasks.fetch();
       };
 
       App.prototype.showLogin = function() {};

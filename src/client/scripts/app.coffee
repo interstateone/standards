@@ -9,7 +9,10 @@ define (require) ->
     url: '/api/user/info'
 
     isSignedIn: ->
-      !this.isNew()
+      # Uses the HTTP status returned from the server to determine state
+      @fetch
+        success: -> true
+        error: -> false
 
     signIn: (email, password, onFail, onSucceed) ->
       $.ajax
@@ -69,19 +72,15 @@ define (require) ->
     initialize: ->
       @template = _.template $('#check-template').html()
 
-    render: ->
-      renderedContent = @template @model.toJSON()
-      $(@el).html renderedContent
-      @
-
   class NavBarView extends Backbone.Marionette.Layout
     template: require 'text!templates/navbar.html'
-    render: ->
-      @$el.html _.template @template, @serializeData()
-      @
-    serializeData: -> { title: app.title, name: @model.get('name') }
     initialize: ->
       app.vent.on 'scroll:window', @addDropShadow, @
+      @model.bind 'change', @render, @
+    render: ->
+      @$el.html _.template @template, @model.toJSON()
+      @
+    serializeData: -> {name: @model.get('name')}
     addDropShadow: ->
       if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
       else @$el.children().removeClass 'nav-drop-shadow'
@@ -103,7 +102,9 @@ define (require) ->
       @main.show @layout = new AppLayout
       @layout.navigation.show @navigation = new NavBarView model: @user
     showTasks: ->
+      @user.fetch()
       @layout.body.show @tasksView = new TasksView model: @tasks = new Tasks
+      @tasks.fetch()
     showLogin: ->
       # @layout.body.show @loginView = new LoginView
 
