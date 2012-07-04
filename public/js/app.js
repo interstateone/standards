@@ -101,11 +101,16 @@
         return AppLayout.__super__.constructor.apply(this, arguments);
       }
 
-      AppLayout.prototype.template = '#app-layout';
+      AppLayout.prototype.template = require('text!templates/app.html');
 
       AppLayout.prototype.regions = {
         navigation: ".navigation",
         body: ".body"
+      };
+
+      AppLayout.prototype.render = function() {
+        this.el.innerHTML = this.template;
+        return this;
       };
 
       return AppLayout;
@@ -192,7 +197,31 @@
         return NavBarView.__super__.constructor.apply(this, arguments);
       }
 
-      NavBarView.prototype.template = '#navbar-template';
+      NavBarView.prototype.template = require('text!templates/navbar.html');
+
+      NavBarView.prototype.render = function() {
+        this.$el.html(_.template(this.template, this.serializeData()));
+        return this;
+      };
+
+      NavBarView.prototype.serializeData = function() {
+        return {
+          title: app.title,
+          name: this.model.get('name')
+        };
+      };
+
+      NavBarView.prototype.initialize = function() {
+        return app.vent.on('scroll:window', this.addDropShadow, this);
+      };
+
+      NavBarView.prototype.addDropShadow = function() {
+        if (window.pageYOffset > 0) {
+          return this.$el.children().addClass('nav-drop-shadow');
+        } else {
+          return this.$el.children().removeClass('nav-drop-shadow');
+        }
+      };
 
       return NavBarView;
 
@@ -206,18 +235,28 @@
       }
 
       App.prototype.initialize = function() {
+        var _this = this;
         this.title = 'Standards';
         this.user = new User;
-        this.user.fetch();
-        this.tasks = new Tasks;
-        this.tasks.fetch();
-        this.main.show(this.layout = new AppLayout);
-        this.layout.navigation.show(this.navigation = new NavBarView({
-          model: this.user
-        }));
-        return this.layout.body.show(this.tasksView = new TasksView({
-          collection: this.tasks
-        }));
+        this.user.fetch({
+          success: function() {
+            _this.tasks = new Tasks;
+            _this.tasks.fetch();
+            _this.addRegions({
+              main: 'body'
+            });
+            _this.main.show(_this.layout = new AppLayout);
+            _this.layout.navigation.show(_this.navigation = new NavBarView({
+              model: _this.user
+            }));
+            return _this.layout.body.show(_this.tasksView = new TasksView({
+              collection: _this.tasks
+            }));
+          }
+        });
+        return $(window).bind('scroll touchmove', function() {
+          return _this.vent.trigger('scroll:window');
+        });
       };
 
       return App;
@@ -229,9 +268,6 @@
         interpolate: /\{\{([\s\S]+?)\}\}/g
       };
       window.app = new App;
-      window.app.addRegions({
-        main: 'body'
-      });
       return window.app.initialize();
     };
     return {

@@ -40,10 +40,13 @@ define (require) ->
     url: '/api/tasks'
 
   class AppLayout extends Backbone.Marionette.Layout
-    template: '#app-layout'
+    template: require 'text!templates/app.html'
     regions:
       navigation: ".navigation"
       body: ".body"
+    render: ->
+      @el.innerHTML = @template
+      @
 
   class WeekDayHeader extends Backbone.View
     template: '#weekday-header-template'
@@ -71,21 +74,35 @@ define (require) ->
       @
 
   class NavBarView extends Backbone.Marionette.Layout
-    template: '#navbar-template'
+    template: require 'text!templates/navbar.html'
+    render: ->
+      @$el.html _.template @template, @serializeData()
+      @
+    serializeData: -> { title: app.title, name: @model.get('name') }
+    initialize: ->
+      app.vent.on 'scroll:window', @addDropShadow, @
+    addDropShadow: ->
+      if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
+      else @$el.children().removeClass 'nav-drop-shadow'
 
   class App extends Backbone.Marionette.Application
     initialize: ->
       # Setup up initial state
       @title = 'Standards'
       @user = new User
-      @user.fetch()
-      @tasks = new Tasks
-      @tasks.fetch()
+      @user.fetch
+        success: =>
+          @tasks = new Tasks
+          @tasks.fetch()
 
-      @main.show @layout = new AppLayout
+          @addRegions
+            main: 'body'
+          @main.show @layout = new AppLayout
 
-      @layout.navigation.show @navigation = new NavBarView model: @user
-      @layout.body.show @tasksView = new TasksView collection: @tasks
+          @layout.navigation.show @navigation = new NavBarView model: @user
+          @layout.body.show @tasksView = new TasksView collection: @tasks
+
+      $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
 
   initialize = ->
     _.templateSettings =
@@ -93,8 +110,6 @@ define (require) ->
       interpolate: /\{\{([\s\S]+?)\}\}/g
 
     window.app = new App
-    window.app.addRegions
-      main: 'body'
     window.app.initialize()
 
   return initialize: initialize

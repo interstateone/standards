@@ -1,5 +1,6 @@
 require.config
   paths:
+    text: 'lib/text'
     jquery: 'lib/jquery'
     underscore: 'lib/underscore'
     backbone: 'lib/backbone'
