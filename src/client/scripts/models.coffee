@@ -9,11 +9,10 @@ define (require) ->
   class User extends Backbone.Model
       url: '/api/user/info'
 
-      isSignedIn: ->
-        # Uses the HTTP status returned from the server to determine state
+      isSignedIn: (yep, nope) ->
         @fetch
-          success: -> true
-          error: -> false
+          success: -> yep()
+          error: -> nope()
 
       signIn: (email, password, onFail, onSucceed) ->
         $.ajax

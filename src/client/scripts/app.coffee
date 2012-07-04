@@ -84,8 +84,7 @@ define (require) ->
       @user = new User
       @showApp()
 
-      if @user.isSignedIn() then @showTasks()
-      else @showLogin()
+      @user.isSignedIn (=> @showTasks()), (=> @showLogin())
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
 

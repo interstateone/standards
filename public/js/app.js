@@ -213,11 +213,11 @@
         var _this = this;
         this.user = new User;
         this.showApp();
-        if (this.user.isSignedIn()) {
-          this.showTasks();
-        } else {
-          this.showLogin();
-        }
+        this.user.isSignedIn((function() {
+          return _this.showTasks();
+        }), (function() {
+          return _this.showLogin();
+        }));
         return $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });

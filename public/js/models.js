@@ -19,13 +19,13 @@
 
       User.prototype.url = '/api/user/info';
 
-      User.prototype.isSignedIn = function() {
+      User.prototype.isSignedIn = function(yep, nope) {
         return this.fetch({
           success: function() {
-            return true;
+            return yep();
           },
           error: function() {
-            return false;
+            return nope();
           }
         });
       };
