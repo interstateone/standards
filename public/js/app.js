@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppLayout, Backbone, Check, CheckView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _, _ref;
+    var $, App, AppLayout, Backbone, Check, CheckView, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -89,15 +89,64 @@
 
       TasksView.prototype.id = 'tasksView';
 
+      TasksView.prototype.template = require('text!templates/tasks-table.html');
+
+      TasksView.prototype.render = function() {
+        this.$el.html(_.template(this.template, this.serializeData()));
+        return this;
+      };
+
+      TasksView.prototype.serializeData = function() {
+        return {
+          weekdays: this.getWeekdays()
+        };
+      };
+
       TasksView.prototype.itemView = TaskView;
 
       TasksView.prototype.appendHtml = function(collectionView, itemView) {
         return collectionView.$("tbody").append(itemView.el);
       };
 
+      TasksView.prototype.getWeekdays = function() {
+        var day, firstDayOfWeek, startingWeekday, today, week;
+        today = moment();
+        startingWeekday = this.model.get('starting_weekday');
+        firstDayOfWeek = moment().day(startingWeekday);
+        if (firstDayOfWeek.day() > today.day()) {
+          firstDayOfWeek.day(startingWeekday - 7);
+        }
+        return week = (function() {
+          var _i, _results;
+          _results = [];
+          for (day = _i = 0; _i <= 6; day = ++_i) {
+            _results.push(firstDayOfWeek.clone().add('d', day).format('ddd'));
+          }
+          return _results;
+        })();
+      };
+
       return TasksView;
 
     })(Backbone.Marionette.CollectionView);
+    LoginView = (function(_super) {
+
+      __extends(LoginView, _super);
+
+      function LoginView() {
+        return LoginView.__super__.constructor.apply(this, arguments);
+      }
+
+      LoginView.prototype.template = require('text!templates/login.html');
+
+      LoginView.prototype.render = function() {
+        this.$el.html(this.template);
+        return this;
+      };
+
+      return LoginView;
+
+    })(Backbone.Marionette.View);
     CheckView = (function(_super) {
 
       __extends(CheckView, _super);
@@ -185,14 +234,16 @@
       };
 
       App.prototype.showTasks = function() {
-        this.user.fetch();
         this.layout.body.show(this.tasksView = new TasksView({
-          model: this.tasks = new Tasks
+          model: this.user,
+          collection: this.tasks = new Tasks
         }));
         return this.tasks.fetch();
       };
 
-      App.prototype.showLogin = function() {};
+      App.prototype.showLogin = function() {
+        return this.layout.body.show(this.loginView = new LoginView);
+      };
 
       return App;
 

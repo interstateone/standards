@@ -35,10 +35,30 @@ define (require) ->
   class TasksView extends Backbone.Marionette.CollectionView
     tagName: 'table'
     id: 'tasksView'
+    template: require 'text!templates/tasks-table.html'
+    render: ->
+      @$el.html _.template @template, @serializeData()
+      @
+    serializeData: ->
+      { weekdays: @getWeekdays() }
     itemView: TaskView
-
     appendHtml: (collectionView, itemView) ->
       collectionView.$("tbody").append(itemView.el);
+    getWeekdays: ->
+      today = moment()
+      startingWeekday = @model.get 'starting_weekday'
+      firstDayOfWeek = moment().day startingWeekday
+
+      # If the week starts after the current weekday, start last week
+      if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
+
+      week = (firstDayOfWeek.clone().add('d', day).format('ddd') for day in [0..6])
+
+  class LoginView extends Backbone.Marionette.View
+    template: require 'text!templates/login.html'
+    render: ->
+      @$el.html @template
+      @
 
   class CheckView extends Backbone.Marionette.ItemView
     tagname: 'a'
@@ -75,17 +95,12 @@ define (require) ->
       @main.show @layout = new AppLayout
       @layout.navigation.show @navigation = new NavBarView model: @user
     showTasks: ->
-      @user.fetch()
-      @layout.body.show @tasksView = new TasksView model: @tasks = new Tasks
+      @layout.body.show @tasksView = new TasksView model: @user, collection: @tasks = new Tasks
       @tasks.fetch()
     showLogin: ->
-      # @layout.body.show @loginView = new LoginView
+      @layout.body.show @loginView = new LoginView
 
   initialize = ->
-    _.templateSettings =
-      evaluate: /\{\[([\s\S]+?)\]\}/g
-      interpolate: /\{\{([\s\S]+?)\}\}/g
-
     window.app = new App
     window.app.initialize()
 

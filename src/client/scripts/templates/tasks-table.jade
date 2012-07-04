@@ -1,0 +1,9 @@
+thead
+  tr
+    <% _.each(weekdays, function (day) { %>
+    th <%= day %>
+    <% }); %>
+tfoot
+  tr
+    td(class="title add", style="height: 50px;", colspan="8")
+tbody
