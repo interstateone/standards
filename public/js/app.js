@@ -3,8 +3,12 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'backbone', 'marionette'], function($, _, Backbone, Marionette) {
-    var App, AppLayout, Check, CheckView, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize;
+  define(function(require) {
+    var $, App, AppLayout, Backbone, Check, CheckView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _;
+    $ = require('jquery');
+    _ = require('underscore');
+    Backbone = require('backbone');
+    Marionette = require('marionette');
     User = (function(_super) {
 
       __extends(User, _super);
