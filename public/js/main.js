@@ -8,6 +8,7 @@
       underscore: 'lib/underscore',
       backbone: 'lib/backbone',
       marionette: 'lib/backbone.marionette',
+      plugins: 'plugins',
       app: 'app'
     },
     shim: {
@@ -22,6 +23,9 @@
       'marionette': {
         deps: ['backbone'],
         exports: 'Marionette'
+      },
+      'plugins': {
+        deps: ['jquery']
       }
     }
   });

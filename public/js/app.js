@@ -9,6 +9,7 @@
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
+    require('plugins');
     User = (function(_super) {
 
       __extends(User, _super);

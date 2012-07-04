@@ -5,7 +5,7 @@ require.config
     underscore: 'lib/underscore'
     backbone: 'lib/backbone'
     marionette: 'lib/backbone.marionette'
-    # plugins: 'plugins'
+    plugins: 'plugins'
     app: 'app'
   shim:
     'underscore':
@@ -17,6 +17,8 @@ require.config
     'marionette':
       deps: ['backbone']
       exports: 'Marionette'
+    'plugins':
+      deps: ['jquery']
 
 require ['app'], (app) ->
   app.initialize()

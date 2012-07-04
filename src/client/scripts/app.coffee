@@ -3,6 +3,7 @@ define (require) ->
   _ = require 'underscore'
   Backbone = require 'backbone'
   Marionette = require 'marionette'
+  require 'plugins'
 
   class User extends Backbone.Model
     url: '/api/user/info'
