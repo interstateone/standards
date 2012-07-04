@@ -4,88 +4,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppLayout, Backbone, Check, CheckView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _;
+    var $, App, AppLayout, Backbone, Check, CheckView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('plugins');
-    User = (function(_super) {
-
-      __extends(User, _super);
-
-      function User() {
-        return User.__super__.constructor.apply(this, arguments);
-      }
-
-      User.prototype.url = '/api/user/info';
-
-      User.prototype.isSignedIn = function() {
-        return this.fetch({
-          success: function() {
-            return true;
-          },
-          error: function() {
-            return false;
-          }
-        });
-      };
-
-      User.prototype.signIn = function(email, password, onFail, onSucceed) {
-        $.ajax({
-          url: '/sign-in',
-          method: 'POST',
-          dataType: 'json',
-          data: {
-            email: email,
-            password: password
-          },
-          error: onFail,
-          success: onSucceed,
-          context: this
-        });
-        return this;
-      };
-
-      User.prototype.signOut = function() {
-        return $.ajax({
-          url: '/sign-out',
-          method: 'POST'
-        }).done(function() {
-          this.clear();
-          return this.trigger('signed-out');
-        });
-      };
-
-      return User;
-
-    })(Backbone.Model);
-    Task = (function(_super) {
-
-      __extends(Task, _super);
-
-      function Task() {
-        return Task.__super__.constructor.apply(this, arguments);
-      }
-
-      Task.prototype.url = "/task";
-
-      return Task;
-
-    })(Backbone.Model);
-    Check = (function(_super) {
-
-      __extends(Check, _super);
-
-      function Check() {
-        return Check.__super__.constructor.apply(this, arguments);
-      }
-
-      Check.prototype.url = "/check";
-
-      return Check;
-
-    })(Backbone.Model);
+    _ref = require('models'), User = _ref.User, Task = _ref.Task, Check = _ref.Check;
     Tasks = (function(_super) {
 
       __extends(Tasks, _super);
