@@ -236,28 +236,35 @@
 
       App.prototype.initialize = function() {
         var _this = this;
-        this.title = 'Standards';
         this.user = new User;
-        this.user.fetch({
-          success: function() {
-            _this.tasks = new Tasks;
-            _this.tasks.fetch();
-            _this.addRegions({
-              main: 'body'
-            });
-            _this.main.show(_this.layout = new AppLayout);
-            _this.layout.navigation.show(_this.navigation = new NavBarView({
-              model: _this.user
-            }));
-            return _this.layout.body.show(_this.tasksView = new TasksView({
-              collection: _this.tasks
-            }));
-          }
-        });
+        this.showApp();
+        if (this.user.isSignedIn()) {
+          this.showTasks();
+        } else {
+          this.showLogin();
+        }
         return $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
       };
+
+      App.prototype.showApp = function() {
+        this.addRegions({
+          main: 'body'
+        });
+        this.main.show(this.layout = new AppLayout);
+        return this.layout.navigation.show(this.navigation = new NavBarView({
+          model: this.user
+        }));
+      };
+
+      App.prototype.showTasks = function() {
+        return this.layout.body.show(this.tasksView = new TasksView({
+          model: this.tasks = new Tasks
+        }));
+      };
+
+      App.prototype.showLogin = function() {};
 
       return App;
 

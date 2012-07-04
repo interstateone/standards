@@ -88,21 +88,23 @@ define (require) ->
   class App extends Backbone.Marionette.Application
     initialize: ->
       # Setup up initial state
-      @title = 'Standards'
       @user = new User
-      @user.fetch
-        success: =>
-          @tasks = new Tasks
-          @tasks.fetch()
+      @showApp()
 
-          @addRegions
-            main: 'body'
-          @main.show @layout = new AppLayout
-
-          @layout.navigation.show @navigation = new NavBarView model: @user
-          @layout.body.show @tasksView = new TasksView collection: @tasks
+      if @user.isSignedIn() then @showTasks()
+      else @showLogin()
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
+
+    showApp: ->
+      @addRegions
+        main: 'body'
+      @main.show @layout = new AppLayout
+      @layout.navigation.show @navigation = new NavBarView model: @user
+    showTasks: ->
+      @layout.body.show @tasksView = new TasksView model: @tasks = new Tasks
+    showLogin: ->
+      # @layout.body.show @loginView = new LoginView
 
   initialize = ->
     _.templateSettings =
