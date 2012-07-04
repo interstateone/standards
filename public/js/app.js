@@ -249,10 +249,6 @@
 
     })(Backbone.Marionette.Application);
     initialize = function() {
-      _.templateSettings = {
-        evaluate: /\{\[([\s\S]+?)\]\}/g,
-        interpolate: /\{\{([\s\S]+?)\}\}/g
-      };
       window.app = new App;
       return window.app.initialize();
     };
