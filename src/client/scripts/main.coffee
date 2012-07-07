@@ -1,10 +1,13 @@
 require.config
   paths:
     text: 'lib/text'
+    jade: 'lib/jade'
     jquery: 'lib/jquery'
     underscore: 'lib/underscore'
     backbone: 'lib/backbone'
     marionette: 'lib/backbone.marionette'
+    relational: 'lib/backbone-relational'
+    moment: 'lib/moment'
     plugins: 'plugins'
     app: 'app'
   shim:
@@ -17,8 +20,11 @@ require.config
     'marionette':
       deps: ['backbone']
       exports: 'Marionette'
+    'relational':
+      deps: ['underscore', 'backbone']
     'plugins':
       deps: ['jquery']
 
 require ['app'], (app) ->
-  app.initialize()
+  window.app = new app()
+  window.app.initialize()
