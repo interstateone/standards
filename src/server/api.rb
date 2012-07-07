@@ -210,12 +210,27 @@ class API < Sinatra::Base
 		current_user.tasks.to_json
 	end
 
+	get '/task/:id/checks/?' do
+		content_type :json
+
+		login_required
+
+		current_user.tasks.get(params[:id]).checks.to_json
+	end
+
 	# ------------------------------------------------
 	#
 	# Check Routes
 	#
 	# ------------------------------------------------
 
+	get '/checks/?' do
+		content_type :json
+
+		login_required
+
+		current_user.checks.to_json
+	end
 
 
 
