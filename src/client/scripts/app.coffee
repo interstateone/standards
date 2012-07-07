@@ -17,7 +17,7 @@ define (require) ->
     url: '/api/tasks'
 
   class AppLayout extends Backbone.Marionette.Layout
-    template: require 'text!templates/app.html'
+    template: require('jade!../templates/app')()
     regions:
       navigation: ".navigation"
       body: ".body"
@@ -30,12 +30,12 @@ define (require) ->
 
   class TaskView extends Backbone.Marionette.ItemView
     tagName: 'tr'
-    template: '#task-template'
+    template: require('jade!../templates/task-row')()
 
   class TasksView extends Backbone.Marionette.CollectionView
     tagName: 'table'
     id: 'tasksView'
-    template: require 'text!templates/tasks-table.html'
+    template: require('jade!../templates/tasks-table')()
     render: ->
       @$el.html _.template @template, @serializeData()
       @
@@ -55,7 +55,7 @@ define (require) ->
       week = (firstDayOfWeek.clone().add('d', day).format('ddd') for day in [0..6])
 
   class LoginView extends Backbone.Marionette.View
-    template: require 'text!templates/login.html'
+    template: require('jade!../templates/login')()
     render: ->
       @$el.html @template
       @
@@ -66,7 +66,7 @@ define (require) ->
       @template = _.template $('#check-template').html()
 
   class NavBarView extends Backbone.Marionette.Layout
-    template: require 'text!templates/navbar.html'
+    template: require('jade!../templates/navbar')()
     initialize: ->
       app.vent.on 'scroll:window', @addDropShadow, @
       @model.bind 'change', @render, @
@@ -99,8 +99,4 @@ define (require) ->
     showLogin: ->
       @layout.body.show @loginView = new LoginView
 
-  initialize = ->
-    window.app = new App
-    window.app.initialize()
-
-  return initialize: initialize
+  return App

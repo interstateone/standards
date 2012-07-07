@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppLayout, Backbone, Check, CheckView, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _, _ref;
+    var $, App, AppLayout, Backbone, Check, CheckView, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -34,7 +34,7 @@
         return AppLayout.__super__.constructor.apply(this, arguments);
       }
 
-      AppLayout.prototype.template = require('text!templates/app.html');
+      AppLayout.prototype.template = require('jade!../templates/app')();
 
       AppLayout.prototype.regions = {
         navigation: ".navigation",
@@ -72,7 +72,7 @@
 
       TaskView.prototype.tagName = 'tr';
 
-      TaskView.prototype.template = '#task-template';
+      TaskView.prototype.template = require('jade!../templates/task-row')();
 
       return TaskView;
 
@@ -89,7 +89,7 @@
 
       TasksView.prototype.id = 'tasksView';
 
-      TasksView.prototype.template = require('text!templates/tasks-table.html');
+      TasksView.prototype.template = require('jade!../templates/tasks-table')();
 
       TasksView.prototype.render = function() {
         this.$el.html(_.template(this.template, this.serializeData()));
@@ -137,7 +137,7 @@
         return LoginView.__super__.constructor.apply(this, arguments);
       }
 
-      LoginView.prototype.template = require('text!templates/login.html');
+      LoginView.prototype.template = require('jade!../templates/login')();
 
       LoginView.prototype.render = function() {
         this.$el.html(this.template);
@@ -172,7 +172,7 @@
         return NavBarView.__super__.constructor.apply(this, arguments);
       }
 
-      NavBarView.prototype.template = require('text!templates/navbar.html');
+      NavBarView.prototype.template = require('jade!../templates/navbar')();
 
       NavBarView.prototype.initialize = function() {
         app.vent.on('scroll:window', this.addDropShadow, this);
@@ -248,13 +248,7 @@
       return App;
 
     })(Backbone.Marionette.Application);
-    initialize = function() {
-      window.app = new App;
-      return window.app.initialize();
-    };
-    return {
-      initialize: initialize
-    };
+    return App;
   });
 
 }).call(this);
