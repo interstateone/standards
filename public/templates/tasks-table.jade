@@ -1,0 +1,10 @@
+thead
+  tr
+    th
+    <% _.each(getWeekdaysAsArray(), function (day) { %>
+    th <%= day.format('ddd') %>
+    <% }); %>
+tfoot
+  tr
+    td(class="title add", style="height: 50px;", colspan="8")
+tbody
