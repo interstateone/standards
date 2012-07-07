@@ -5971,7 +5971,7 @@ header hr {
 table {
   width: 100%;
 }
-#check-table table {
+table#tasksView {
   margin-top: 5%;
 }
 th {

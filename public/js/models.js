@@ -69,6 +69,22 @@
 
       Task.prototype.url = "/task";
 
+      Task.prototype.getChecks = function() {
+        var check, checks;
+        return checks = (function() {
+          var _i, _len, _ref, _results;
+          _ref = app.checks;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            check = _ref[_i];
+            if (check.get('task_id' === this.get('id'))) {
+              _results.push(check);
+            }
+          }
+          return _results;
+        }).call(this);
+      };
+
       return Task;
 
     })(Backbone.Model);
