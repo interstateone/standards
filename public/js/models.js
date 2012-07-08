@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, Backbone, Check, Marionette, Task, User, _;
+    var $, Backbone, Check, Checks, Marionette, Task, Tasks, User, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -69,22 +69,6 @@
 
       Task.prototype.url = "/task";
 
-      Task.prototype.getChecks = function() {
-        var check, checks;
-        return checks = (function() {
-          var _i, _len, _ref, _results;
-          _ref = app.checks;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            check = _ref[_i];
-            if (check.get('task_id' === this.get('id'))) {
-              _results.push(check);
-            }
-          }
-          return _results;
-        }).call(this);
-      };
-
       return Task;
 
     })(Backbone.Model);
@@ -101,10 +85,40 @@
       return Check;
 
     })(Backbone.Model);
+    Tasks = (function(_super) {
+
+      __extends(Tasks, _super);
+
+      function Tasks() {
+        return Tasks.__super__.constructor.apply(this, arguments);
+      }
+
+      Tasks.prototype.model = Task;
+
+      Tasks.prototype.url = '/api/tasks';
+
+      return Tasks;
+
+    })(Backbone.Collection);
+    Checks = (function(_super) {
+
+      __extends(Checks, _super);
+
+      function Checks() {
+        return Checks.__super__.constructor.apply(this, arguments);
+      }
+
+      Checks.prototype.model = Check;
+
+      return Checks;
+
+    })(Backbone.Collection);
     return {
       User: User,
       Task: Task,
-      Check: Check
+      Tasks: Tasks,
+      Check: Check,
+      Checks: Checks
     };
   });
 

@@ -10,20 +10,7 @@ define (require) ->
   require 'plugins'
 
   # App Components
-  {User, Task, Check} = require 'models'
-
-  class Tasks extends Backbone.Collection
-    model: Task
-    url: '/api/tasks'
-
-  class AppLayout extends Backbone.Marionette.Layout
-    template: require('jade!../templates/app')()
-    regions:
-      navigation: ".navigation"
-      body: ".body"
-    render: ->
-      @el.innerHTML = @template
-      @
+  {User, Task, Tasks, Check, Checks} = require 'models'
 
   class WeekDayHeader extends Backbone.View
     template: '#weekday-header-template'
@@ -36,23 +23,18 @@ define (require) ->
     tagName: 'table'
     id: 'tasksView'
     template: require('jade!../templates/tasks-table')()
-    render: ->
-      @$el.html _.template @template, @serializeData()
-      @
-    serializeData: ->
-      { weekdays: @getWeekdays() }
+    templateHelpers:
+      getWeekdaysAsArray: @getWeekdaysAsArray
     itemView: TaskView
     appendHtml: (collectionView, itemView) ->
       collectionView.$("tbody").append(itemView.el);
-    getWeekdays: ->
+    getWeekdaysAsArray: ->
+      console.log 'template function'
       today = moment()
-      startingWeekday = @model.get 'starting_weekday'
+      startingWeekday = app.user.get 'starting_weekday'
       firstDayOfWeek = moment().day startingWeekday
-
-      # If the week starts after the current weekday, start last week
       if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
-
-      week = (firstDayOfWeek.clone().add('d', day).format('ddd') for day in [0..6])
+      week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
   class LoginView extends Backbone.Marionette.View
     template: require('jade!../templates/login')()
@@ -82,21 +64,25 @@ define (require) ->
     initialize: ->
       # Setup up initial state
       @user = new User
+      @tasks = new Tasks
       @showApp()
-
-      @user.isSignedIn (=> @showTasks()), (=> @showLogin())
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
 
+      @user.isSignedIn (=> @showTasks()), (=> @showLogin())
     showApp: ->
       @addRegions
-        main: 'body'
-      @main.show @layout = new AppLayout
-      @layout.navigation.show @navigation = new NavBarView model: @user
+        navigation: ".navigation"
+        body: ".body"
+      @navigation.show @navigation = new NavBarView model: @user
     showTasks: ->
-      @layout.body.show @tasksView = new TasksView model: @user, collection: @tasks = new Tasks
+      @body.show @tasksView = new TasksView collection: @tasks
       @tasks.fetch()
     showLogin: ->
-      @layout.body.show @loginView = new LoginView
+      @body.show @loginView = new LoginView
 
-  return App
+  initialize = ->
+     window.app = new App
+     window.app.initialize()
+
+  return initialize: initialize

@@ -4,51 +4,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppLayout, Backbone, Check, CheckView, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, _, _ref;
+    var $, App, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('plugins');
-    _ref = require('models'), User = _ref.User, Task = _ref.Task, Check = _ref.Check;
-    Tasks = (function(_super) {
-
-      __extends(Tasks, _super);
-
-      function Tasks() {
-        return Tasks.__super__.constructor.apply(this, arguments);
-      }
-
-      Tasks.prototype.model = Task;
-
-      Tasks.prototype.url = '/api/tasks';
-
-      return Tasks;
-
-    })(Backbone.Collection);
-    AppLayout = (function(_super) {
-
-      __extends(AppLayout, _super);
-
-      function AppLayout() {
-        return AppLayout.__super__.constructor.apply(this, arguments);
-      }
-
-      AppLayout.prototype.template = require('jade!../templates/app')();
-
-      AppLayout.prototype.regions = {
-        navigation: ".navigation",
-        body: ".body"
-      };
-
-      AppLayout.prototype.render = function() {
-        this.el.innerHTML = this.template;
-        return this;
-      };
-
-      return AppLayout;
-
-    })(Backbone.Marionette.Layout);
+    _ref = require('models'), User = _ref.User, Task = _ref.Task, Tasks = _ref.Tasks, Check = _ref.Check, Checks = _ref.Checks;
     WeekDayHeader = (function(_super) {
 
       __extends(WeekDayHeader, _super);
@@ -91,15 +53,8 @@
 
       TasksView.prototype.template = require('jade!../templates/tasks-table')();
 
-      TasksView.prototype.render = function() {
-        this.$el.html(_.template(this.template, this.serializeData()));
-        return this;
-      };
-
-      TasksView.prototype.serializeData = function() {
-        return {
-          weekdays: this.getWeekdays()
-        };
+      TasksView.prototype.templateHelpers = {
+        getWeekdaysAsArray: TasksView.getWeekdaysAsArray
       };
 
       TasksView.prototype.itemView = TaskView;
@@ -108,10 +63,11 @@
         return collectionView.$("tbody").append(itemView.el);
       };
 
-      TasksView.prototype.getWeekdays = function() {
+      TasksView.prototype.getWeekdaysAsArray = function() {
         var day, firstDayOfWeek, startingWeekday, today, week;
+        console.log('template function');
         today = moment();
-        startingWeekday = this.model.get('starting_weekday');
+        startingWeekday = app.user.get('starting_weekday');
         firstDayOfWeek = moment().day(startingWeekday);
         if (firstDayOfWeek.day() > today.day()) {
           firstDayOfWeek.day(startingWeekday - 7);
@@ -120,7 +76,7 @@
           var _i, _results;
           _results = [];
           for (day = _i = 0; _i <= 6; day = ++_i) {
-            _results.push(firstDayOfWeek.clone().add('d', day).format('ddd'));
+            _results.push(firstDayOfWeek.clone().add('d', day));
           }
           return _results;
         })();
@@ -212,43 +168,49 @@
       App.prototype.initialize = function() {
         var _this = this;
         this.user = new User;
+        this.tasks = new Tasks;
         this.showApp();
-        this.user.isSignedIn((function() {
+        $(window).bind('scroll touchmove', function() {
+          return _this.vent.trigger('scroll:window');
+        });
+        return this.user.isSignedIn((function() {
           return _this.showTasks();
         }), (function() {
           return _this.showLogin();
         }));
-        return $(window).bind('scroll touchmove', function() {
-          return _this.vent.trigger('scroll:window');
-        });
       };
 
       App.prototype.showApp = function() {
         this.addRegions({
-          main: 'body'
+          navigation: ".navigation",
+          body: ".body"
         });
-        this.main.show(this.layout = new AppLayout);
-        return this.layout.navigation.show(this.navigation = new NavBarView({
+        return this.navigation.show(this.navigation = new NavBarView({
           model: this.user
         }));
       };
 
       App.prototype.showTasks = function() {
-        this.layout.body.show(this.tasksView = new TasksView({
-          model: this.user,
-          collection: this.tasks = new Tasks
+        this.body.show(this.tasksView = new TasksView({
+          collection: this.tasks
         }));
         return this.tasks.fetch();
       };
 
       App.prototype.showLogin = function() {
-        return this.layout.body.show(this.loginView = new LoginView);
+        return this.body.show(this.loginView = new LoginView);
       };
 
       return App;
 
     })(Backbone.Marionette.Application);
-    return App;
+    initialize = function() {
+      window.app = new App;
+      return window.app.initialize();
+    };
+    return {
+      initialize: initialize
+    };
   });
 
 }).call(this);

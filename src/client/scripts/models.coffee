@@ -5,6 +5,7 @@ define (require) ->
   _ = require 'underscore'
   Backbone = require 'backbone'
   Marionette = require 'marionette'
+  # require 'relational'
 
   class User extends Backbone.Model
     url: '/api/user/info'
@@ -35,10 +36,15 @@ define (require) ->
 
   class Task extends Backbone.Model
     url: "/task"
-    getChecks: ->
-      checks = (check for check in app.checks when check.get 'task_id' is @get 'id')
 
   class Check extends Backbone.Model
     url: "/check"
 
-  return {User: User, Task: Task, Check: Check}
+  class Tasks extends Backbone.Collection
+    model: Task
+    url: '/api/tasks'
+
+  class Checks extends Backbone.Collection
+    model: Check
+
+  return {User, Task, Tasks, Check, Checks}
