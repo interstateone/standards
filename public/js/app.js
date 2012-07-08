@@ -4,41 +4,35 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, WeekDayHeader, initialize, _, _ref;
+    var $, App, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('plugins');
     _ref = require('models'), User = _ref.User, Task = _ref.Task, Tasks = _ref.Tasks, Check = _ref.Check, Checks = _ref.Checks;
-    WeekDayHeader = (function(_super) {
-
-      __extends(WeekDayHeader, _super);
-
-      function WeekDayHeader() {
-        return WeekDayHeader.__super__.constructor.apply(this, arguments);
+    Backbone.Marionette.Renderer.render = function(template, data) {
+      return _.template(template, data);
+    };
+    ({
+      getWeekdaysAsArray: function() {
+        var day, firstDayOfWeek, startingWeekday, today, week;
+        today = moment();
+        startingWeekday = app.user.get('starting_weekday');
+        firstDayOfWeek = moment().day(startingWeekday);
+        if (firstDayOfWeek.day() > today.day()) {
+          firstDayOfWeek.day(startingWeekday - 7);
+        }
+        return week = (function() {
+          var _i, _results;
+          _results = [];
+          for (day = _i = 0; _i <= 6; day = ++_i) {
+            _results.push(firstDayOfWeek.clone().add('d', day));
+          }
+          return _results;
+        })();
       }
-
-      WeekDayHeader.prototype.template = '#weekday-header-template';
-
-      return WeekDayHeader;
-
-    })(Backbone.View);
-    TaskView = (function(_super) {
-
-      __extends(TaskView, _super);
-
-      function TaskView() {
-        return TaskView.__super__.constructor.apply(this, arguments);
-      }
-
-      TaskView.prototype.tagName = 'tr';
-
-      TaskView.prototype.template = require('jade!../templates/task-row')();
-
-      return TaskView;
-
-    })(Backbone.Marionette.ItemView);
+    });
     TasksView = (function(_super) {
 
       __extends(TasksView, _super);
@@ -53,11 +47,16 @@
 
       TasksView.prototype.template = require('jade!../templates/tasks-table')();
 
-      TasksView.prototype.templateHelpers = {
-        getWeekdaysAsArray: TasksView.getWeekdaysAsArray
+      TasksView.prototype.templateHelpers = function() {
+        return {
+          getWeekdaysAsArray: this.getWeekdaysAsArray
+        };
       };
 
-      TasksView.prototype.itemView = TaskView;
+      TasksView.prototype.render = function() {
+        this.$el.html(_.template(this.template, this.serializeData()));
+        return this.showCollection();
+      };
 
       TasksView.prototype.appendHtml = function(collectionView, itemView) {
         return collectionView.$("tbody").append(itemView.el);
@@ -85,6 +84,21 @@
       return TasksView;
 
     })(Backbone.Marionette.CollectionView);
+    TaskView = (function(_super) {
+
+      __extends(TaskView, _super);
+
+      function TaskView() {
+        return TaskView.__super__.constructor.apply(this, arguments);
+      }
+
+      TaskView.prototype.tagName = 'tr';
+
+      TaskView.prototype.template = require('jade!../templates/task-row')();
+
+      return TaskView;
+
+    })(Backbone.Marionette.ItemView);
     LoginView = (function(_super) {
 
       __extends(LoginView, _super);
@@ -102,7 +116,7 @@
 
       return LoginView;
 
-    })(Backbone.Marionette.View);
+    })(Backbone.Marionette.ItemView);
     CheckView = (function(_super) {
 
       __extends(CheckView, _super);
@@ -192,7 +206,8 @@
 
       App.prototype.showTasks = function() {
         this.body.show(this.tasksView = new TasksView({
-          collection: this.tasks
+          collection: this.tasks,
+          itemView: TaskView
         }));
         return this.tasks.fetch();
       };

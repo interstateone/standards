@@ -12,20 +12,25 @@ define (require) ->
   # App Components
   {User, Task, Tasks, Check, Checks} = require 'models'
 
-  class WeekDayHeader extends Backbone.View
-    template: '#weekday-header-template'
+  Backbone.Marionette.Renderer.render = (template, data) ->
+    _.template template, data
 
-  class TaskView extends Backbone.Marionette.ItemView
-    tagName: 'tr'
-    template: require('jade!../templates/task-row')()
+  getWeekdaysAsArray: ->
+    today = moment()
+    startingWeekday = app.user.get 'starting_weekday'
+    firstDayOfWeek = moment().day startingWeekday
+    if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
+    week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
   class TasksView extends Backbone.Marionette.CollectionView
     tagName: 'table'
     id: 'tasksView'
     template: require('jade!../templates/tasks-table')()
-    templateHelpers:
+    templateHelpers: ->
       getWeekdaysAsArray: @getWeekdaysAsArray
-    itemView: TaskView
+    render: ->
+      @$el.html _.template @template, @serializeData()
+      @showCollection()
     appendHtml: (collectionView, itemView) ->
       collectionView.$("tbody").append(itemView.el);
     getWeekdaysAsArray: ->
@@ -36,7 +41,11 @@ define (require) ->
       if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
       week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
-  class LoginView extends Backbone.Marionette.View
+  class TaskView extends Backbone.Marionette.ItemView
+    tagName: 'tr'
+    template: require('jade!../templates/task-row')()
+
+  class LoginView extends Backbone.Marionette.ItemView
     template: require('jade!../templates/login')()
     render: ->
       @$el.html @template
@@ -76,7 +85,7 @@ define (require) ->
         body: ".body"
       @navigation.show @navigation = new NavBarView model: @user
     showTasks: ->
-      @body.show @tasksView = new TasksView collection: @tasks
+      @body.show @tasksView = new TasksView collection: @tasks, itemView: TaskView
       @tasks.fetch()
     showLogin: ->
       @body.show @loginView = new LoginView
