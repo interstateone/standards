@@ -54,30 +54,6 @@
            and (-webkit-device-pixel-ratio: 2)"
         href="apple-touch-startup-image-1496x2048.png">
 
-  <script type="text/template" id="task-template">
-    <td class="title">
-      <a href="/{{ id }}" alt="{{ title }}" title="{{ purpose }}">{{ title }}</a>
-    </td>
-  </script>
-
-  <script type="text/template" id="tasks-template">
-    <table>
-      <thead>
-        <tr>
-          <th>Day</th>
-        </tr>
-      </thead>
-      <tfoot>
-        <tr>
-          <td class="title add" style="height: 50px;" colspan="8">
-          </td>
-        </tr>
-      </tfoot>
-      <tbody>
-      </tbody>
-    </table>
-  </script>
-
   <script type="text/template" id="flash-notice">
     <div class="alert alert-info">
       <a class="close" data-dismiss="alert">&times;</a>
@@ -95,6 +71,8 @@
 </head>
 
 <body>
+  <div class="navigation"></div>
+  <div class="container body"></div>
   <!-- Javascript -->
   <script data-main="js/main.js" src="/js/lib/require.js"></script>
 </body>
