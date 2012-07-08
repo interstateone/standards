@@ -34,6 +34,21 @@
         })();
       }
     });
+    TaskView = (function(_super) {
+
+      __extends(TaskView, _super);
+
+      function TaskView() {
+        return TaskView.__super__.constructor.apply(this, arguments);
+      }
+
+      TaskView.prototype.tagName = 'tr';
+
+      TaskView.prototype.template = require('jade!../templates/task-row')();
+
+      return TaskView;
+
+    })(Backbone.Marionette.ItemView);
     TasksView = (function(_super) {
 
       __extends(TasksView, _super);
@@ -45,6 +60,8 @@
       TasksView.prototype.tagName = 'table';
 
       TasksView.prototype.id = 'tasksView';
+
+      TasksView.prototype.itemView = TaskView;
 
       TasksView.prototype.template = require('jade!../templates/tasks-table')();
 
@@ -85,21 +102,6 @@
       return TasksView;
 
     })(Backbone.Marionette.CollectionView);
-    TaskView = (function(_super) {
-
-      __extends(TaskView, _super);
-
-      function TaskView() {
-        return TaskView.__super__.constructor.apply(this, arguments);
-      }
-
-      TaskView.prototype.tagName = 'tr';
-
-      TaskView.prototype.template = require('jade!../templates/task-row')();
-
-      return TaskView;
-
-    })(Backbone.Marionette.ItemView);
     LoginView = (function(_super) {
 
       __extends(LoginView, _super);
@@ -230,8 +232,7 @@
 
       App.prototype.showTasks = function() {
         this.body.show(this.tasksView = new TasksView({
-          collection: this.tasks,
-          itemView: TaskView
+          collection: this.tasks
         }));
         return this.tasks.fetch();
       };

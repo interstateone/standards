@@ -23,9 +23,14 @@ define (require) ->
     if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
     week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
+  class TaskView extends Backbone.Marionette.ItemView
+    tagName: 'tr'
+    template: require('jade!../templates/task-row')()
+
   class TasksView extends Backbone.Marionette.CollectionView
     tagName: 'table'
     id: 'tasksView'
+    itemView: TaskView
     template: require('jade!../templates/tasks-table')()
     templateHelpers: ->
       getWeekdaysAsArray: @getWeekdaysAsArray
@@ -41,10 +46,6 @@ define (require) ->
       firstDayOfWeek.day startingWeekday
       if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
       week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
-
-  class TaskView extends Backbone.Marionette.ItemView
-    tagName: 'tr'
-    template: require('jade!../templates/task-row')()
 
   class LoginView extends Backbone.Marionette.ItemView
     template: require('jade!../templates/login')()
@@ -98,7 +99,7 @@ define (require) ->
         body: ".body"
       @navigation.show @navigation = new NavBarView model: @user
     showTasks: ->
-      @body.show @tasksView = new TasksView collection: @tasks, itemView: TaskView
+      @body.show @tasksView = new TasksView collection: @tasks
       @tasks.fetch()
     showLogin: ->
       @body.show @loginView = new LoginView
