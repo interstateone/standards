@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
+    var $, App, AppRouter, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -19,7 +19,8 @@
         var day, firstDayOfWeek, startingWeekday, today, week;
         today = moment();
         startingWeekday = app.user.get('starting_weekday');
-        firstDayOfWeek = moment().day(startingWeekday);
+        firstDayOfWeek = moment();
+        firstDayOfWeek.day(startingWeekday);
         if (firstDayOfWeek.day() > today.day()) {
           firstDayOfWeek.day(startingWeekday - 7);
         }
@@ -64,10 +65,10 @@
 
       TasksView.prototype.getWeekdaysAsArray = function() {
         var day, firstDayOfWeek, startingWeekday, today, week;
-        console.log('template function');
         today = moment();
         startingWeekday = app.user.get('starting_weekday');
-        firstDayOfWeek = moment().day(startingWeekday);
+        firstDayOfWeek = moment();
+        firstDayOfWeek.day(startingWeekday);
         if (firstDayOfWeek.day() > today.day()) {
           firstDayOfWeek.day(startingWeekday - 7);
         }
@@ -114,6 +115,19 @@
         return this;
       };
 
+      LoginView.prototype.events = {
+        'submit': 'clickedLogin'
+      };
+
+      LoginView.prototype.clickedLogin = function(e) {
+        var email, password;
+        e.preventDefault();
+        e.stopPropagation();
+        email = this.$('#email').val();
+        password = this.$('#password').val();
+        return app.vent.trigger('user:sign-in', email, password);
+      };
+
       return LoginView;
 
     })(Backbone.Marionette.ItemView);
@@ -146,7 +160,7 @@
 
       NavBarView.prototype.initialize = function() {
         app.vent.on('scroll:window', this.addDropShadow, this);
-        return this.model.bind('change', this.render, this);
+        return this.model.on('change', this.render, this);
       };
 
       NavBarView.prototype.render = function() {
@@ -171,6 +185,19 @@
       return NavBarView;
 
     })(Backbone.Marionette.Layout);
+    AppRouter = (function(_super) {
+
+      __extends(AppRouter, _super);
+
+      function AppRouter() {
+        return AppRouter.__super__.constructor.apply(this, arguments);
+      }
+
+      AppRouter.prototype.controller = App;
+
+      return AppRouter;
+
+    })(Backbone.Marionette.AppRouter);
     App = (function(_super) {
 
       __extends(App, _super);
@@ -187,11 +214,8 @@
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
-        return this.user.isSignedIn((function() {
-          return _this.showTasks();
-        }), (function() {
-          return _this.showLogin();
-        }));
+        app.vent.on('user:sign-in', this.signIn, this);
+        return this.user.isSignedIn(this.showTasks, this.showLogin, this);
       };
 
       App.prototype.showApp = function() {
@@ -214,6 +238,10 @@
 
       App.prototype.showLogin = function() {
         return this.body.show(this.loginView = new LoginView);
+      };
+
+      App.prototype.signIn = function(email, password) {
+        return this.user.signIn(email, password, this.showTasks, this.showLogin, this);
       };
 
       return App;

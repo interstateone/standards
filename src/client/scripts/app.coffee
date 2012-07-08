@@ -18,7 +18,8 @@ define (require) ->
   getWeekdaysAsArray: ->
     today = moment()
     startingWeekday = app.user.get 'starting_weekday'
-    firstDayOfWeek = moment().day startingWeekday
+    firstDayOfWeek = moment()
+    firstDayOfWeek.day startingWeekday
     if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
     week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
@@ -34,10 +35,10 @@ define (require) ->
     appendHtml: (collectionView, itemView) ->
       collectionView.$("tbody").append(itemView.el);
     getWeekdaysAsArray: ->
-      console.log 'template function'
       today = moment()
       startingWeekday = app.user.get 'starting_weekday'
-      firstDayOfWeek = moment().day startingWeekday
+      firstDayOfWeek = moment()
+      firstDayOfWeek.day startingWeekday
       if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
       week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
@@ -50,6 +51,14 @@ define (require) ->
     render: ->
       @$el.html @template
       @
+    events:
+      'submit': 'clickedLogin'
+    clickedLogin: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      email = @$('#email').val()
+      password = @$('#password').val()
+      app.vent.trigger 'user:sign-in', email, password
 
   class CheckView extends Backbone.Marionette.ItemView
     tagname: 'a'
@@ -60,7 +69,7 @@ define (require) ->
     template: require('jade!../templates/navbar')()
     initialize: ->
       app.vent.on 'scroll:window', @addDropShadow, @
-      @model.bind 'change', @render, @
+      @model.on 'change', @render, @
     render: ->
       @$el.html _.template @template, @model.toJSON()
       @
@@ -68,6 +77,9 @@ define (require) ->
     addDropShadow: ->
       if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
       else @$el.children().removeClass 'nav-drop-shadow'
+
+  class AppRouter extends Backbone.Marionette.AppRouter
+    controller: App
 
   class App extends Backbone.Marionette.Application
     initialize: ->
@@ -77,8 +89,9 @@ define (require) ->
       @showApp()
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
+      app.vent.on 'user:sign-in', @signIn, @
 
-      @user.isSignedIn (=> @showTasks()), (=> @showLogin())
+      @user.isSignedIn @showTasks, @showLogin, @
     showApp: ->
       @addRegions
         navigation: ".navigation"
@@ -89,6 +102,8 @@ define (require) ->
       @tasks.fetch()
     showLogin: ->
       @body.show @loginView = new LoginView
+    signIn: (email, password) ->
+      @user.signIn email, password, @showTasks, @showLogin, @
 
   initialize = ->
      window.app = new App

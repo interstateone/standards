@@ -9,6 +9,7 @@
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
+    require('relational');
     User = (function(_super) {
 
       __extends(User, _super);
@@ -19,37 +20,36 @@
 
       User.prototype.url = '/api/user/info';
 
-      User.prototype.isSignedIn = function(yep, nope) {
+      User.prototype.isSignedIn = function(yep, nope, context) {
         return this.fetch({
-          success: function() {
-            return yep();
-          },
-          error: function() {
-            return nope();
-          }
+          success: $.proxy(yep, context),
+          error: $.proxy(nope, context)
         });
       };
 
-      User.prototype.signIn = function(email, password, onFail, onSucceed) {
-        $.ajax({
-          url: '/sign-in',
-          method: 'POST',
+      User.prototype.signIn = function(e, p, onSucceed, onFail, context) {
+        var _this = this;
+        return $.ajax({
+          url: '/api/sign-in',
+          type: 'POST',
           dataType: 'json',
           data: {
-            email: email,
-            password: password
+            email: e,
+            password: p
           },
-          error: onFail,
-          success: onSucceed,
+          error: $.proxy(onFail, context),
+          success: function(data) {
+            _this.set(data);
+            return onSucceed.call(context);
+          },
           context: this
         });
-        return this;
       };
 
       User.prototype.signOut = function() {
         return $.ajax({
-          url: '/sign-out',
-          method: 'POST'
+          url: '/api/sign-out',
+          type: 'POST'
         }).done(function() {
           this.clear();
           return this.trigger('signed-out');
