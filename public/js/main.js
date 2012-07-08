@@ -37,8 +37,7 @@
   });
 
   require(['app'], function(app) {
-    window.app = new app();
-    return window.app.initialize();
+    return app.initialize();
   });
 
 }).call(this);

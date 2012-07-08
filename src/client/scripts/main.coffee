@@ -26,5 +26,4 @@ require.config
       deps: ['jquery']
 
 require ['app'], (app) ->
-  window.app = new app()
-  window.app.initialize()
+  app.initialize()
