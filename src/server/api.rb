@@ -57,24 +57,19 @@ class API < Sinatra::Base
 	# Sign In
 
 	post "/sign-in/?" do
-		content_type :json
-
-		# Try authenticating that email/pass combo
 		if user = User.authenticate(params[:email], params[:password])
-			# If it succeeds then set the session id to this user
+			content_type :json
 			session[:id] = user.id
-			# and then return the user
-			user.to_json
+			user.attributes.only(:id, :name, :email, :starting_weekday).to_json
 		else
-			# If it doesn't authenticate then return a 401 status
 			status 401
 		end
 	end
 
+	# Sign Out
+
 	get "/sign-out/?" do
 		content_type :json
-
-		# Delete the session id
 		session[:id] = nil
 	end
 
@@ -127,12 +122,9 @@ class API < Sinatra::Base
 	# Read User --------------------------------------
 
 	get "/user/info/?" do
-
-		login_required
-
 		content_type :json
+		login_required
 		current_user.attributes.only(:id, :name, :email, :starting_weekday).to_json
-
 	end
 
 	# Update User ------------------------------------
