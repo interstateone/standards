@@ -38,6 +38,7 @@ define (require) ->
       , options
 
       options.template ?= @template
+      options.fieldsets ?= @fieldsets
 
       # Determine fieldsets
       unless options.fieldsets

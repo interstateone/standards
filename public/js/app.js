@@ -24,7 +24,7 @@
       }
 
       Form.prototype.initialize = function(options) {
-        var fields, _ref1, _ref2;
+        var fields, _ref1, _ref2, _ref3;
         if (!Form.templates.form) {
           throw new Error('Templates not loaded');
         }
@@ -51,6 +51,9 @@
         }, options);
         if ((_ref2 = options.template) == null) {
           options.template = this.template;
+        }
+        if ((_ref3 = options.fieldsets) == null) {
+          options.fieldsets = this.fieldsets;
         }
         if (!options.fieldsets) {
           fields = options.fields || _.keys(this.schema);
