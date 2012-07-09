@@ -10,6 +10,9 @@
       backbone: 'lib/backbone',
       marionette: 'lib/backbone.marionette',
       relational: 'lib/backbone-relational',
+      'backbone-forms': 'lib/backbone-forms',
+      'backbone-forms-bootstrap': 'lib/backbone-forms.bootstrap',
+      'backbone-forms-modal': 'lib/backbone-forms.bootstrap-modal',
       moment: 'lib/moment',
       plugins: 'plugins',
       app: 'app'
@@ -27,12 +30,9 @@
         deps: ['backbone'],
         exports: 'Marionette'
       },
-      'relational': {
-        deps: ['underscore', 'backbone']
-      },
-      'plugins': {
-        deps: ['jquery']
-      }
+      'relational': ['backbone'],
+      'backbone-forms-modal': ['backbone-forms'],
+      'plugins': ['jquery']
     }
   });
 

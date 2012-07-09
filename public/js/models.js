@@ -9,7 +9,6 @@
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
-    require('relational');
     User = (function(_super) {
 
       __extends(User, _super);
@@ -67,8 +66,6 @@
         return Task.__super__.constructor.apply(this, arguments);
       }
 
-      Task.prototype.url = "/task";
-
       return Task;
 
     })(Backbone.Model);
@@ -79,8 +76,6 @@
       function Check() {
         return Check.__super__.constructor.apply(this, arguments);
       }
-
-      Check.prototype.url = "/check";
 
       return Check;
 

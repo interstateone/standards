@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
+    var $, App, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, SettingsView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -187,19 +187,19 @@
       return NavBarView;
 
     })(Backbone.Marionette.Layout);
-    AppRouter = (function(_super) {
+    SettingsView = (function(_super) {
 
-      __extends(AppRouter, _super);
+      __extends(SettingsView, _super);
 
-      function AppRouter() {
-        return AppRouter.__super__.constructor.apply(this, arguments);
+      function SettingsView() {
+        return SettingsView.__super__.constructor.apply(this, arguments);
       }
 
-      AppRouter.prototype.controller = App;
+      SettingsView.prototype.template = require('jade!../templates/settings');
 
-      return AppRouter;
+      return SettingsView;
 
-    })(Backbone.Marionette.AppRouter);
+    })(Backbone.Marionette.Layout);
     App = (function(_super) {
 
       __extends(App, _super);
@@ -213,11 +213,23 @@
         this.user = new User;
         this.tasks = new Tasks;
         this.showApp();
+        this.router = new AppRouter;
+        Backbone.history.start({
+          pushState: true
+        });
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
-        app.vent.on('user:sign-in', this.signIn, this);
+        return app.vent.on('user:sign-in', this.signIn, this);
+      };
+
+      App.prototype.checkAuth = function() {
+        console.log('checking auth');
         return this.user.isSignedIn(this.showTasks, this.showLogin, this);
+      };
+
+      App.prototype.signIn = function(email, password) {
+        return this.user.signIn(email, password, this.showTasks, this.showLogin, this);
       };
 
       App.prototype.showApp = function() {
@@ -225,9 +237,10 @@
           navigation: ".navigation",
           body: ".body"
         });
-        return this.navigation.show(this.navigation = new NavBarView({
+        this.navigation.show(this.navigation = new NavBarView({
           model: this.user
         }));
+        return this.checkAuth;
       };
 
       App.prototype.showTasks = function() {
@@ -241,8 +254,9 @@
         return this.body.show(this.loginView = new LoginView);
       };
 
-      App.prototype.signIn = function(email, password) {
-        return this.user.signIn(email, password, this.showTasks, this.showLogin, this);
+      App.prototype.showSettings = function() {
+        console.log('settings');
+        return this.body.show(this.settingsView = new SettingsView);
       };
 
       return App;

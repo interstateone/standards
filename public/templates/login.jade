@@ -1,14 +1,5 @@
-form(class="form-horizontal", method="post", action="/login", name="login")
-  fieldset
-    legend Log in
-    div(class="control-group")
-      label(class="control-label", for="email") Email
-      div(class="controls")
-        input(type="text", class="input-xlarge", id="email", name="email", placeholder="", autocorrect="false", autocapitalize="false", type="email")
-    div(class="control-group")
-      label(class="control-label", for="password") Password
-      div(class="controls")
-        input(type="password", class="input-xlarge", id="password", name="password", placeholder="")
-    div(class="form-actions")
-      button(type="submit", class="btn btn-primary") Log in
-      button(type="submit", class="btn btn-standard forgot") Forgot password
+form(class="form-horizontal", method="", action="", name="login")
+  {{ fieldsets }}
+  div(class="form-actions")
+    button(type="submit", name="login", class="btn btn-primary") Log in
+    button(type="submit", class="btn btn-standard forgot") Forgot password

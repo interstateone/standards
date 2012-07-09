@@ -382,7 +382,7 @@
 			Backbone[ this.reverseRelation.type ] || Backbone.Relational.store.getObjectByName( this.reverseRelation.type );
 		this.model = options.model || this.instance.constructor;
 		this.options = _.defaults( options, this.options, Backbone.Relation.prototype.options );
-		
+
 		this.key = this.options.key;
 		this.keySource = this.options.keySource || this.key;
 		this.keyDestination = this.options.keyDestination || this.keySource || this.key;
