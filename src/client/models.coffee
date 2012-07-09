@@ -5,7 +5,6 @@ define (require) ->
   _ = require 'underscore'
   Backbone = require 'backbone'
   Marionette = require 'marionette'
-  require 'relational'
 
   class User extends Backbone.Model
     url: '/api/user/info'
@@ -36,10 +35,20 @@ define (require) ->
         @trigger 'signed-out'
 
   class Task extends Backbone.Model
-    url: "/task"
-
   class Check extends Backbone.Model
-    url: "/check"
+  # exports.Check = Check = Backbone.RelationalModel.extend
+  #   url: "/check"
+
+  # exports.Task = Task = Backbone.RelationalModel.extend
+  #   url: "/task"
+  #   relations: [
+  #     type: Backbone.HasOne
+  #     key: 'checks'
+  #     relatedModel: 'Check'
+  #     reverseRelation:
+  #       key: 'task'
+  #       includeInJSON: 'id'
+  #   ]
 
   class Tasks extends Backbone.Collection
     model: Task

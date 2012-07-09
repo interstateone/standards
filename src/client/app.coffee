@@ -79,8 +79,8 @@ define (require) ->
       if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
       else @$el.children().removeClass 'nav-drop-shadow'
 
-  class AppRouter extends Backbone.Marionette.AppRouter
-    controller: App
+  class SettingsView extends Backbone.Marionette.Layout
+    template: require('jade!../templates/settings')
 
   class App extends Backbone.Marionette.Application
     initialize: ->
@@ -89,22 +89,37 @@ define (require) ->
       @tasks = new Tasks
       @showApp()
 
+      @router = new AppRouter
+      Backbone.history.start
+        pushState: true
+
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       app.vent.on 'user:sign-in', @signIn, @
-
+    checkAuth: ->
+      console.log 'checking auth'
       @user.isSignedIn @showTasks, @showLogin, @
+    signIn: (email, password) ->
+      @user.signIn email, password, @showTasks, @showLogin, @
     showApp: ->
       @addRegions
         navigation: ".navigation"
         body: ".body"
       @navigation.show @navigation = new NavBarView model: @user
+      @checkAuth
     showTasks: ->
       @body.show @tasksView = new TasksView collection: @tasks
       @tasks.fetch()
     showLogin: ->
       @body.show @loginView = new LoginView
-    signIn: (email, password) ->
-      @user.signIn email, password, @showTasks, @showLogin, @
+    showSettings: ->
+      console.log 'settings'
+      @body.show @settingsView = new SettingsView
+
+  # class AppRouter extends Backbone.Marionette.AppRouter
+  #   controller: App
+  #   appRoutes:
+  #     "": "checkAuth"
+  #     "settings": "showSettings"
 
   initialize = ->
      window.app = new App
