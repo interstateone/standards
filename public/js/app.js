@@ -24,49 +24,12 @@
       }
 
       Form.prototype.initialize = function(options) {
-        var fields, _ref1, _ref2, _ref3;
-        if (!Form.templates.form) {
-          throw new Error('Templates not loaded');
-        }
-        if ((_ref1 = this.schema) == null) {
-          this.schema = (function() {
-            var model;
-            if (options.schema) {
-              options.schema;
-            }
-            model = options.model;
-            if (!model) {
-              throw new Error('Could not find schema');
-            }
-            if (_.isFunction(model.schema)) {
-              model.schema();
-            }
-            return model.schema;
-          });
-        }
-        options = _.extend({
-          template: 'form',
-          fieldsetTemplate: 'fieldset',
-          fieldTemplate: 'field'
-        }, options);
-        if ((_ref2 = options.template) == null) {
-          options.template = this.template;
-        }
-        if ((_ref3 = options.fieldsets) == null) {
-          options.fieldsets = this.fieldsets;
-        }
-        if (!options.fieldsets) {
-          fields = options.fields || _.keys(this.schema);
-          options.fieldsets = [
-            {
-              fields: fields
-            }
-          ];
-        }
-        this.options = options;
-        this.model = options.model;
-        this.data = options.data;
-        return this.fields = {};
+        _.extend(options != null ? options : options = {}, {
+          schema: this.schema,
+          template: this.template,
+          fieldsets: this.fieldsets
+        });
+        return Form.__super__.initialize.call(this, options);
       };
 
       Form.prototype.render = function() {

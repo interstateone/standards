@@ -18,39 +18,11 @@ define (require) ->
 
   class Form extends Backbone.Form
     initialize: (options) ->
-      # Check templates have been loaded
-      unless Form.templates.form then throw new Error 'Templates not loaded'
-
-      # Get the schema
-      @schema ?= ( ->
-        if options.schema then options.schema
-        model = options.model
-        unless model then throw new Error 'Could not find schema'
-        if _.isFunction model.schema then model.schema()
-        model.schema
-      )
-
-      # Option defaults
-      options = _.extend
-        template: 'form'
-        fieldsetTemplate: 'fieldset'
-        fieldTemplate: 'field'
-      , options
-
-      options.template ?= @template
-      options.fieldsets ?= @fieldsets
-
-      # Determine fieldsets
-      unless options.fieldsets
-        fields = options.fields || _.keys @schema
-
-        options.fieldsets = [fields: fields]
-
-      # Store main attributes
-      @options = options
-      @model = options.model
-      @data = options.data
-      @fields = {}
+      _.extend options ?= {},
+        schema: @schema
+        template: @template
+        fieldsets: @fieldsets
+      super options
     render: ->
       options = @options
       template = @template ? Form.templates[options.template]
