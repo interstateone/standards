@@ -4,13 +4,94 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, Backbone, Check, CheckView, Checks, LoginView, Marionette, NavBarView, SettingsView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
+    var $, App, Backbone, Check, CheckView, Checks, Form, LoginView, Marionette, NavBarView, SettingsView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
+    require('moment');
+    require('backbone-forms');
+    require('backbone-forms-bootstrap');
+    require('backbone-forms-modal');
     require('plugins');
     _ref = require('models'), User = _ref.User, Task = _ref.Task, Tasks = _ref.Tasks, Check = _ref.Check, Checks = _ref.Checks;
+    Form = (function(_super) {
+
+      __extends(Form, _super);
+
+      function Form() {
+        return Form.__super__.constructor.apply(this, arguments);
+      }
+
+      Form.prototype.initialize = function(options) {
+        var fields, _ref1, _ref2;
+        if (!Form.templates.form) {
+          throw new Error('Templates not loaded');
+        }
+        if ((_ref1 = this.schema) == null) {
+          this.schema = (function() {
+            var model;
+            if (options.schema) {
+              options.schema;
+            }
+            model = options.model;
+            if (!model) {
+              throw new Error('Could not find schema');
+            }
+            if (_.isFunction(model.schema)) {
+              model.schema();
+            }
+            return model.schema;
+          });
+        }
+        options = _.extend({
+          template: 'form',
+          fieldsetTemplate: 'fieldset',
+          fieldTemplate: 'field'
+        }, options);
+        if ((_ref2 = options.template) == null) {
+          options.template = this.template;
+        }
+        if (!options.fieldsets) {
+          fields = options.fields || _.keys(this.schema);
+          options.fieldsets = [
+            {
+              fields: fields
+            }
+          ];
+        }
+        this.options = options;
+        this.model = options.model;
+        this.data = options.data;
+        return this.fields = {};
+      };
+
+      Form.prototype.render = function() {
+        var $fieldsetContainer, $form, options, template, _ref1,
+          _this = this;
+        options = this.options;
+        template = (_ref1 = this.template) != null ? _ref1 : Form.templates[options.template];
+        if (_.isFunction(template)) {
+          $form = $(template({
+            fieldsets: '<b class="bbf-tmp"></b>'
+          }));
+        } else {
+          $form = $(_.template(template, {
+            fieldsets: '<b class="bbf-tmp"></b>'
+          }));
+        }
+        $fieldsetContainer = $('.bbf-tmp', $form);
+        _.each(options.fieldsets, function(fieldset) {
+          return $fieldsetContainer.append(_this.renderFieldset(fieldset));
+        });
+        $fieldsetContainer.children().unwrap();
+        this.setElement($form);
+        return this;
+      };
+
+      return Form;
+
+    })(Backbone.Form);
     Backbone.Marionette.Renderer.render = function(template, data) {
       return _.template(template, data);
     };
@@ -112,13 +193,25 @@
 
       LoginView.prototype.template = require('jade!../templates/login')();
 
-      LoginView.prototype.render = function() {
-        this.$el.html(this.template);
-        return this;
+      LoginView.prototype.schema = {
+        email: {
+          validate: ['required', 'email']
+        },
+        password: {
+          type: 'Password'
+        }
       };
 
+      LoginView.prototype.fieldsets = [
+        {
+          fields: ['email', 'password'],
+          legend: 'Log In'
+        }
+      ];
+
       LoginView.prototype.events = {
-        'submit': 'clickedLogin'
+        'submit': 'clickedLogin',
+        'click .forgot': 'clickedForgot'
       };
 
       LoginView.prototype.clickedLogin = function(e) {
@@ -130,9 +223,17 @@
         return app.vent.trigger('user:sign-in', email, password);
       };
 
+      LoginView.prototype.clickedForgot = function(e) {
+        var email;
+        e.preventDefault();
+        e.stopPropagation();
+        email = this.$('#email').val();
+        return app.vent.trigger('user:forgot', email);
+      };
+
       return LoginView;
 
-    })(Backbone.Marionette.ItemView);
+    })(Form);
     CheckView = (function(_super) {
 
       __extends(CheckView, _super);
@@ -213,10 +314,6 @@
         this.user = new User;
         this.tasks = new Tasks;
         this.showApp();
-        this.router = new AppRouter;
-        Backbone.history.start({
-          pushState: true
-        });
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
@@ -240,7 +337,7 @@
         this.navigation.show(this.navigation = new NavBarView({
           model: this.user
         }));
-        return this.checkAuth;
+        return this.checkAuth();
       };
 
       App.prototype.showTasks = function() {

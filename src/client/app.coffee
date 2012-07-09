@@ -5,12 +5,70 @@ define (require) ->
   _ = require 'underscore'
   Backbone = require 'backbone'
   Marionette = require 'marionette'
+  require 'moment'
+  require 'backbone-forms'
+  require 'backbone-forms-bootstrap'
+  require 'backbone-forms-modal'
 
   # App Libs
   require 'plugins'
 
   # App Components
   {User, Task, Tasks, Check, Checks} = require 'models'
+
+  class Form extends Backbone.Form
+    initialize: (options) ->
+      # Check templates have been loaded
+      unless Form.templates.form then throw new Error 'Templates not loaded'
+
+      # Get the schema
+      @schema ?= ( ->
+        if options.schema then options.schema
+        model = options.model
+        unless model then throw new Error 'Could not find schema'
+        if _.isFunction model.schema then model.schema()
+        model.schema
+      )
+
+      # Option defaults
+      options = _.extend
+        template: 'form'
+        fieldsetTemplate: 'fieldset'
+        fieldTemplate: 'field'
+      , options
+
+      options.template ?= @template
+
+      # Determine fieldsets
+      unless options.fieldsets
+        fields = options.fields || _.keys @schema
+
+        options.fieldsets = [fields: fields]
+
+      # Store main attributes
+      @options = options
+      @model = options.model
+      @data = options.data
+      @fields = {}
+    render: ->
+      options = @options
+      template = @template ? Form.templates[options.template]
+
+      # Create el from template
+      if _.isFunction template then $form = $ template fieldsets: '<b class="bbf-tmp"></b>'
+      else $form = $ _.template template, fieldsets: '<b class="bbf-tmp"></b>'
+
+      # Render fieldsets
+      $fieldsetContainer = $ '.bbf-tmp', $form
+
+      _.each options.fieldsets, (fieldset) =>
+        $fieldsetContainer.append @renderFieldset fieldset
+
+      $fieldsetContainer.children().unwrap()
+
+      # Set the template contents as the main element; removes the wrapper element
+      @setElement $form
+      @
 
   Backbone.Marionette.Renderer.render = (template, data) ->
     _.template template, data
@@ -47,19 +105,31 @@ define (require) ->
       if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
       week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
-  class LoginView extends Backbone.Marionette.ItemView
+  class LoginView extends Form
     template: require('jade!../templates/login')()
-    render: ->
-      @$el.html @template
-      @
+    schema:
+      email:
+        validate: ['required', 'email']
+      password:
+        type: 'Password'
+    fieldsets: [
+      fields: ['email', 'password']
+      legend: 'Log In'
+    ]
     events:
       'submit': 'clickedLogin'
+      'click .forgot': 'clickedForgot'
     clickedLogin: (e) ->
       e.preventDefault()
       e.stopPropagation()
       email = @$('#email').val()
       password = @$('#password').val()
       app.vent.trigger 'user:sign-in', email, password
+    clickedForgot: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      email = @$('#email').val()
+      app.vent.trigger 'user:forgot', email
 
   class CheckView extends Backbone.Marionette.ItemView
     tagname: 'a'
@@ -89,9 +159,9 @@ define (require) ->
       @tasks = new Tasks
       @showApp()
 
-      @router = new AppRouter
-      Backbone.history.start
-        pushState: true
+      # @router = new AppRouter
+      # Backbone.history.start
+      #   pushState: true
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       app.vent.on 'user:sign-in', @signIn, @
@@ -105,7 +175,7 @@ define (require) ->
         navigation: ".navigation"
         body: ".body"
       @navigation.show @navigation = new NavBarView model: @user
-      @checkAuth
+      @checkAuth()
     showTasks: ->
       @body.show @tasksView = new TasksView collection: @tasks
       @tasks.fetch()
