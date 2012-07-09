@@ -6,42 +6,13 @@ define (require) ->
   Backbone = require 'backbone'
   Marionette = require 'marionette'
   require 'moment'
-  require 'backbone-forms'
-  require 'backbone-forms-bootstrap'
-  require 'backbone-forms-modal'
 
   # App Libs
   require 'plugins'
 
   # App Components
   {User, Task, Tasks, Check, Checks} = require 'models'
-
-  class Form extends Backbone.Form
-    initialize: (options) ->
-      _.extend options ?= {},
-        schema: @schema
-        template: @template
-        fieldsets: @fieldsets
-      super options
-    render: ->
-      options = @options
-      template = @template ? Form.templates[options.template]
-
-      # Create el from template
-      if _.isFunction template then $form = $ template fieldsets: '<b class="bbf-tmp"></b>'
-      else $form = $ _.template template, fieldsets: '<b class="bbf-tmp"></b>'
-
-      # Render fieldsets
-      $fieldsetContainer = $ '.bbf-tmp', $form
-
-      _.each options.fieldsets, (fieldset) =>
-        $fieldsetContainer.append @renderFieldset fieldset
-
-      $fieldsetContainer.children().unwrap()
-
-      # Set the template contents as the main element; removes the wrapper element
-      @setElement $form
-      @
+  Form = require 'form'
 
   Backbone.Marionette.Renderer.render = (template, data) ->
     _.template template, data

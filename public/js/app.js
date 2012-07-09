@@ -10,54 +10,9 @@
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('moment');
-    require('backbone-forms');
-    require('backbone-forms-bootstrap');
-    require('backbone-forms-modal');
     require('plugins');
     _ref = require('models'), User = _ref.User, Task = _ref.Task, Tasks = _ref.Tasks, Check = _ref.Check, Checks = _ref.Checks;
-    Form = (function(_super) {
-
-      __extends(Form, _super);
-
-      function Form() {
-        return Form.__super__.constructor.apply(this, arguments);
-      }
-
-      Form.prototype.initialize = function(options) {
-        _.extend(options != null ? options : options = {}, {
-          schema: this.schema,
-          template: this.template,
-          fieldsets: this.fieldsets
-        });
-        return Form.__super__.initialize.call(this, options);
-      };
-
-      Form.prototype.render = function() {
-        var $fieldsetContainer, $form, options, template, _ref1,
-          _this = this;
-        options = this.options;
-        template = (_ref1 = this.template) != null ? _ref1 : Form.templates[options.template];
-        if (_.isFunction(template)) {
-          $form = $(template({
-            fieldsets: '<b class="bbf-tmp"></b>'
-          }));
-        } else {
-          $form = $(_.template(template, {
-            fieldsets: '<b class="bbf-tmp"></b>'
-          }));
-        }
-        $fieldsetContainer = $('.bbf-tmp', $form);
-        _.each(options.fieldsets, function(fieldset) {
-          return $fieldsetContainer.append(_this.renderFieldset(fieldset));
-        });
-        $fieldsetContainer.children().unwrap();
-        this.setElement($form);
-        return this;
-      };
-
-      return Form;
-
-    })(Backbone.Form);
+    Form = require('form');
     Backbone.Marionette.Renderer.render = function(template, data) {
       return _.template(template, data);
     };
