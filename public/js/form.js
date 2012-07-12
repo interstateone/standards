@@ -28,8 +28,7 @@
       };
 
       Form.prototype.render = function() {
-        var $fieldsetContainer, $form, options, template, _ref,
-          _this = this;
+        var $fieldsetContainer, $form, fieldset, options, template, _i, _len, _ref, _ref1;
         options = this.options;
         template = (_ref = this.template) != null ? _ref : Form.templates[options.template];
         if (_.isFunction(template)) {
@@ -42,9 +41,11 @@
           }));
         }
         $fieldsetContainer = $('.bbf-tmp', $form);
-        _.each(options.fieldsets, function(fieldset) {
-          return $fieldsetContainer.append(_this.renderFieldset(fieldset));
-        });
+        _ref1 = options.fieldsets;
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          fieldset = _ref1[_i];
+          $fieldsetContainer.append(this.renderFieldset(fieldset));
+        }
         $fieldsetContainer.children().unwrap();
         this.setElement($form);
         return this;

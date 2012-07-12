@@ -25,10 +25,7 @@ define (require) ->
 
       # Render fieldsets
       $fieldsetContainer = $ '.bbf-tmp', $form
-
-      _.each options.fieldsets, (fieldset) =>
-        $fieldsetContainer.append @renderFieldset fieldset
-
+      $fieldsetContainer.append @renderFieldset fieldset for fieldset in options.fieldsets
       $fieldsetContainer.children().unwrap()
 
       # Set the template contents as the main element; removes the wrapper element
