@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, Backbone, CheckView, Form, LoginView, Marionette, NavBarView, SettingsView, Task, TaskView, Tasks, TasksView, User, initialize, _;
+    var $, App, Backbone, CheckView, Checks, Form, LoginView, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -29,44 +29,148 @@
       return Tasks;
 
     })(Backbone.Collection);
+    Checks = (function(_super) {
+
+      __extends(Checks, _super);
+
+      function Checks() {
+        return Checks.__super__.constructor.apply(this, arguments);
+      }
+
+      Checks.prototype.model = Check;
+
+      Checks.prototype.url = '/api/checks';
+
+      return Checks;
+
+    })(Backbone.Collection);
     Backbone.Marionette.Renderer.render = function(template, data) {
       return _.template(template, data);
     };
-    ({
-      getWeekdaysAsArray: function() {
-        var day, firstDayOfWeek, startingWeekday, today, week;
-        today = moment();
-        startingWeekday = app.user.get('starting_weekday');
-        firstDayOfWeek = moment();
-        firstDayOfWeek.day(startingWeekday);
-        if (firstDayOfWeek.day() > today.day()) {
-          firstDayOfWeek.day(startingWeekday - 7);
+    getWeekdaysAsArray = function(full) {
+      var day, firstDayOfWeek, lengthOfWeek, startingWeekday, today, week;
+      today = moment().sod();
+      startingWeekday = app.user.get('starting_weekday');
+      firstDayOfWeek = moment().sod();
+      firstDayOfWeek.day(startingWeekday);
+      if (firstDayOfWeek.day() > today.day()) {
+        firstDayOfWeek.day(startingWeekday - 7);
+      }
+      lengthOfWeek = full ? 6 : Math.min(6, today.diff(firstDayOfWeek, 'days'));
+      return week = (function() {
+        var _i, _results;
+        _results = [];
+        for (day = _i = 0; 0 <= lengthOfWeek ? _i <= lengthOfWeek : _i >= lengthOfWeek; day = 0 <= lengthOfWeek ? ++_i : --_i) {
+          _results.push(firstDayOfWeek.clone().add('d', day));
         }
-        return week = (function() {
-          var _i, _results;
-          _results = [];
-          for (day = _i = 0; _i <= 6; day = ++_i) {
-            _results.push(firstDayOfWeek.clone().add('d', day));
-          }
-          return _results;
-        })();
-      }
-    });
-    TaskView = (function(_super) {
+        return _results;
+      })();
+    };
+    CheckView = (function(_super) {
 
-      __extends(TaskView, _super);
+      __extends(CheckView, _super);
 
-      function TaskView() {
-        return TaskView.__super__.constructor.apply(this, arguments);
+      function CheckView() {
+        return CheckView.__super__.constructor.apply(this, arguments);
       }
 
-      TaskView.prototype.tagName = 'tr';
+      CheckView.prototype.tagName = 'td';
 
-      TaskView.prototype.template = require('jade!../templates/task-row')();
+      CheckView.prototype.template = require('jade!../templates/check')();
 
-      return TaskView;
+      CheckView.prototype.initialize = function() {
+        if (this.model.isNew != null) {
+          return this.date = this.model.get('date');
+        } else {
+          return _.extend(this, this.model);
+        }
+      };
+
+      CheckView.prototype.events = {
+        'click': 'toggleCheck'
+      };
+
+      CheckView.prototype.toggleCheck = function() {
+        if (this.model.isNew != null) {
+          return app.vent.trigger('task:uncheck', this.model);
+        } else {
+          return app.vent.trigger('task:check', this.date);
+        }
+      };
+
+      CheckView.prototype.render = function() {
+        this.$el.html(this.template);
+        if (this.model.isNew != null) {
+          this.$('img').addClass('complete');
+        }
+        return this;
+      };
+
+      return CheckView;
 
     })(Backbone.Marionette.ItemView);
+    TaskRowView = (function(_super) {
+
+      __extends(TaskRowView, _super);
+
+      function TaskRowView() {
+        return TaskRowView.__super__.constructor.apply(this, arguments);
+      }
+
+      TaskRowView.prototype.tagName = 'tr';
+
+      TaskRowView.prototype.template = require('jade!../templates/task-row')();
+
+      TaskRowView.prototype.itemView = CheckView;
+
+      TaskRowView.prototype.initialEvents = function() {
+        if (this.collection != null) {
+          this.bindTo(this.collection, "add", this.render, this);
+          this.bindTo(this.collection, "sync", this.render, this);
+          this.bindTo(this.collection, "remove", this.render, this);
+          return this.bindTo(this.collection, "reset", this.render, this);
+        }
+      };
+
+      TaskRowView.prototype.initialize = function() {
+        this.collection = this.model.get('checks');
+        app.vent.on('task:check', this.check, this);
+        return app.vent.on('task:uncheck', this.uncheck, this);
+      };
+
+      TaskRowView.prototype.showCollection = function() {
+        var ItemView, boilerplate, check, day, index, weekdays, _i, _len, _results;
+        ItemView = this.getItemView();
+        weekdays = getWeekdaysAsArray();
+        _results = [];
+        for (index = _i = 0, _len = weekdays.length; _i < _len; index = ++_i) {
+          day = weekdays[index];
+          check = this.collection.find(function(check) {
+            if ((check.get('date')) != null) {
+              return (day.diff(moment(check.get('date')))) === 0;
+            }
+          });
+          boilerplate = {
+            date: day.format('YYYY-MM-DD')
+          };
+          _results.push(this.addItemView(check || (check = boilerplate), ItemView, index));
+        }
+        return _results;
+      };
+
+      TaskRowView.prototype.check = function(date) {
+        return this.collection.create({
+          date: date
+        });
+      };
+
+      TaskRowView.prototype.uncheck = function(model) {
+        return model.destroy();
+      };
+
+      return TaskRowView;
+
+    })(Backbone.Marionette.CompositeView);
     TasksView = (function(_super) {
 
       __extends(TasksView, _super);
@@ -79,13 +183,13 @@
 
       TasksView.prototype.id = 'tasksView';
 
-      TasksView.prototype.itemView = TaskView;
+      TasksView.prototype.itemView = TaskRowView;
 
       TasksView.prototype.template = require('jade!../templates/tasks-table')();
 
       TasksView.prototype.templateHelpers = function() {
         return {
-          getWeekdaysAsArray: this.getWeekdaysAsArray
+          getWeekdaysAsArray: getWeekdaysAsArray
         };
       };
 
@@ -96,25 +200,6 @@
 
       TasksView.prototype.appendHtml = function(collectionView, itemView) {
         return collectionView.$("tbody").append(itemView.el);
-      };
-
-      TasksView.prototype.getWeekdaysAsArray = function() {
-        var day, firstDayOfWeek, startingWeekday, today, week;
-        today = moment();
-        startingWeekday = app.user.get('starting_weekday');
-        firstDayOfWeek = moment();
-        firstDayOfWeek.day(startingWeekday);
-        if (firstDayOfWeek.day() > today.day()) {
-          firstDayOfWeek.day(startingWeekday - 7);
-        }
-        return week = (function() {
-          var _i, _results;
-          _results = [];
-          for (day = _i = 0; _i <= 6; day = ++_i) {
-            _results.push(firstDayOfWeek.clone().add('d', day));
-          }
-          return _results;
-        })();
       };
 
       return TasksView;
@@ -171,23 +256,6 @@
       return LoginView;
 
     })(Form);
-    CheckView = (function(_super) {
-
-      __extends(CheckView, _super);
-
-      function CheckView() {
-        return CheckView.__super__.constructor.apply(this, arguments);
-      }
-
-      CheckView.prototype.tagname = 'a';
-
-      CheckView.prototype.initialize = function() {
-        return this.template = _.template($('#check-template').html());
-      };
-
-      return CheckView;
-
-    })(Backbone.Marionette.ItemView);
     NavBarView = (function(_super) {
 
       __extends(NavBarView, _super);
@@ -254,7 +322,9 @@
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
-        return app.vent.on('user:sign-in', this.signIn, this);
+        app.vent.on('user:sign-in', this.signIn, this);
+        app.vent.on('task:check', this.check, this);
+        return app.vent.on('task:uncheck', this.uncheck, this);
       };
 
       App.prototype.checkAuth = function() {

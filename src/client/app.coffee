@@ -19,40 +19,79 @@ define (require) ->
     model: Task
     url: '/api/tasks'
 
+  class Checks extends Backbone.Collection
+    model: Check
+    url: '/api/checks'
+
   Backbone.Marionette.Renderer.render = (template, data) ->
     _.template template, data
 
-  getWeekdaysAsArray: ->
-    today = moment()
+  getWeekdaysAsArray = (full) ->
+    today = moment().sod()
     startingWeekday = app.user.get 'starting_weekday'
-    firstDayOfWeek = moment()
+    firstDayOfWeek = moment().sod()
     firstDayOfWeek.day startingWeekday
     if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
-    week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
+    lengthOfWeek = if full then 6 else Math.min 6, today.diff firstDayOfWeek, 'days'
+    week = (firstDayOfWeek.clone().add('d', day) for day in [0..lengthOfWeek])
 
-  class TaskView extends Backbone.Marionette.ItemView
+  class CheckView extends Backbone.Marionette.ItemView
+    tagName: 'td'
+    template: require('jade!../templates/check')()
+    initialize: ->
+      if @model.isNew? then @date = @model.get 'date'
+      else _.extend @, @model
+    events:
+      'click': 'toggleCheck'
+    toggleCheck: ->
+      if @model.isNew?
+        app.vent.trigger 'task:uncheck', @model
+      else
+        app.vent.trigger 'task:check', @date
+    render: ->
+      @$el.html @template
+      if @model.isNew? then @$('img').addClass 'complete'
+      @
+
+  class TaskRowView extends Backbone.Marionette.CompositeView
     tagName: 'tr'
     template: require('jade!../templates/task-row')()
+    itemView: CheckView
+    initialEvents: ->
+      if @collection?
+        @bindTo @collection, "add", @render, @
+        @bindTo @collection, "sync", @render, @
+        @bindTo @collection, "remove", @render, @
+        @bindTo @collection, "reset", @render, @
+    initialize: ->
+      @collection = @model.get 'checks'
+      app.vent.on 'task:check', @check, @
+      app.vent.on 'task:uncheck', @uncheck, @
+    showCollection: ->
+      ItemView = @getItemView()
+      weekdays = getWeekdaysAsArray()
+      for day, index in weekdays
+        check = @collection.find (check) ->
+          if (check.get 'date')? then (day.diff moment check.get 'date') is 0
+        boilerplate = {date: day.format('YYYY-MM-DD')}
+        @addItemView check ||= boilerplate, ItemView, index
+    check: (date) ->
+      @collection.create date: date
+    uncheck: (model) ->
+      model.destroy()
 
   class TasksView extends Backbone.Marionette.CollectionView
     tagName: 'table'
     id: 'tasksView'
-    itemView: TaskView
+    itemView: TaskRowView
     template: require('jade!../templates/tasks-table')()
     templateHelpers: ->
-      getWeekdaysAsArray: @getWeekdaysAsArray
+      getWeekdaysAsArray: getWeekdaysAsArray
     render: ->
       @$el.html _.template @template, @serializeData()
       @showCollection()
     appendHtml: (collectionView, itemView) ->
       collectionView.$("tbody").append(itemView.el);
-    getWeekdaysAsArray: ->
-      today = moment()
-      startingWeekday = app.user.get 'starting_weekday'
-      firstDayOfWeek = moment()
-      firstDayOfWeek.day startingWeekday
-      if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
-      week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
 
   class LoginView extends Form
     template: require('jade!../templates/login')()
@@ -79,11 +118,6 @@ define (require) ->
       e.stopPropagation()
       email = @$('#email').val()
       app.vent.trigger 'user:forgot', email
-
-  class CheckView extends Backbone.Marionette.ItemView
-    tagname: 'a'
-    initialize: ->
-      @template = _.template $('#check-template').html()
 
   class NavBarView extends Backbone.Marionette.Layout
     template: require('jade!../templates/navbar')()
@@ -114,6 +148,9 @@ define (require) ->
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       app.vent.on 'user:sign-in', @signIn, @
+
+      app.vent.on 'task:check', @check, @
+      app.vent.on 'task:uncheck', @uncheck, @
     checkAuth: ->
       console.log 'checking auth'
       @user.isSignedIn @showTasks, @showLogin, @
@@ -133,6 +170,10 @@ define (require) ->
     showSettings: ->
       console.log 'settings'
       @body.show @settingsView = new SettingsView
+    # check: (options) ->
+    #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
+    # uncheck: (model) ->
+    #   model.destroy()
 
   # class AppRouter extends Backbone.Marionette.AppRouter
   #   controller: App

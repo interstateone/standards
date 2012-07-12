@@ -8,6 +8,7 @@ define (require) ->
   require 'relational'
 
   class Check extends Backbone.RelationalModel
+    urlRoot: '/api/checks'
 
   Check.setup()
 

@@ -18,6 +18,8 @@
         return Check.__super__.constructor.apply(this, arguments);
       }
 
+      Check.prototype.urlRoot = '/api/checks';
+
       return Check;
 
     })(Backbone.RelationalModel);
