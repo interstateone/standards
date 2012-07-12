@@ -127,6 +127,87 @@ class API < Sinatra::Base
 		current_user.attributes.only(:id, :name, :email, :starting_weekday).to_json
 	end
 
+	# Forgot password --------------------------------
+
+	post "/user/forgot/?" do
+		unless valid_email? params[:email]
+			content_type :json
+			{
+				'status' => 'error',
+				'error' => 'invalid email'
+			}.to_json
+		else
+			user = User.first(:email => params[:email])
+			unless user.nil?
+				@key = user.password_reset_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
+				user.save
+
+				@name = user.name
+				@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
+
+				resetWorker = EmailWorker.new
+				resetWorker.username = ENV['EMAIL_USERNAME'] || settings.email_username
+				resetWorker.password = ENV['EMAIL_PASSWORD'] || settings.email_password
+				resetWorker.to = user.email
+				resetWorker.from = ENV['EMAIL_USERNAME'] || settings.email_username
+				resetWorker.subject = "Reset your Standards password"
+				resetWorker.body = erb :reset_password_email, :layout => false
+
+				if production?
+					resetWorker.queue
+				else
+					resetWorker.run_local
+				end
+
+				content_type :json
+				{
+					'status' => 'success',
+					'message' => 'You\'ve been sent a password reset email to the address you provided, click the link inside to do so.'
+				}.to_json
+			else
+				content_type :json
+				{
+					'status' => 'error',
+					'message' => 'invalid email'
+				}.to_json
+			end
+		end
+	end
+
+	# Reset password
+
+	post '/user/reset/?' do
+		user = User.first :password_reset_key => params[:key]
+		if !user.nil?
+			user.password = params[:password]
+			user.password_reset_key = nil
+			user.save
+			session[:id] = user.id
+
+			content_type :json
+			{
+				'status' => 'success',
+				'message' => 'Great! Your password has been changed'
+			}.to_json
+		else
+			content_type :json
+			{
+				'status' => 'error',
+				'message' => 'That isn\'t a valid password reset link.'
+			}.to_json
+		end
+	end
+
+	get '/user/reset/:key/?' do
+		@user = User.first :password_reset_key => params[:key]
+		if !@user.nil?
+			erb :reset_password
+		else
+			flash[:error] = "That is not a valid password reset link."
+			redirect '/'
+		end
+	end
+
 	# Update User ------------------------------------
 
 	put "/user/:id/?" do
@@ -199,31 +280,16 @@ class API < Sinatra::Base
 
 		login_required
 
-		current_user.tasks.to_json
+		current_user.tasks.to_json :methods => [:checks]
 	end
 
-	get '/task/:id/checks/?' do
+	get '/tasks/:id/?' do
 		content_type :json
 
 		login_required
 
-		current_user.tasks.get(params[:id]).checks.to_json
+		current_user.tasks.get(params[:id]).to_json :methods => [:checks]
 	end
-
-	# ------------------------------------------------
-	#
-	# Check Routes
-	#
-	# ------------------------------------------------
-
-	get '/checks/?' do
-		content_type :json
-
-		login_required
-
-		current_user.checks.to_json
-	end
-
 
 
 
@@ -277,73 +343,6 @@ class API < Sinatra::Base
 
 	get '/about/?' do
 		erb :about
-	end
-
-	get "/signup/?" do
-	  erb :signup
-	end
-
-	get "/logout/?" do
-	  session[:id] = nil
-	  redirect "/"
-	end
-
-	post "/forgot/?" do
-		if !valid_email? params[:email]
-			flash[:error] = "Please enter the email address you signed up with."
-			redirect '/login'
-		else
-			user = User.first(:email => params[:email])
-			if !user.nil?
-				@key = user.password_reset_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
-				user.save
-
-				@name = user.name
-				@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
-
-				resetWorker = EmailWorker.new
-				resetWorker.username = ENV['EMAIL_USERNAME'] || settings.email_username
-				resetWorker.password = ENV['EMAIL_PASSWORD'] || settings.email_password
-				resetWorker.to = user.email
-				resetWorker.from = ENV['EMAIL_USERNAME'] || settings.email_username
-				resetWorker.subject = "Reset your Standards password"
-				resetWorker.body = erb :reset_password_email, :layout => false
-
-				if production?
-					resetWorker.queue
-				else
-					resetWorker.run_local
-				end
-
-				flash[:notice] = "You've been sent a password reset email to the address you provided, click the link inside to do so."
-				redirect "/"
-			end
-		end
-	end
-
-	get '/reset/:key/?' do
-		@user = User.first :password_reset_key => params[:key]
-		if !@user.nil?
-			erb :reset_password
-		else
-			flash[:error] = "That is not a valid password reset link."
-			redirect '/'
-		end
-	end
-
-	post '/reset/?' do
-		user = User.first :password_reset_key => params[:key]
-		if !user.nil?
-			user.password = params[:password]
-			user.password_reset_key = nil
-			user.save
-			session[:id] = user.id
-			flash[:notice] = "Great! You're password has been changed."
-			redirect '/'
-		else
-			flash[:error] = "That is not a valid password reset link."
-			redirect '/'
-		end
 	end
 
 	get '/admin/?' do
