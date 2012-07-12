@@ -291,9 +291,27 @@ class API < Sinatra::Base
 		current_user.tasks.get(params[:id]).to_json :methods => [:checks]
 	end
 
+	# ------------------------------------------------
+	#
+	# Check Routes
+	#
+	# ------------------------------------------------
 
+	delete '/checks/:id/?' do
+		login_required
+		user = current_user
+		c = user.checks.get params[:id]
+		c.destroy unless c.nil?
+	end
 
-
+	post '/checks/?' do
+		content_type :json
+		login_required
+		data = JSON.parse request.body.read.to_s
+		user = current_user
+		task = user.tasks.get data['task']['id']
+		check = Check.create(:user => user, :task => task, :date => data['date']).to_json
+	end
 
 
 	get '/' do
