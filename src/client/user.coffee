@@ -13,7 +13,6 @@ define (require) ->
       @fetch
         success: $.proxy yep, context
         error: $.proxy nope, context
-
     signIn: (e, p, onSucceed, onFail, context) ->
       $.ajax
         url: '/api/sign-in'
@@ -25,7 +24,6 @@ define (require) ->
           @set data
           onSucceed.call context
         context: @
-
     signOut: ->
       $.ajax
         url       : '/api/sign-out'
@@ -33,28 +31,8 @@ define (require) ->
       .done ->
         @clear()
         @trigger 'signed-out'
-
-  class Task extends Backbone.Model
-  class Check extends Backbone.Model
-  # exports.Check = Check = Backbone.RelationalModel.extend
-  #   url: "/check"
-
-  # exports.Task = Task = Backbone.RelationalModel.extend
-  #   url: "/task"
-  #   relations: [
-  #     type: Backbone.HasOne
-  #     key: 'checks'
-  #     relatedModel: 'Check'
-  #     reverseRelation:
-  #       key: 'task'
-  #       includeInJSON: 'id'
-  #   ]
-
-  class Tasks extends Backbone.Collection
-    model: Task
-    url: '/api/tasks'
-
-  class Checks extends Backbone.Collection
-    model: Check
-
-  return {User, Task, Tasks, Check, Checks}
+    forgot: (e) ->
+      $.ajax
+        url: '/api/user/forgot'
+        type: 'POST'
+        dataType: ''
