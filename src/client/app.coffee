@@ -11,8 +11,13 @@ define (require) ->
   require 'plugins'
 
   # App Components
-  {User, Task, Tasks, Check, Checks} = require 'models'
+  User = require 'user'
+  Task = require 'task'
   Form = require 'form'
+
+  class Tasks extends Backbone.Collection
+    model: Task
+    url: '/api/tasks'
 
   Backbone.Marionette.Renderer.render = (template, data) ->
     _.template template, data

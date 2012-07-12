@@ -4,15 +4,31 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, Backbone, Check, CheckView, Checks, Form, LoginView, Marionette, NavBarView, SettingsView, Task, TaskView, Tasks, TasksView, User, initialize, _, _ref;
+    var $, App, Backbone, CheckView, Form, LoginView, Marionette, NavBarView, SettingsView, Task, TaskView, Tasks, TasksView, User, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('moment');
     require('plugins');
-    _ref = require('models'), User = _ref.User, Task = _ref.Task, Tasks = _ref.Tasks, Check = _ref.Check, Checks = _ref.Checks;
+    User = require('user');
+    Task = require('task');
     Form = require('form');
+    Tasks = (function(_super) {
+
+      __extends(Tasks, _super);
+
+      function Tasks() {
+        return Tasks.__super__.constructor.apply(this, arguments);
+      }
+
+      Tasks.prototype.model = Task;
+
+      Tasks.prototype.url = '/api/tasks';
+
+      return Tasks;
+
+    })(Backbone.Collection);
     Backbone.Marionette.Renderer.render = function(template, data) {
       return _.template(template, data);
     };
