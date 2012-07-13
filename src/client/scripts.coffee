@@ -119,31 +119,6 @@ $ ->
 						when error.UNKNOWN_ERROR then alert 'Unknown error'
 			)
 
-	# Map JS reset() function to jQuery
-	jQuery.fn.reset = ->
-		$(this).each -> this.reset()
-
-	# Show new task form when user clicks the plus button
-	$('a.add').click (e) ->
-		if !$(this).children("i").hasClass("cancel")
-			$("input#title").focus()
-			$(this).children("i").animate({transform: 'rotate(45deg)'}, 'fast').toggleClass("cancel")
-			$(this).css('color', "red")
-			$(this).siblings('#newtask').animate({opacity: 1}, 'fast').css("visibility", "visible")
-		else
-			$(this).children("i").animate({transform: ''}, 'fast').toggleClass("cancel")
-			$(this).css('color', "#CCC")
-			$(this).siblings('#newtask').animate {opacity: 0}, 'fast', ->
-				$(this).css("visibility", "hidden")
-				$(this).reset()
-
-	# Submit a new task with the enter key
-	$('#newtask > input#purpose').keypress (e) ->
-		if e.which == 13
-			e.preventDefault()
-			$('#newtask').submit()
-			_gaq.push(['_trackEvent', 'task', 'create'])
-
 	colorArray = (numberOfRows, lightness) ->
 		colors = []
 
@@ -166,56 +141,6 @@ $ ->
 			$ministat.children('.minibar').css("background-color", barColors[row])
 
 	renderColors()
-
-	renderHeight = ->
-		rows = $('tbody').children()
-		$(rows).each (i) ->
-			$bar = $(this).children('td.title').children('.ministat').children('.minibar')
-			data = $bar.data()
-			count = data.count
-			total = data.total
-			$bar.css("height", Math.min(50 * count / total, 50))
-
-	# If this is the homepage, call renderHeight() once
-	if $('td.title').length
-		renderHeight()
-
-	incrementHeight = (target) ->
-		$bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar')
-
-		# Caching the data object is faster than calling it twice (http://api.jquery.com/data/)
-		data = $bar.data()
-		data.count += 1
-
-		# Rerender the bar heights
-		renderHeight()
-
-	decrementHeight = (target) ->
-		$bar = $(target).parents('tr').children('td.title').children('.ministat').children('.minibar')
-
-		# Caching the data object is faster than calling it twice (http://api.jquery.com/data/)
-		data = $bar.data()
-		data.count -= 1
-		# Rerender the bar heights
-
-		renderHeight()
-
-	# Post a new task
-	$('#newtask').submit (e) ->
-		e.preventDefault()
-		$.post "/new", $(this).serialize(), (data) ->
-				# Append the new task row
-				$('tbody').append(data)
-
-				# Remove welcome message after submitting first task
-				$('.hero-unit').hide()
-
-				renderColors()
-
-				$('a.add').children('i').animate({transform: ''}, 'fast').toggleClass("cancel")
-				$('a.add').css('color', "#CCC").siblings('#newtask').animate {opacity: 0}, 'fast', ->
-					$(this).reset()
-			, "text"
 
 	# Delete a task modal
 	$(document).on "click", 'a.delete', (e) ->
