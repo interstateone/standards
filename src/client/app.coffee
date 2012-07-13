@@ -26,6 +26,10 @@ define (require) ->
   Backbone.Marionette.Renderer.render = (template, data) ->
     _.template template, data
 
+  # Map JS reset() function to jQuery
+  jQuery.fn.reset = ->
+    $(this).each -> this.reset()
+
   getWeekdaysAsArray = (full) ->
     today = moment().sod()
     startingWeekday = app.user.get 'starting_weekday'
@@ -45,9 +49,9 @@ define (require) ->
       'click': 'toggleCheck'
     toggleCheck: ->
       if @model.isNew?
-        app.vent.trigger 'task:uncheck', @model
+        @trigger 'task:uncheck', @model
       else
-        app.vent.trigger 'task:check', @date
+        @trigger 'task:check', @date
     render: ->
       @$el.html @template
       if @model.isNew? then @$('img').addClass 'complete'
@@ -59,14 +63,22 @@ define (require) ->
     itemView: CheckView
     initialEvents: ->
       if @collection?
-        @bindTo @collection, "add", @render, @
-        @bindTo @collection, "sync", @render, @
-        @bindTo @collection, "remove", @render, @
-        @bindTo @collection, "reset", @render, @
+        @bindTo @collection, 'add', @render, @
+        @bindTo @collection, 'sync', @render, @
+        @bindTo @collection, 'remove', @render, @
+        @bindTo @collection, 'reset', @render, @
     initialize: ->
       @collection = @model.get 'checks'
-      app.vent.on 'task:check', @check, @
-      app.vent.on 'task:uncheck', @uncheck, @
+      @collection.comparator = (check) -> check.get 'date'
+      @on 'itemview:task:check', @check, @
+      @on 'itemview:task:uncheck', @uncheck, @
+    onRender: -> @renderHeight()
+    renderCollection: ->
+      @triggerBeforeRender()
+      @closeChildren()
+      @showCollection()
+      @triggerRendered()
+      @trigger "composite:collection:rendered"
     showCollection: ->
       ItemView = @getItemView()
       weekdays = getWeekdaysAsArray()
@@ -75,23 +87,71 @@ define (require) ->
           if (check.get 'date')? then (day.diff moment check.get 'date') is 0
         boilerplate = {date: day.format('YYYY-MM-DD')}
         @addItemView check ||= boilerplate, ItemView, index
-    check: (date) ->
+    check: (itemView, date) ->
       @collection.create date: date
-    uncheck: (model) ->
+    uncheck: (itemView, model) ->
       model.destroy()
+    renderHeight: ->
+      count = @model.get('checks').length
+      createdDay = moment(@model.get 'created_on')
+      firstDay = createdDay.valueOf()
+      if @model.get('checks').length
+        firstCheckDay = moment(@model.get('checks').sort(silent: true).first().get 'date')
+        firstDay = Math.min createdDay.valueOf(), firstCheckDay.valueOf()
+      today = moment().sod()
+      total = (today.diff (moment firstDay), 'days') + 1
+      console.log 'created', createdDay, 'firstCheckDay', firstCheckDay, 'first day', moment(firstDay), 'count', count, 'total', total
+      console.log @collection.pluck 'date'
+      @$('.minibar').css "height", Math.min 50 * count / total, 50
 
-  class TasksView extends Backbone.Marionette.CollectionView
+  class TasksView extends Backbone.Marionette.CompositeView
     tagName: 'table'
     id: 'tasksView'
     itemView: TaskRowView
+    itemViewContainer: 'tbody'
     template: require('jade!../templates/tasks-table')()
+    events:
+      'click a.add': 'clickedAdd'
+      'keypress #newtask': 'keypressNewTask'
+      'submit #newtask': 'submitNewTask'
     templateHelpers: ->
       getWeekdaysAsArray: getWeekdaysAsArray
     render: ->
       @$el.html _.template @template, @serializeData()
       @showCollection()
-    appendHtml: (collectionView, itemView) ->
-      collectionView.$("tbody").append(itemView.el);
+    clickedAdd: ->
+      @toggleNewTaskButton()
+      @toggleNewTaskForm()
+    toggleNewTaskButton: ->
+      unless @$('i').hasClass('cancel')
+        @$('i').animate({transform: 'rotate(45deg)'}, 'fast').toggleClass('cancel')
+      else
+        @$('i').animate({transform: ''}, 'fast').toggleClass('cancel')
+    toggleNewTaskForm: ->
+      if @$('#newtask').css('opacity') is '0'
+        @$('#newtask').animate(opacity: 1, 'fast').css 'visibility', 'visible'
+      else
+        @$('#newtask').animate({opacity: 0}, 'fast').reset().css 'visibility', 'hidden'
+    keypressNewTask: (e) ->
+      key = if (e.which)? then e.which else e.keyCode
+      if key == 13
+        e.preventDefault()
+        e.stopPropagation()
+        $('#newtask').submit()
+        _gaq.push(['_trackEvent', 'task', 'create'])
+    submitNewTask: (e) ->
+      e.preventDefault()
+      title = @$('input#title').val()
+      purpose = @$('input#purpose').val()
+      @collection.create title: title, purpose: purpose
+
+      # Remove welcome message after submitting first task
+      # $('.hero-unit').hide()
+
+      # renderColors()
+
+      @toggleNewTaskButton()
+      @toggleNewTaskForm()
 
   class LoginView extends Form
     template: require('jade!../templates/login')()

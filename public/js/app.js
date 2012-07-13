@@ -47,6 +47,11 @@
     Backbone.Marionette.Renderer.render = function(template, data) {
       return _.template(template, data);
     };
+    jQuery.fn.reset = function() {
+      return $(this).each(function() {
+        return this.reset();
+      });
+    };
     getWeekdaysAsArray = function(full) {
       var day, firstDayOfWeek, lengthOfWeek, startingWeekday, today, week;
       today = moment().sod();
@@ -92,9 +97,9 @@
 
       CheckView.prototype.toggleCheck = function() {
         if (this.model.isNew != null) {
-          return app.vent.trigger('task:uncheck', this.model);
+          return this.trigger('task:uncheck', this.model);
         } else {
-          return app.vent.trigger('task:check', this.date);
+          return this.trigger('task:check', this.date);
         }
       };
 
@@ -125,17 +130,32 @@
 
       TaskRowView.prototype.initialEvents = function() {
         if (this.collection != null) {
-          this.bindTo(this.collection, "add", this.render, this);
-          this.bindTo(this.collection, "sync", this.render, this);
-          this.bindTo(this.collection, "remove", this.render, this);
-          return this.bindTo(this.collection, "reset", this.render, this);
+          this.bindTo(this.collection, 'add', this.render, this);
+          this.bindTo(this.collection, 'sync', this.render, this);
+          this.bindTo(this.collection, 'remove', this.render, this);
+          return this.bindTo(this.collection, 'reset', this.render, this);
         }
       };
 
       TaskRowView.prototype.initialize = function() {
         this.collection = this.model.get('checks');
-        app.vent.on('task:check', this.check, this);
-        return app.vent.on('task:uncheck', this.uncheck, this);
+        this.collection.comparator = function(check) {
+          return check.get('date');
+        };
+        this.on('itemview:task:check', this.check, this);
+        return this.on('itemview:task:uncheck', this.uncheck, this);
+      };
+
+      TaskRowView.prototype.onRender = function() {
+        return this.renderHeight();
+      };
+
+      TaskRowView.prototype.renderCollection = function() {
+        this.triggerBeforeRender();
+        this.closeChildren();
+        this.showCollection();
+        this.triggerRendered();
+        return this.trigger("composite:collection:rendered");
       };
 
       TaskRowView.prototype.showCollection = function() {
@@ -158,14 +178,32 @@
         return _results;
       };
 
-      TaskRowView.prototype.check = function(date) {
+      TaskRowView.prototype.check = function(itemView, date) {
         return this.collection.create({
           date: date
         });
       };
 
-      TaskRowView.prototype.uncheck = function(model) {
+      TaskRowView.prototype.uncheck = function(itemView, model) {
         return model.destroy();
+      };
+
+      TaskRowView.prototype.renderHeight = function() {
+        var count, createdDay, firstCheckDay, firstDay, today, total;
+        count = this.model.get('checks').length;
+        createdDay = moment(this.model.get('created_on'));
+        firstDay = createdDay.valueOf();
+        if (this.model.get('checks').length) {
+          firstCheckDay = moment(this.model.get('checks').sort({
+            silent: true
+          }).first().get('date'));
+          firstDay = Math.min(createdDay.valueOf(), firstCheckDay.valueOf());
+        }
+        today = moment().sod();
+        total = (today.diff(moment(firstDay), 'days')) + 1;
+        console.log('created', createdDay, 'firstCheckDay', firstCheckDay, 'first day', moment(firstDay), 'count', count, 'total', total);
+        console.log(this.collection.pluck('date'));
+        return this.$('.minibar').css("height", Math.min(50 * count / total, 50));
       };
 
       return TaskRowView;
@@ -185,7 +223,15 @@
 
       TasksView.prototype.itemView = TaskRowView;
 
+      TasksView.prototype.itemViewContainer = 'tbody';
+
       TasksView.prototype.template = require('jade!../templates/tasks-table')();
+
+      TasksView.prototype.events = {
+        'click a.add': 'clickedAdd',
+        'keypress #newtask': 'keypressNewTask',
+        'submit #newtask': 'submitNewTask'
+      };
 
       TasksView.prototype.templateHelpers = function() {
         return {
@@ -198,13 +244,62 @@
         return this.showCollection();
       };
 
-      TasksView.prototype.appendHtml = function(collectionView, itemView) {
-        return collectionView.$("tbody").append(itemView.el);
+      TasksView.prototype.clickedAdd = function() {
+        this.toggleNewTaskButton();
+        return this.toggleNewTaskForm();
+      };
+
+      TasksView.prototype.toggleNewTaskButton = function() {
+        if (!this.$('i').hasClass('cancel')) {
+          return this.$('i').animate({
+            transform: 'rotate(45deg)'
+          }, 'fast').toggleClass('cancel');
+        } else {
+          return this.$('i').animate({
+            transform: ''
+          }, 'fast').toggleClass('cancel');
+        }
+      };
+
+      TasksView.prototype.toggleNewTaskForm = function() {
+        if (this.$('#newtask').css('opacity') === '0') {
+          return this.$('#newtask').animate({
+            opacity: 1
+          }, 'fast').css('visibility', 'visible');
+        } else {
+          return this.$('#newtask').animate({
+            opacity: 0
+          }, 'fast').reset().css('visibility', 'hidden');
+        }
+      };
+
+      TasksView.prototype.keypressNewTask = function(e) {
+        var key;
+        key = e.which != null ? e.which : e.keyCode;
+        if (key === 13) {
+          e.preventDefault();
+          e.stopPropagation();
+          $('#newtask').submit();
+          return _gaq.push(['_trackEvent', 'task', 'create']);
+        }
+      };
+
+      TasksView.prototype.submitNewTask = function(e) {
+        var purpose, title;
+        e.preventDefault();
+        title = this.$('input#title').val();
+        purpose = this.$('input#purpose').val();
+        this.collection.create({
+          title: title,
+          purpose: purpose
+        });
+        this.toggleNewTaskButton();
+        return this.toggleNewTaskForm();
       };
 
       return TasksView;
 
-    })(Backbone.Marionette.CollectionView);
+    })(Backbone.Marionette.CompositeView);
     LoginView = (function(_super) {
 
       __extends(LoginView, _super);
