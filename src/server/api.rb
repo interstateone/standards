@@ -283,6 +283,14 @@ class API < Sinatra::Base
 		current_user.tasks.to_json :methods => [:checks]
 	end
 
+	post '/tasks/?' do
+		content_type :json
+		login_required
+		data = JSON.parse request.body.read.to_s
+		user = current_user
+		task = Task.create(:title => data['title'], :purpose => data['purpose'], :user => user).to_json
+	end
+
 	get '/tasks/:id/?' do
 		content_type :json
 
@@ -310,7 +318,9 @@ class API < Sinatra::Base
 		data = JSON.parse request.body.read.to_s
 		user = current_user
 		task = user.tasks.get data['task']['id']
-		check = Check.create(:user => user, :task => task, :date => data['date']).to_json
+		if task.checks.count(:date => data['date']) == 0
+			check = Check.create(:user => user, :task => task, :date => data['date']).to_json
+		end
 	end
 
 
