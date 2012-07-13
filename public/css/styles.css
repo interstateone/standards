@@ -6005,6 +6005,9 @@ td.add a {
 td.add a i {
   margin-top: 10px;
 }
+td.add a i.cancel {
+  color: red;
+}
 #newtask {
   opacity: 0;
   visibility: hidden;
