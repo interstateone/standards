@@ -489,6 +489,17 @@
         var _this = this;
         this.user = new User;
         this.tasks = new Tasks;
+        this.navBar = new NavBarView;
+        this.tasksView = new TasksView({
+          collection: this.tasks
+        });
+        this.loginDropdown = new LoginDropdown;
+        this.userDropdown = new UserDropdown({
+          model: this.user
+        });
+        this.settingsView = new SettingsView({
+          model: this.user
+        });
         this.showApp();
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
@@ -512,26 +523,23 @@
           navigation: ".navigation",
           body: ".body"
         });
-        this.navigation.show(this.navigation = new NavBarView({
-          model: this.user
-        }));
+        this.navigation.show(this.navBar);
         return this.checkAuth();
       };
 
       App.prototype.showTasks = function() {
-        this.body.show(this.tasksView = new TasksView({
-          collection: this.tasks
-        }));
-        return this.tasks.fetch();
+        this.body.show(this.tasksView);
+        this.tasks.fetch();
+        return this.navBar.dropdown.show(this.userDropdown);
       };
 
       App.prototype.showLogin = function() {
-        return this.body.show(this.loginView = new LoginView);
+        return this.navBar.dropdown.show(this.loginDropdown);
       };
 
       App.prototype.showSettings = function() {
         console.log('settings');
-        return this.body.show(this.settingsView = new SettingsView);
+        return this.body.show(this.settingsView);
       };
 
       return App;

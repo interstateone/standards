@@ -236,6 +236,13 @@ define (require) ->
       # Setup up initial state
       @user = new User
       @tasks = new Tasks
+
+      @navBar = new NavBarView
+      @tasksView = new TasksView collection: @tasks
+      @loginDropdown = new LoginDropdown
+      @userDropdown = new UserDropdown model: @user
+      @settingsView = new SettingsView model: @user
+
       @showApp()
 
       # @router = new AppRouter
@@ -256,16 +263,17 @@ define (require) ->
       @addRegions
         navigation: ".navigation"
         body: ".body"
-      @navigation.show @navigation = new NavBarView model: @user
+      @navigation.show @navBar
       @checkAuth()
     showTasks: ->
-      @body.show @tasksView = new TasksView collection: @tasks
+      @body.show @tasksView
       @tasks.fetch()
+      @navBar.dropdown.show @userDropdown
     showLogin: ->
-      @body.show @loginView = new LoginView
+      @navBar.dropdown.show @loginDropdown
     showSettings: ->
       console.log 'settings'
-      @body.show @settingsView = new SettingsView
+      @body.show @settingsView
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->
