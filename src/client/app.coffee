@@ -245,9 +245,9 @@ define (require) ->
 
       @showApp()
 
-      # @router = new AppRouter
-      # Backbone.history.start
-      #   pushState: true
+      @router = new AppRouter controller: @
+      Backbone.history.start
+        pushState: true
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       app.vent.on 'user:sign-in', @signIn, @
@@ -264,7 +264,6 @@ define (require) ->
         navigation: ".navigation"
         body: ".body"
       @navigation.show @navBar
-      @checkAuth()
     showTasks: ->
       @body.show @tasksView
       @tasks.fetch()
@@ -279,11 +278,10 @@ define (require) ->
     # uncheck: (model) ->
     #   model.destroy()
 
-  # class AppRouter extends Backbone.Marionette.AppRouter
-  #   controller: App
-  #   appRoutes:
-  #     "": "checkAuth"
-  #     "settings": "showSettings"
+  class AppRouter extends Backbone.Marionette.AppRouter
+    appRoutes:
+      "": "checkAuth"
+      "settings": "showSettings"
 
   initialize = ->
      window.app = new App

@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, Backbone, CheckView, Checks, Form, LoginDropdown, LoginView, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, UserDropdown, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, CheckView, Checks, Form, LoginDropdown, LoginView, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, UserDropdown, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -501,6 +501,12 @@
           model: this.user
         });
         this.showApp();
+        this.router = new AppRouter({
+          controller: this
+        });
+        Backbone.history.start({
+          pushState: true
+        });
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
@@ -523,8 +529,7 @@
           navigation: ".navigation",
           body: ".body"
         });
-        this.navigation.show(this.navBar);
-        return this.checkAuth();
+        return this.navigation.show(this.navBar);
       };
 
       App.prototype.showTasks = function() {
@@ -545,6 +550,22 @@
       return App;
 
     })(Backbone.Marionette.Application);
+    AppRouter = (function(_super) {
+
+      __extends(AppRouter, _super);
+
+      function AppRouter() {
+        return AppRouter.__super__.constructor.apply(this, arguments);
+      }
+
+      AppRouter.prototype.appRoutes = {
+        "": "checkAuth",
+        "settings": "showSettings"
+      };
+
+      return AppRouter;
+
+    })(Backbone.Marionette.AppRouter);
     initialize = function() {
       window.app = new App;
       return window.app.initialize();
