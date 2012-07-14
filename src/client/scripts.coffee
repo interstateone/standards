@@ -181,12 +181,6 @@ $ ->
 		.error ->
 			$(clicked).children('img').toggleClass("complete")
 
-	# Let forgot password button make post to alternate route than submitting the login
-	$('button.forgot').click (e) ->
-		e.preventDefault()
-		$(this).parents('form').attr("action", '/forgot')
-		$(this).parents('form').submit()
-
 	# Submit timezone with signup
 	timezone = jstz.determine()
 	name = timezone.name()

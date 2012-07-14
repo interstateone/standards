@@ -192,11 +192,6 @@
         return $(clicked).children('img').toggleClass("complete");
       });
     });
-    $('button.forgot').click(function(e) {
-      e.preventDefault();
-      $(this).parents('form').attr("action", '/forgot');
-      return $(this).parents('form').submit();
-    });
     timezone = jstz.determine();
     name = timezone.name();
     return $('input#timezone').val(name);
