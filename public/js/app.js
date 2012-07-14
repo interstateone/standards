@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, Backbone, CheckView, Checks, Form, LoginView, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
+    var $, App, Backbone, CheckView, Checks, Form, LoginDropdown, LoginView, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, UserDropdown, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -201,8 +201,6 @@
         }
         today = moment().sod();
         total = (today.diff(moment(firstDay), 'days')) + 1;
-        console.log('created', createdDay, 'firstCheckDay', firstCheckDay, 'first day', moment(firstDay), 'count', count, 'total', total);
-        console.log(this.collection.pluck('date'));
         return this.$('.minibar').css("height", Math.min(50 * count / total, 50));
       };
 
@@ -361,20 +359,12 @@
 
       NavBarView.prototype.template = require('jade!../templates/navbar')();
 
+      NavBarView.prototype.regions = {
+        'dropdown': 'ul.nav'
+      };
+
       NavBarView.prototype.initialize = function() {
-        app.vent.on('scroll:window', this.addDropShadow, this);
-        return this.model.on('change', this.render, this);
-      };
-
-      NavBarView.prototype.render = function() {
-        this.$el.html(_.template(this.template, this.model.toJSON()));
-        return this;
-      };
-
-      NavBarView.prototype.serializeData = function() {
-        return {
-          name: this.model.get('name')
-        };
+        return app.vent.on('scroll:window', this.addDropShadow, this);
       };
 
       NavBarView.prototype.addDropShadow = function() {
@@ -388,6 +378,92 @@
       return NavBarView;
 
     })(Backbone.Marionette.Layout);
+    UserDropdown = (function(_super) {
+
+      __extends(UserDropdown, _super);
+
+      function UserDropdown() {
+        return UserDropdown.__super__.constructor.apply(this, arguments);
+      }
+
+      UserDropdown.prototype.tagName = 'li';
+
+      UserDropdown.prototype.className = 'dropdown';
+
+      UserDropdown.prototype.template = require('jade!../templates/user-dropdown')();
+
+      UserDropdown.prototype.initialize = function() {
+        return this.model.on('change', this.render, this);
+      };
+
+      UserDropdown.prototype.render = function() {
+        this.$el.html(_.template(this.template, this.model.toJSON()));
+        return this;
+      };
+
+      return UserDropdown;
+
+    })(Backbone.Marionette.ItemView);
+    LoginDropdown = (function(_super) {
+
+      __extends(LoginDropdown, _super);
+
+      function LoginDropdown() {
+        return LoginDropdown.__super__.constructor.apply(this, arguments);
+      }
+
+      LoginDropdown.prototype.tagName = 'li';
+
+      LoginDropdown.prototype.className = 'dropdown';
+
+      LoginDropdown.prototype.template = require('jade!../templates/login-dropdown')();
+
+      LoginDropdown.prototype.schema = {
+        email: {
+          validate: ['required', 'email']
+        },
+        password: {
+          type: 'Password'
+        }
+      };
+
+      LoginDropdown.prototype.fieldsets = [
+        {
+          fields: ['email', 'password']
+        }
+      ];
+
+      LoginDropdown.prototype.events = {
+        'submit': 'clickedLogin',
+        'click [type="submit"]': 'clickedLogin',
+        'click li': 'clicked',
+        'click .forgot': 'clickedForgot'
+      };
+
+      LoginDropdown.prototype.clicked = function(e) {
+        return e.stopPropagation();
+      };
+
+      LoginDropdown.prototype.clickedLogin = function(e) {
+        var email, password;
+        e.preventDefault();
+        e.stopPropagation();
+        email = this.$('#email').val();
+        password = this.$('#password').val();
+        return app.vent.trigger('user:sign-in', email, password);
+      };
+
+      LoginDropdown.prototype.clickedForgot = function(e) {
+        var email;
+        e.preventDefault();
+        e.stopPropagation();
+        email = this.$('#email').val();
+        return app.vent.trigger('user:forgot', email);
+      };
+
+      return LoginDropdown;
+
+    })(Form);
     SettingsView = (function(_super) {
 
       __extends(SettingsView, _super);

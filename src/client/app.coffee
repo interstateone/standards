@@ -100,8 +100,8 @@ define (require) ->
         firstDay = Math.min createdDay.valueOf(), firstCheckDay.valueOf()
       today = moment().sod()
       total = (today.diff (moment firstDay), 'days') + 1
-      console.log 'created', createdDay, 'firstCheckDay', firstCheckDay, 'first day', moment(firstDay), 'count', count, 'total', total
-      console.log @collection.pluck 'date'
+      # console.log 'created', createdDay, 'firstCheckDay', firstCheckDay, 'first day', moment(firstDay), 'count', count, 'total', total
+      # console.log @collection.pluck 'date'
       @$('.minibar').css "height", Math.min 50 * count / total, 50
 
   class TasksView extends Backbone.Marionette.CompositeView
@@ -181,16 +181,52 @@ define (require) ->
 
   class NavBarView extends Backbone.Marionette.Layout
     template: require('jade!../templates/navbar')()
+    regions:
+      'dropdown': 'ul.nav'
     initialize: ->
       app.vent.on 'scroll:window', @addDropShadow, @
+    addDropShadow: ->
+      if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
+      else @$el.children().removeClass 'nav-drop-shadow'
+
+  class UserDropdown extends Backbone.Marionette.ItemView
+    tagName: 'li'
+    className: 'dropdown'
+    template: require('jade!../templates/user-dropdown')()
+    initialize: ->
       @model.on 'change', @render, @
     render: ->
       @$el.html _.template @template, @model.toJSON()
       @
-    serializeData: -> {name: @model.get('name')}
-    addDropShadow: ->
-      if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
-      else @$el.children().removeClass 'nav-drop-shadow'
+
+  class LoginDropdown extends Form
+    tagName: 'li'
+    className: 'dropdown'
+    template: require('jade!../templates/login-dropdown')()
+    schema:
+      email:
+        validate: ['required', 'email']
+      password:
+        type: 'Password'
+    fieldsets: [ fields: ['email', 'password'] ]
+    events:
+      'submit': 'clickedLogin'
+      'click [type="submit"]': 'clickedLogin'
+      'click li': 'clicked'
+      'click .forgot': 'clickedForgot'
+    clicked: (e) ->
+      e.stopPropagation()
+    clickedLogin: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      email = @$('#email').val()
+      password = @$('#password').val()
+      app.vent.trigger 'user:sign-in', email, password
+    clickedForgot: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      email = @$('#email').val()
+      app.vent.trigger 'user:forgot', email
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')
