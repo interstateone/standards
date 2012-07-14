@@ -20,6 +20,8 @@
 
       Form.prototype.initialize = function(options) {
         _.extend(options != null ? options : options = {}, {
+          tagName: this.tagName,
+          className: this.className,
           schema: this.schema,
           template: this.template,
           fieldsets: this.fieldsets
@@ -28,7 +30,7 @@
       };
 
       Form.prototype.render = function() {
-        var $fieldsetContainer, $form, fieldset, options, template, _i, _len, _ref, _ref1;
+        var $el, $fieldsetContainer, $form, fieldset, options, template, _i, _len, _ref, _ref1;
         options = this.options;
         template = (_ref = this.template) != null ? _ref : Form.templates[options.template];
         if (_.isFunction(template)) {
@@ -40,14 +42,18 @@
             fieldsets: '<b class="bbf-tmp"></b>'
           }));
         }
-        $fieldsetContainer = $('.bbf-tmp', $form);
+        $el = $(document.createElement(options.tagName != null ? options.tagName : 'div'));
+        if (options.className != null) {
+          $el.addClass(options.className);
+        }
+        $el.html($form);
+        $fieldsetContainer = $('.bbf-tmp', $el);
         _ref1 = options.fieldsets;
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           fieldset = _ref1[_i];
           $fieldsetContainer.append(this.renderFieldset(fieldset));
         }
-        $fieldsetContainer.children().unwrap();
-        this.setElement($form);
+        this.setElement($el);
         return this;
       };
 
