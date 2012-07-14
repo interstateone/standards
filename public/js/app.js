@@ -472,7 +472,7 @@
         return SettingsView.__super__.constructor.apply(this, arguments);
       }
 
-      SettingsView.prototype.template = require('jade!../templates/settings');
+      SettingsView.prototype.template = require('jade!../templates/settings')();
 
       return SettingsView;
 

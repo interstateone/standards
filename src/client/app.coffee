@@ -229,7 +229,7 @@ define (require) ->
       app.vent.trigger 'user:forgot', email
 
   class SettingsView extends Backbone.Marionette.Layout
-    template: require('jade!../templates/settings')
+    template: require('jade!../templates/settings')()
 
   class App extends Backbone.Marionette.Application
     initialize: ->
