@@ -1,0 +1,10 @@
+a(href="#", class="dropdown-toggle", data-toggle="dropdown")
+  p Sign In
+  b(class="caret")
+ul(class="dropdown-menu")
+  li
+    form(class="form-horizontal", method="post", action="/login", name="login")
+    <%= fieldsets %>
+    div(class="form-actions")
+      button(type="submit", class="btn btn-primary") Log in
+      button(type="button", class="btn btn-standard forgot") Forgot password
