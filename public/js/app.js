@@ -312,6 +312,10 @@
         'dropdown': 'ul.nav'
       };
 
+      NavBarView.prototype.events = {
+        'click .brand': 'clickedHome'
+      };
+
       NavBarView.prototype.initialize = function() {
         return app.vent.on('scroll:window', this.addDropShadow, this);
       };
@@ -322,6 +326,13 @@
         } else {
           return this.$el.children().removeClass('nav-drop-shadow');
         }
+      };
+
+      NavBarView.prototype.clickedHome = function(e) {
+        e.preventDefault();
+        return app.router.navigate('', {
+          trigger: true
+        });
       };
 
       return NavBarView;
@@ -389,6 +400,12 @@
         var _this = this;
         this.user = new User;
         this.tasks = new Tasks;
+        if (window.bootstrap.user != null) {
+          this.user.set(window.bootstrap.user);
+        }
+        if (window.bootstrap.tasks != null) {
+          this.tasks.reset(window.bootstrap.tasks);
+        }
         this.navBar = new NavBarView;
         this.tasksView = new TasksView({
           collection: this.tasks

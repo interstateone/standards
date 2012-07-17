@@ -157,11 +157,16 @@ define (require) ->
     template: require('jade!../templates/navbar')()
     regions:
       'dropdown': 'ul.nav'
+    events:
+      'click .brand': 'clickedHome'
     initialize: ->
       app.vent.on 'scroll:window', @addDropShadow, @
     addDropShadow: ->
       if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
       else @$el.children().removeClass 'nav-drop-shadow'
+    clickedHome: (e) ->
+      e.preventDefault()
+      app.router.navigate '', trigger: true
 
   class UserDropdown extends Backbone.Marionette.ItemView
     tagName: 'li'
@@ -173,7 +178,10 @@ define (require) ->
       @$el.html _.template @template, @model.toJSON()
       @
     events:
+      'click .settings': 'clickedSettings'
+    clickedSettings: (e) ->
       e.preventDefault()
+      app.router.navigate 'settings', trigger: true
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
@@ -183,6 +191,8 @@ define (require) ->
       # Setup up initial state
       @user = new User
       @tasks = new Tasks
+      if window.bootstrap.user? then @user.set window.bootstrap.user
+      if window.bootstrap.tasks? then @tasks.reset window.bootstrap.tasks
 
       @navBar = new NavBarView
       @tasksView = new TasksView collection: @tasks
@@ -208,16 +218,17 @@ define (require) ->
       @tasks.fetch()
       @navBar.dropdown.show @userDropdown
     showSettings: ->
-      console.log 'settings'
       @body.show @settingsView
+      @navBar.dropdown.show @userDropdown
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->
     #   model.destroy()
 
   class AppRouter extends Backbone.Marionette.AppRouter
-      @navBar.dropdown.show @userDropdown
     appRoutes:
+      '': 'showTasks'
+      'settings': 'showSettings'
 
   initialize = ->
      window.app = new App
