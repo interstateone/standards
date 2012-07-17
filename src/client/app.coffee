@@ -74,6 +74,11 @@ define (require) ->
       @on 'itemview:task:uncheck', @uncheck, @
     onRender: -> @renderHeight()
     renderCollection: ->
+    events:
+      'click .task': 'clickedTask'
+    clickedTask: (e) ->
+      e.preventDefault()
+      console.log 'clicked', @model.id
       @triggerBeforeRender()
       @closeChildren()
       @showCollection()
@@ -175,6 +180,59 @@ define (require) ->
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
 
+  class TaskView extends Backbone.Marionette.ItemView
+    template: require('jade!../templates/taskview')()
+    serializeData: ->
+      count = @model.get('checks').length
+      today = moment()
+
+      createdDay = moment(@model.get 'created_on')
+      firstDay = createdDay
+      if @model.get('checks').length
+        firstCheckDay = moment(@model.get('checks').sort(silent: true).first().get 'date')
+        firstDay = moment(Math.min createdDay.valueOf(), firstCheckDay.valueOf())
+
+      timeAgo = firstDay.fromNow()
+      percentComplete = Math.ceil(count * 100 / today.diff firstDay, 'days')
+
+      _.extend super,
+        count: count
+        percentComplete: percentComplete
+        timeAgo: timeAgo
+    templateHelpers:
+      sentenceCase: (string) -> string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
+      titleCase: (string) -> (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() for word in string.split ' ').join ' '
+      pluralize: (word, count) -> word += 's' if count > 0
+      getWeekdaysAsArray: getWeekdaysAsArray
+      gsub: (source, pattern, replacement) ->
+        result = ''
+
+        if _.isString pattern then pattern = RegExp.escape pattern
+
+        unless pattern.length || pattern.source
+          replacement = replacement ''
+          replacement + source.split('').join(replacement) + replacement
+
+        while source.length > 0
+          if match = source.match pattern
+            result += source.slice 0, match.index
+            result += replacement match
+            source = source.slice(match.index + match[0].length)
+          else
+            result += source
+            source = ''
+        result
+
+      switchPronouns: (string) ->
+        this.gsub string, /\b(I am|You are|I|You|Your|My)\b/i, (pronoun) ->
+          switch pronoun[0].toLowerCase()
+            when 'i' then 'you'
+            when 'you' then 'I'
+            when 'i am' then "You are"
+            when 'you are' then 'I am'
+            when 'your' then 'my'
+            when 'my' then 'your'
+
   class App extends Backbone.Marionette.Application
     initialize: ->
       # Setup up initial state
@@ -199,11 +257,12 @@ define (require) ->
       app.vent.on 'task:uncheck', @uncheck, @
 
       # Routes
+      app.vent.on 'task:clicked', @showTask, @
       app.vent.on 'settings:clicked', @showSettings, @
       app.vent.on 'home:clicked', @showTasks, @
     showApp: ->
-      @addRegions
         navigation: ".navigation"
+      @addRegions
         body: ".body"
       @navigation.show @navBar
     showTasks: ->
@@ -213,6 +272,10 @@ define (require) ->
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->
+    showTask: (task) ->
+      @router.navigate "task/#{ task.id }"
+      unless _.isObject task then task = @tasks.get task
+      @body.show @taskView = new TaskView model: task
     #   model.destroy()
 
   class AppRouter extends Backbone.Marionette.AppRouter
@@ -222,6 +285,7 @@ define (require) ->
 
   initialize = ->
      window.app = new App
+      'task/:id': 'showTask'
      window.app.initialize()
 
   return initialize: initialize

@@ -1,0 +1,39 @@
+h2 <%= titleCase(title) %>
+p Remember! You're doing this because <%= switchPronouns(purpose) %>.
+
+div.row-fluid
+  div.span3
+    div.well
+      span.large-stat <%= percentComplete %>%
+      p Completion
+  div.span3
+    div.well
+      <% if (count > 0) { %>
+      p You've done this
+      span.large-stat <%= count %>
+      p <%= pluralize('time', count) %> since you started <%= timeAgo %>.
+      <% } else { %>
+      p You haven't done this since you started <%= timeAgo %>.
+      <% } %>
+  div.span6
+    div.well
+      h3 Weekday Heatmap
+      table.weekday-heatmap
+        thead
+          tr
+          <% _.each(getWeekdaysAsArray(true), function (day) { %>
+          th <%= day.format('d') %>
+          <% }); %>
+        tbody
+          tr
+
+a.delete.btn.btn-danger.pull-right Delete
+
+div.modal.hide.fade.deleteModal
+  div.modal-header
+    h3 Delete
+  div.modal-body
+    p Are you sure you want to delete the task "<%= title %>"?
+  div.modal-footer
+    a.btn(href="#", data-dismiss="modal") No, I'll give it another shot
+    a.delete-confirm.btn.btn-danger(data-loading-text="Deleting...") Yes, delete it
