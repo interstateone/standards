@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, CheckView, Checks, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, UserDropdown, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, CheckView, Checks, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -308,12 +308,9 @@
 
       NavBarView.prototype.template = require('jade!../templates/navbar')();
 
-      NavBarView.prototype.regions = {
-        'dropdown': 'ul.nav'
-      };
-
       NavBarView.prototype.events = {
-        'click .brand': 'clickedHome'
+        'click .brand': 'clickedHome',
+        'click .settings': 'clickedSettings'
       };
 
       NavBarView.prototype.initialize = function() {
@@ -330,49 +327,17 @@
 
       NavBarView.prototype.clickedHome = function(e) {
         e.preventDefault();
-        return app.router.navigate('', {
-          trigger: true
-        });
+        app.vent.trigger('home:clicked');
+        return app.router.navigate('');
+      };
+
+      NavBarView.prototype.clickedSettings = function(e) {
+        e.preventDefault();
+        app.vent.trigger('settings:clicked');
+        return app.router.navigate('settings');
       };
 
       return NavBarView;
-
-    })(Backbone.Marionette.Layout);
-    UserDropdown = (function(_super) {
-
-      __extends(UserDropdown, _super);
-
-      function UserDropdown() {
-        return UserDropdown.__super__.constructor.apply(this, arguments);
-      }
-
-      UserDropdown.prototype.tagName = 'li';
-
-      UserDropdown.prototype.className = 'dropdown';
-
-      UserDropdown.prototype.template = require('jade!../templates/user-dropdown')();
-
-      UserDropdown.prototype.initialize = function() {
-        return this.model.on('change', this.render, this);
-      };
-
-      UserDropdown.prototype.render = function() {
-        this.$el.html(_.template(this.template, this.model.toJSON()));
-        return this;
-      };
-
-      UserDropdown.prototype.events = {
-        'click .settings': 'clickedSettings'
-      };
-
-      UserDropdown.prototype.clickedSettings = function(e) {
-        e.preventDefault();
-        return app.router.navigate('settings', {
-          trigger: true
-        });
-      };
-
-      return UserDropdown;
 
     })(Backbone.Marionette.ItemView);
     SettingsView = (function(_super) {
@@ -406,12 +371,11 @@
         if (window.bootstrap.tasks != null) {
           this.tasks.reset(window.bootstrap.tasks);
         }
-        this.navBar = new NavBarView;
+        this.navBar = new NavBarView({
+          model: this.user
+        });
         this.tasksView = new TasksView({
           collection: this.tasks
-        });
-        this.userDropdown = new UserDropdown({
-          model: this.user
         });
         this.settingsView = new SettingsView({
           model: this.user
@@ -441,12 +405,10 @@
       App.prototype.showTasks = function() {
         this.body.show(this.tasksView);
         this.tasks.fetch();
-        return this.navBar.dropdown.show(this.userDropdown);
       };
 
       App.prototype.showSettings = function() {
         this.body.show(this.settingsView);
-        return this.navBar.dropdown.show(this.userDropdown);
       };
 
       return App;

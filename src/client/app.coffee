@@ -153,12 +153,11 @@ define (require) ->
       @toggleNewTaskButton()
       @toggleNewTaskForm()
 
-  class NavBarView extends Backbone.Marionette.Layout
+  class NavBarView extends Backbone.Marionette.ItemView
     template: require('jade!../templates/navbar')()
-    regions:
-      'dropdown': 'ul.nav'
     events:
       'click .brand': 'clickedHome'
+      'click .settings': 'clickedSettings'
     initialize: ->
       app.vent.on 'scroll:window', @addDropShadow, @
     addDropShadow: ->
@@ -166,22 +165,12 @@ define (require) ->
       else @$el.children().removeClass 'nav-drop-shadow'
     clickedHome: (e) ->
       e.preventDefault()
-      app.router.navigate '', trigger: true
-
-  class UserDropdown extends Backbone.Marionette.ItemView
-    tagName: 'li'
-    className: 'dropdown'
-    template: require('jade!../templates/user-dropdown')()
-    initialize: ->
-      @model.on 'change', @render, @
-    render: ->
-      @$el.html _.template @template, @model.toJSON()
-      @
-    events:
-      'click .settings': 'clickedSettings'
+      app.vent.trigger 'home:clicked'
+      app.router.navigate ''
     clickedSettings: (e) ->
       e.preventDefault()
-      app.router.navigate 'settings', trigger: true
+      app.vent.trigger 'settings:clicked'
+      app.router.navigate 'settings'
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
@@ -194,9 +183,8 @@ define (require) ->
       if window.bootstrap.user? then @user.set window.bootstrap.user
       if window.bootstrap.tasks? then @tasks.reset window.bootstrap.tasks
 
-      @navBar = new NavBarView
+      @navBar = new NavBarView model: @user
       @tasksView = new TasksView collection: @tasks
-      @userDropdown = new UserDropdown model: @user
       @settingsView = new SettingsView model: @user
 
       @showApp()
@@ -216,10 +204,8 @@ define (require) ->
     showTasks: ->
       @body.show @tasksView
       @tasks.fetch()
-      @navBar.dropdown.show @userDropdown
     showSettings: ->
       @body.show @settingsView
-      @navBar.dropdown.show @userDropdown
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->
