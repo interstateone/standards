@@ -193,19 +193,23 @@ define (require) ->
       Backbone.history.start
         pushState: true
 
+      # Events
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       app.vent.on 'task:check', @check, @
       app.vent.on 'task:uncheck', @uncheck, @
+
+      # Routes
+      app.vent.on 'settings:clicked', @showSettings, @
+      app.vent.on 'home:clicked', @showTasks, @
     showApp: ->
       @addRegions
         navigation: ".navigation"
         body: ".body"
       @navigation.show @navBar
     showTasks: ->
-      @body.show @tasksView
-      @tasks.fetch()
+      @body.show @tasksView = new TasksView collection: @tasks
     showSettings: ->
-      @body.show @settingsView
+      @body.show @settingsView = new SettingsView model: @user
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->

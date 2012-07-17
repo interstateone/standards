@@ -391,7 +391,9 @@
           return _this.vent.trigger('scroll:window');
         });
         app.vent.on('task:check', this.check, this);
-        return app.vent.on('task:uncheck', this.uncheck, this);
+        app.vent.on('task:uncheck', this.uncheck, this);
+        app.vent.on('settings:clicked', this.showSettings, this);
+        return app.vent.on('home:clicked', this.showTasks, this);
       };
 
       App.prototype.showApp = function() {
@@ -403,12 +405,15 @@
       };
 
       App.prototype.showTasks = function() {
-        this.body.show(this.tasksView);
-        this.tasks.fetch();
+        return this.body.show(this.tasksView = new TasksView({
+          collection: this.tasks
+        }));
       };
 
       App.prototype.showSettings = function() {
-        this.body.show(this.settingsView);
+        return this.body.show(this.settingsView = new SettingsView({
+          model: this.user
+        }));
       };
 
       return App;
