@@ -5992,6 +5992,7 @@ td.title a {
   vertical-align: middle;
   display: block;
   height: 100%;
+  cursor: pointer;
 }
 td.add a {
   font-size: 24px;
