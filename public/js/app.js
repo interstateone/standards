@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, CheckView, Checks, ErrorView, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, CheckView, Checks, ErrorView, Form, Marionette, MultiRegion, NavBarView, NoticeView, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -27,7 +27,7 @@
       Tasks.prototype.url = '/api/tasks';
 
       Tasks.prototype.selectTask = function(task) {
-        return app.vent.trigger('task:clicked', task);
+        return app.vent.trigger('task:clicked', task.id);
       };
 
       return Tasks;
@@ -388,6 +388,29 @@
       return ErrorView;
 
     })(Backbone.Marionette.View);
+    NoticeView = (function(_super) {
+
+      __extends(NoticeView, _super);
+
+      function NoticeView() {
+        return NoticeView.__super__.constructor.apply(this, arguments);
+      }
+
+      NoticeView.prototype.template = require('jade!../templates/notice-flash')();
+
+      NoticeView.prototype.render = function() {
+        return this.$el.html(_.template(this.template, this.serializeData()));
+      };
+
+      NoticeView.prototype.serializeData = function() {
+        return {
+          message: this.options.message
+        };
+      };
+
+      return NoticeView;
+
+    })(Backbone.Marionette.View);
     TaskView = (function(_super) {
 
       __extends(TaskView, _super);
@@ -408,17 +431,9 @@
       };
 
       TaskView.prototype.confirmDelete = function(e) {
-        var _this = this;
         e.preventDefault();
         this.$('.delete-confirm').button('loading');
-        return this.model.destroy({
-          success: function() {
-            _this.$(".deleteModal").modal('hide');
-            return app.router.navigate('', {
-              trigger: true
-            });
-          }
-        });
+        return app.vent.trigger('task:delete', this.model.id);
       };
 
       TaskView.prototype.serializeData = function() {
@@ -510,6 +525,62 @@
       return TaskView;
 
     })(Backbone.Marionette.ItemView);
+    MultiRegion = (function(_super) {
+
+      __extends(MultiRegion, _super);
+
+      function MultiRegion() {
+        return MultiRegion.__super__.constructor.apply(this, arguments);
+      }
+
+      MultiRegion.prototype.open = function(view) {
+        return this.$el.append(view.el);
+      };
+
+      MultiRegion.prototype.close = function() {
+        var view;
+        view = this.currentView;
+        if (!((view != null) || view.length > 0)) {
+          return;
+        }
+        if (!_.isArray(view)) {
+          this.currentView = view = [view];
+        }
+        _.each(view, function(v) {
+          if (v.close) {
+            v.close();
+          }
+          return this.trigger("view:closed", v);
+        }, this);
+        this.currentView = [];
+        return this.$el.empty();
+      };
+
+      MultiRegion.prototype.append = function(view) {
+        var _ref;
+        this.ensureEl();
+        view.render();
+        this.open(view);
+        if (view.onShow) {
+          view.onShow();
+        }
+        view.trigger("show");
+        if (this.onShow) {
+          this.onShow(view);
+        }
+        this.trigger("view:show", view);
+        if ((_ref = this.currentView) == null) {
+          this.currentView = [];
+        }
+        if (!_.isArray(this.currentView)) {
+          this.currentView = [this.currentView];
+        }
+        return this.currentView.push(view);
+      };
+
+      return MultiRegion;
+
+    })(Backbone.Marionette.Region);
     App = (function(_super) {
 
       __extends(App, _super);
@@ -544,12 +615,24 @@
         Backbone.history.start({
           pushState: true
         });
+        $(document).ajaxError(function(e, xhr, settings, error) {
+          switch (xhr.status) {
+            case 401:
+              return app.vent.trigger('error', 'Authentication error, try logging in again.');
+            case 404:
+              return app.vent.trigger('error', 'The server didn\'t understand that action.');
+            case 500:
+              return app.vent.trigger('error', 'There was a server error, try again.');
+          }
+        });
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
         app.vent.on('task:check', this.check, this);
         app.vent.on('task:uncheck', this.uncheck, this);
+        app.vent.on('error', this.showError, this);
         app.vent.on('task:clicked', this.showTask, this);
+        app.vent.on('task:delete', this.deleteTask, this);
         app.vent.on('settings:clicked', this.showSettings, this);
         return app.vent.on('home:clicked', this.showTasks, this);
       };
@@ -557,8 +640,10 @@
       App.prototype.showApp = function() {
         this.addRegions({
           navigation: '.navigation',
-          flash: '.flash',
           body: '.body'
+        });
+        this.flash = new MultiRegion({
+          el: '.flash'
         });
         return this.navigation.show(this.navBar);
       };
@@ -577,18 +662,42 @@
         }));
       };
 
-      App.prototype.showTask = function(task) {
-        this.router.navigate("task/" + task.id);
-        if (!_.isObject(task)) {
-          task = this.tasks.get(task);
+      App.prototype.showTask = function(id) {
+        var task;
+        task = this.tasks.get(id);
+        if (task == null) {
+          this.showTasks();
+          return this.showError('That task doesn\'t exist.');
+        } else {
+          this.router.navigate("task/" + task.id);
+          return this.body.show(this.taskView = new TaskView({
+            model: task
+          }));
         }
-        return this.body.show(this.taskView = new TaskView({
-          model: task
-        }));
+      };
+
+      App.prototype.deleteTask = function(id) {
+        var _this = this;
+        return this.tasks.get(id).destroy({
+          success: function() {
+            $(".deleteModal").modal('hide');
+            return _this.showTasks();
+          }
+        });
       };
 
       App.prototype.showError = function(message) {
-        return this.flash.show(this.error = new ErrorView({
+        return this.flash.append(this.error = new ErrorView({
+          message: message
+        }));
+      };
+
+      App.prototype.hideErrors = function() {
+        return this.flash.close();
+      };
+
+      App.prototype.showNotice = function(message) {
+        return this.flash.append(this.notice = new NoticeView({
           message: message
         }));
       };

@@ -19,7 +19,7 @@ define (require) ->
     model: Task
     url: '/api/tasks'
     selectTask: (task) ->
-      app.vent.trigger 'task:clicked', task
+      app.vent.trigger 'task:clicked', task.id
 
   class Checks extends Backbone.Collection
     model: Check
@@ -188,6 +188,13 @@ define (require) ->
     serializeData: ->
       message: @options.message
 
+  class NoticeView extends Backbone.Marionette.View
+    template: require('jade!../templates/notice-flash')()
+    render: ->
+      @$el.html _.template @template, @serializeData()
+    serializeData: ->
+      message: @options.message
+
   class TaskView extends Backbone.Marionette.ItemView
     template: require('jade!../templates/taskview')()
     events:
@@ -198,11 +205,7 @@ define (require) ->
     confirmDelete: (e) ->
         e.preventDefault()
         @$('.delete-confirm').button('loading')
-        @model.destroy
-          success: =>
-            @$(".deleteModal").modal 'hide'
-            app.router.navigate '', trigger: true
-
+        app.vent.trigger 'task:delete', @model.id
     serializeData: ->
       count = @model.get('checks').length
       today = moment()
@@ -253,6 +256,40 @@ define (require) ->
             when 'your' then 'my'
             when 'my' then 'your'
 
+  class MultiRegion extends Backbone.Marionette.Region
+    open: (view) ->
+      @$el.append view.el
+    close: ->
+      view = @currentView
+      unless (view? or view.length > 0) then return
+      unless _.isArray view then @currentView = view = [view]
+
+      _.each view, (v) ->
+        if v.close then v.close()
+        @trigger("view:closed", v)
+      , this
+
+      @currentView = []
+
+      @$el.empty()
+    append: (view) ->
+      @ensureEl()
+
+      view.render()
+      @open view
+
+      if view.onShow then view.onShow()
+      view.trigger "show"
+
+      if @onShow then @onShow view
+      @trigger "view:show", view
+
+      @currentView ?= []
+
+      unless _.isArray @currentView then @currentView = [@currentView]
+
+      @currentView.push view
+
   class App extends Backbone.Marionette.Application
     initialize: ->
       # Setup up initial state
@@ -271,20 +308,28 @@ define (require) ->
       Backbone.history.start
         pushState: true
 
+      $(document).ajaxError (e, xhr, settings, error) ->
+        switch xhr.status
+          when 401 then app.vent.trigger 'error', 'Authentication error, try logging in again.'
+          when 404 then app.vent.trigger 'error', 'The server didn\'t understand that action.'
+          when 500 then app.vent.trigger 'error', 'There was a server error, try again.'
+
       # Events
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       app.vent.on 'task:check', @check, @
       app.vent.on 'task:uncheck', @uncheck, @
+      app.vent.on 'error', @showError, @
 
       # Routes
       app.vent.on 'task:clicked', @showTask, @
+      app.vent.on 'task:delete', @deleteTask, @
       app.vent.on 'settings:clicked', @showSettings, @
       app.vent.on 'home:clicked', @showTasks, @
     showApp: ->
       @addRegions
         navigation: '.navigation'
-        flash: '.flash'
         body: '.body'
+      @flash = new MultiRegion el: '.flash'
       @navigation.show @navBar
     showTasks: ->
       @router.navigate ''
@@ -292,12 +337,22 @@ define (require) ->
     showSettings: ->
       @router.navigate 'settings'
       @body.show @settingsView = new SettingsView model: @user
-    showTask: (task) ->
-      @router.navigate "task/#{ task.id }"
-      unless _.isObject task then task = @tasks.get task
-      @body.show @taskView = new TaskView model: task
-    showError: (message) ->
-      @flash.show @error = new ErrorView message: message
+    showTask: (id) ->
+      task = @tasks.get id
+      unless task?
+        @showTasks()
+        @showError 'That task doesn\'t exist.'
+      else
+        @router.navigate "task/#{ task.id }"
+        @body.show @taskView = new TaskView model: task
+    deleteTask: (id) ->
+      @tasks.get(id).destroy
+        success: =>
+          $(".deleteModal").modal 'hide'
+          @showTasks()
+    showError: (message) -> @flash.append @error = new ErrorView message: message
+    hideErrors: -> @flash.close()
+    showNotice: (message) -> @flash.append @notice = new NoticeView message: message
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->
