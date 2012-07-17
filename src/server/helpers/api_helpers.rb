@@ -22,8 +22,6 @@ module Sinatra
 			if current_user != nil
 				return true
 			else
-				session[:return_to] = request.url
-
 				# Halt the route and return unauthorized status
 				halt 401
 			end
