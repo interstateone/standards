@@ -2,5 +2,5 @@
 <script>
 	bootstrap = {};
 	bootstrap.user = <%= current_user.to_json %>;
-	bootstrap.tasks = <%= current_user.tasks.to_json %>;
+	bootstrap.tasks = <%= current_user.tasks.to_json :methods => [:checks] %>;
 </script>
