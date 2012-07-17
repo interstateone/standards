@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, CheckView, Checks, Form, LoginDropdown, LoginView, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, UserDropdown, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, CheckView, Checks, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, UserDropdown, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -298,57 +298,6 @@
       return TasksView;
 
     })(Backbone.Marionette.CompositeView);
-    LoginView = (function(_super) {
-
-      __extends(LoginView, _super);
-
-      function LoginView() {
-        return LoginView.__super__.constructor.apply(this, arguments);
-      }
-
-      LoginView.prototype.template = require('jade!../templates/login')();
-
-      LoginView.prototype.schema = {
-        email: {
-          validate: ['required', 'email']
-        },
-        password: {
-          type: 'Password'
-        }
-      };
-
-      LoginView.prototype.fieldsets = [
-        {
-          fields: ['email', 'password'],
-          legend: 'Log In'
-        }
-      ];
-
-      LoginView.prototype.events = {
-        'submit': 'clickedLogin',
-        'click .forgot': 'clickedForgot'
-      };
-
-      LoginView.prototype.clickedLogin = function(e) {
-        var email, password;
-        e.preventDefault();
-        e.stopPropagation();
-        email = this.$('#email').val();
-        password = this.$('#password').val();
-        return app.vent.trigger('user:sign-in', email, password);
-      };
-
-      LoginView.prototype.clickedForgot = function(e) {
-        var email;
-        e.preventDefault();
-        e.stopPropagation();
-        email = this.$('#email').val();
-        return app.vent.trigger('user:forgot', email);
-      };
-
-      return LoginView;
-
-    })(Form);
     NavBarView = (function(_super) {
 
       __extends(NavBarView, _super);
@@ -401,69 +350,20 @@
         return this;
       };
 
+      UserDropdown.prototype.events = {
+        'click .settings': 'clickedSettings'
+      };
+
+      UserDropdown.prototype.clickedSettings = function(e) {
+        e.preventDefault();
+        return app.router.navigate('settings', {
+          trigger: true
+        });
+      };
+
       return UserDropdown;
 
     })(Backbone.Marionette.ItemView);
-    LoginDropdown = (function(_super) {
-
-      __extends(LoginDropdown, _super);
-
-      function LoginDropdown() {
-        return LoginDropdown.__super__.constructor.apply(this, arguments);
-      }
-
-      LoginDropdown.prototype.tagName = 'li';
-
-      LoginDropdown.prototype.className = 'dropdown';
-
-      LoginDropdown.prototype.template = require('jade!../templates/login-dropdown')();
-
-      LoginDropdown.prototype.schema = {
-        email: {
-          validate: ['required', 'email']
-        },
-        password: {
-          type: 'Password'
-        }
-      };
-
-      LoginDropdown.prototype.fieldsets = [
-        {
-          fields: ['email', 'password']
-        }
-      ];
-
-      LoginDropdown.prototype.events = {
-        'submit': 'clickedLogin',
-        'click [type="submit"]': 'clickedLogin',
-        'click li': 'clicked',
-        'click .forgot': 'clickedForgot'
-      };
-
-      LoginDropdown.prototype.clicked = function(e) {
-        return e.stopPropagation();
-      };
-
-      LoginDropdown.prototype.clickedLogin = function(e) {
-        var email, password;
-        e.preventDefault();
-        e.stopPropagation();
-        email = this.$('#email').val();
-        password = this.$('#password').val();
-        return app.vent.trigger('user:sign-in', email, password);
-      };
-
-      LoginDropdown.prototype.clickedForgot = function(e) {
-        var email;
-        e.preventDefault();
-        e.stopPropagation();
-        email = this.$('#email').val();
-        return app.vent.trigger('user:forgot', email);
-      };
-
-      return LoginDropdown;
-
-    })(Form);
     SettingsView = (function(_super) {
 
       __extends(SettingsView, _super);
@@ -493,7 +393,6 @@
         this.tasksView = new TasksView({
           collection: this.tasks
         });
-        this.loginDropdown = new LoginDropdown;
         this.userDropdown = new UserDropdown({
           model: this.user
         });
@@ -510,18 +409,8 @@
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
-        app.vent.on('user:sign-in', this.signIn, this);
         app.vent.on('task:check', this.check, this);
         return app.vent.on('task:uncheck', this.uncheck, this);
-      };
-
-      App.prototype.checkAuth = function() {
-        console.log('checking auth');
-        return this.user.isSignedIn(this.showTasks, this.showLogin, this);
-      };
-
-      App.prototype.signIn = function(email, password) {
-        return this.user.signIn(email, password, this.showTasks, this.showLogin, this);
       };
 
       App.prototype.showApp = function() {
@@ -538,13 +427,9 @@
         return this.navBar.dropdown.show(this.userDropdown);
       };
 
-      App.prototype.showLogin = function() {
-        return this.navBar.dropdown.show(this.loginDropdown);
-      };
-
       App.prototype.showSettings = function() {
-        console.log('settings');
-        return this.body.show(this.settingsView);
+        this.body.show(this.settingsView);
+        return this.navBar.dropdown.show(this.userDropdown);
       };
 
       return App;
@@ -559,8 +444,8 @@
       }
 
       AppRouter.prototype.appRoutes = {
-        "": "checkAuth",
-        "settings": "showSettings"
+        '': 'showTasks',
+        'settings': 'showSettings'
       };
 
       return AppRouter;

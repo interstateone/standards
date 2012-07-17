@@ -153,32 +153,6 @@ define (require) ->
       @toggleNewTaskButton()
       @toggleNewTaskForm()
 
-  class LoginView extends Form
-    template: require('jade!../templates/login')()
-    schema:
-      email:
-        validate: ['required', 'email']
-      password:
-        type: 'Password'
-    fieldsets: [
-      fields: ['email', 'password']
-      legend: 'Log In'
-    ]
-    events:
-      'submit': 'clickedLogin'
-      'click .forgot': 'clickedForgot'
-    clickedLogin: (e) ->
-      e.preventDefault()
-      e.stopPropagation()
-      email = @$('#email').val()
-      password = @$('#password').val()
-      app.vent.trigger 'user:sign-in', email, password
-    clickedForgot: (e) ->
-      e.preventDefault()
-      e.stopPropagation()
-      email = @$('#email').val()
-      app.vent.trigger 'user:forgot', email
-
   class NavBarView extends Backbone.Marionette.Layout
     template: require('jade!../templates/navbar')()
     regions:
@@ -198,35 +172,8 @@ define (require) ->
     render: ->
       @$el.html _.template @template, @model.toJSON()
       @
-
-  class LoginDropdown extends Form
-    tagName: 'li'
-    className: 'dropdown'
-    template: require('jade!../templates/login-dropdown')()
-    schema:
-      email:
-        validate: ['required', 'email']
-      password:
-        type: 'Password'
-    fieldsets: [ fields: ['email', 'password'] ]
     events:
-      'submit': 'clickedLogin'
-      'click [type="submit"]': 'clickedLogin'
-      'click li': 'clicked'
-      'click .forgot': 'clickedForgot'
-    clicked: (e) ->
-      e.stopPropagation()
-    clickedLogin: (e) ->
       e.preventDefault()
-      e.stopPropagation()
-      email = @$('#email').val()
-      password = @$('#password').val()
-      app.vent.trigger 'user:sign-in', email, password
-    clickedForgot: (e) ->
-      e.preventDefault()
-      e.stopPropagation()
-      email = @$('#email').val()
-      app.vent.trigger 'user:forgot', email
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
@@ -239,7 +186,6 @@ define (require) ->
 
       @navBar = new NavBarView
       @tasksView = new TasksView collection: @tasks
-      @loginDropdown = new LoginDropdown
       @userDropdown = new UserDropdown model: @user
       @settingsView = new SettingsView model: @user
 
@@ -250,15 +196,8 @@ define (require) ->
         pushState: true
 
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
-      app.vent.on 'user:sign-in', @signIn, @
-
       app.vent.on 'task:check', @check, @
       app.vent.on 'task:uncheck', @uncheck, @
-    checkAuth: ->
-      console.log 'checking auth'
-      @user.isSignedIn @showTasks, @showLogin, @
-    signIn: (email, password) ->
-      @user.signIn email, password, @showTasks, @showLogin, @
     showApp: ->
       @addRegions
         navigation: ".navigation"
@@ -268,8 +207,6 @@ define (require) ->
       @body.show @tasksView
       @tasks.fetch()
       @navBar.dropdown.show @userDropdown
-    showLogin: ->
-      @navBar.dropdown.show @loginDropdown
     showSettings: ->
       console.log 'settings'
       @body.show @settingsView
@@ -279,9 +216,8 @@ define (require) ->
     #   model.destroy()
 
   class AppRouter extends Backbone.Marionette.AppRouter
+      @navBar.dropdown.show @userDropdown
     appRoutes:
-      "": "checkAuth"
-      "settings": "showSettings"
 
   initialize = ->
      window.app = new App

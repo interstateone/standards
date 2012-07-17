@@ -19,50 +19,6 @@
 
       User.prototype.url = '/api/user/info';
 
-      User.prototype.isSignedIn = function(yep, nope, context) {
-        return this.fetch({
-          success: $.proxy(yep, context),
-          error: $.proxy(nope, context)
-        });
-      };
-
-      User.prototype.signIn = function(e, p, onSucceed, onFail, context) {
-        var _this = this;
-        return $.ajax({
-          url: '/api/sign-in',
-          type: 'POST',
-          dataType: 'json',
-          data: {
-            email: e,
-            password: p
-          },
-          error: $.proxy(onFail, context),
-          success: function(data) {
-            _this.set(data);
-            return onSucceed.call(context);
-          },
-          context: this
-        });
-      };
-
-      User.prototype.signOut = function() {
-        return $.ajax({
-          url: '/api/sign-out',
-          type: 'POST'
-        }).done(function() {
-          this.clear();
-          return this.trigger('signed-out');
-        });
-      };
-
-      User.prototype.forgot = function(e) {
-        return $.ajax({
-          url: '/api/user/forgot',
-          type: 'POST',
-          dataType: ''
-        });
-      };
-
       return User;
 
     })(Backbone.Model);
