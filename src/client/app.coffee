@@ -18,6 +18,8 @@ define (require) ->
   class Tasks extends Backbone.Collection
     model: Task
     url: '/api/tasks'
+    selectTask: (task) ->
+      app.vent.trigger 'task:clicked', task
 
   class Checks extends Backbone.Collection
     model: Check
@@ -72,13 +74,14 @@ define (require) ->
       @collection.comparator = (check) -> check.get 'date'
       @on 'itemview:task:check', @check, @
       @on 'itemview:task:uncheck', @uncheck, @
-    onRender: -> @renderHeight()
-    renderCollection: ->
     events:
       'click .task': 'clickedTask'
     clickedTask: (e) ->
       e.preventDefault()
       console.log 'clicked', @model.id
+      @model.select()
+    onRender: -> @renderHeight()
+    renderCollection: ->
       @triggerBeforeRender()
       @closeChildren()
       @showCollection()
@@ -171,11 +174,9 @@ define (require) ->
     clickedHome: (e) ->
       e.preventDefault()
       app.vent.trigger 'home:clicked'
-      app.router.navigate ''
     clickedSettings: (e) ->
       e.preventDefault()
       app.vent.trigger 'settings:clicked'
-      app.router.navigate 'settings'
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
@@ -261,31 +262,33 @@ define (require) ->
       app.vent.on 'settings:clicked', @showSettings, @
       app.vent.on 'home:clicked', @showTasks, @
     showApp: ->
-        navigation: ".navigation"
       @addRegions
+        navigation: ".navigation"
         body: ".body"
       @navigation.show @navBar
     showTasks: ->
+      @router.navigate ''
       @body.show @tasksView = new TasksView collection: @tasks
     showSettings: ->
+      @router.navigate 'settings'
       @body.show @settingsView = new SettingsView model: @user
-    # check: (options) ->
-    #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
-    # uncheck: (model) ->
     showTask: (task) ->
       @router.navigate "task/#{ task.id }"
       unless _.isObject task then task = @tasks.get task
       @body.show @taskView = new TaskView model: task
+    # check: (options) ->
+    #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
+    # uncheck: (model) ->
     #   model.destroy()
 
   class AppRouter extends Backbone.Marionette.AppRouter
     appRoutes:
       '': 'showTasks'
       'settings': 'showSettings'
+      'task/:id': 'showTask'
 
   initialize = ->
      window.app = new App
-      'task/:id': 'showTask'
      window.app.initialize()
 
   return initialize: initialize

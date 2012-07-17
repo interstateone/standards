@@ -19,6 +19,13 @@
         return Task.__super__.constructor.apply(this, arguments);
       }
 
+      Task.prototype.select = function() {
+        this.set({
+          selected: true
+        });
+        return this.collection.selectTask(this);
+      };
+
       Task.prototype.relations = [
         {
           type: Backbone.HasMany,

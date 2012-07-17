@@ -1,4 +1,5 @@
 require.config
+  baseUrl: '/js'
   paths:
     text: 'lib/text'
     jade: 'lib/jade'

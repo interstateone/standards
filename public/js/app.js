@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, CheckView, Checks, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, CheckView, Checks, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -25,6 +25,10 @@
       Tasks.prototype.model = Task;
 
       Tasks.prototype.url = '/api/tasks';
+
+      Tasks.prototype.selectTask = function(task) {
+        return app.vent.trigger('task:clicked', task);
+      };
 
       return Tasks;
 
@@ -176,14 +180,14 @@
         for (index = _i = 0, _len = weekdays.length; _i < _len; index = ++_i) {
           day = weekdays[index];
           check = this.collection.find(function(check) {
-          boilerplate = {
-            date: day.format('YYYY-MM-DD')
-          };
-          _results.push(this.addItemView(check || (check = boilerplate), ItemView, index));
             if ((check.get('date')) != null) {
               return (day.diff(moment(check.get('date')))) === 0;
             }
           });
+          boilerplate = {
+            date: day.format('YYYY-MM-DD')
+          };
+          _results.push(this.addItemView(check || (check = boilerplate), ItemView, index));
         }
         return _results;
       };
@@ -337,14 +341,12 @@
 
       NavBarView.prototype.clickedHome = function(e) {
         e.preventDefault();
-        app.vent.trigger('home:clicked');
-        return app.router.navigate('');
+        return app.vent.trigger('home:clicked');
       };
 
       NavBarView.prototype.clickedSettings = function(e) {
         e.preventDefault();
-        app.vent.trigger('settings:clicked');
-        return app.router.navigate('settings');
+        return app.vent.trigger('settings:clicked');
       };
 
       return NavBarView;
@@ -515,12 +517,14 @@
       };
 
       App.prototype.showTasks = function() {
+        this.router.navigate('');
         return this.body.show(this.tasksView = new TasksView({
           collection: this.tasks
         }));
       };
 
       App.prototype.showSettings = function() {
+        this.router.navigate('settings');
         return this.body.show(this.settingsView = new SettingsView({
           model: this.user
         }));

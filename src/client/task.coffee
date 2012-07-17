@@ -9,6 +9,9 @@ define (require) ->
   window.Check = require 'check'
 
   class Task extends Backbone.RelationalModel
+    select: ->
+      @set selected: true
+      @collection.selectTask @
     relations: [
       type: Backbone.HasMany
       key: 'checks'
