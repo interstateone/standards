@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, CheckView, Checks, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, CheckView, Checks, ErrorView, Form, Marionette, NavBarView, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -365,6 +365,29 @@
       return SettingsView;
 
     })(Backbone.Marionette.Layout);
+    ErrorView = (function(_super) {
+
+      __extends(ErrorView, _super);
+
+      function ErrorView() {
+        return ErrorView.__super__.constructor.apply(this, arguments);
+      }
+
+      ErrorView.prototype.template = require('jade!../templates/error-flash')();
+
+      ErrorView.prototype.render = function() {
+        return this.$el.html(_.template(this.template, this.serializeData()));
+      };
+
+      ErrorView.prototype.serializeData = function() {
+        return {
+          message: this.options.message
+        };
+      };
+
+      return ErrorView;
+
+    })(Backbone.Marionette.View);
     TaskView = (function(_super) {
 
       __extends(TaskView, _super);
@@ -533,8 +556,9 @@
 
       App.prototype.showApp = function() {
         this.addRegions({
-          navigation: ".navigation",
-          body: ".body"
+          navigation: '.navigation',
+          flash: '.flash',
+          body: '.body'
         });
         return this.navigation.show(this.navBar);
       };
@@ -560,6 +584,12 @@
         }
         return this.body.show(this.taskView = new TaskView({
           model: task
+        }));
+      };
+
+      App.prototype.showError = function(message) {
+        return this.flash.show(this.error = new ErrorView({
+          message: message
         }));
       };
 

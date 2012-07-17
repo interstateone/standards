@@ -181,6 +181,13 @@ define (require) ->
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
 
+  class ErrorView extends Backbone.Marionette.View
+    template: require('jade!../templates/error-flash')()
+    render: ->
+      @$el.html _.template @template, @serializeData()
+    serializeData: ->
+      message: @options.message
+
   class TaskView extends Backbone.Marionette.ItemView
     template: require('jade!../templates/taskview')()
     events:
@@ -275,8 +282,9 @@ define (require) ->
       app.vent.on 'home:clicked', @showTasks, @
     showApp: ->
       @addRegions
-        navigation: ".navigation"
-        body: ".body"
+        navigation: '.navigation'
+        flash: '.flash'
+        body: '.body'
       @navigation.show @navBar
     showTasks: ->
       @router.navigate ''
@@ -288,6 +296,8 @@ define (require) ->
       @router.navigate "task/#{ task.id }"
       unless _.isObject task then task = @tasks.get task
       @body.show @taskView = new TaskView model: task
+    showError: (message) ->
+      @flash.show @error = new ErrorView message: message
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->
