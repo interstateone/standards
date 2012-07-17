@@ -68,7 +68,7 @@ class API < Sinatra::Base
 
 	# Sign Out
 
-	get "/sign-out/?" do
+	post "/sign-out/?" do
 		content_type :json
 		session[:id] = nil
 	end
@@ -359,14 +359,6 @@ class API < Sinatra::Base
 		@tasks = @user.tasks
 		@checks = @user.checks
 		erb :stats
-	end
-
-	get '/settings/?' do
-		login_required
-		@user = current_user
-		@task_count = @user.tasks.count
-		@check_count = @user.checks.count
-		erb :settings
 	end
 
 	get '/about/?' do
