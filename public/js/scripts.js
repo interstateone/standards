@@ -150,48 +150,6 @@
       });
     };
     renderColors();
-    $(document).on("click", 'a.delete', function(e) {
-      return $(this).siblings(".deleteModal").modal();
-    });
-    $(document).on("click", 'a.delete-confirm', function(e) {
-      var clicked;
-      clicked = this;
-      e.preventDefault();
-      return $.post(clicked.href, {
-        _method: 'delete'
-      }, function(data) {
-        $(this).parents(".deleteModal").modal('hide');
-        return window.location.pathname = "/";
-      }, "script");
-    });
-    $(document).on("click", ".delete-confirm", function() {
-      return $('.delete-confirm').button('loading');
-    });
-    $(document).on("click", 'a.target', function(e) {
-      var clicked;
-      clicked = this;
-      e.preventDefault();
-      $(clicked).children('img').toggleClass("complete");
-      if ($(clicked).children('img').hasClass("complete")) {
-        incrementHeight(clicked);
-        _gaq.push(['_trackEvent', 'check', 'complete']);
-      } else {
-        decrementHeight(clicked);
-        _gaq.push(['_trackEvent', 'check', 'uncomplete']);
-      }
-      return $.post(clicked.href, null, function(data) {
-        if (data !== '') {
-          $(clicked).children('img').toggleClass("complete");
-          if ($(clicked).children('img').hasClass("complete")) {
-            return incrementHeight(clicked);
-          } else {
-            return decrementHeight(clicked);
-          }
-        }
-      }).error(function() {
-        return $(clicked).children('img').toggleClass("complete");
-      });
-    });
     timezone = jstz.determine();
     name = timezone.name();
     return $('input#timezone').val(name);

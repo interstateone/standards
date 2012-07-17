@@ -299,6 +299,15 @@ class API < Sinatra::Base
 		current_user.tasks.get(params[:id]).to_json :methods => [:checks]
 	end
 
+	delete '/tasks/:id/?' do
+		login_required
+		user = current_user
+		task = user.tasks.get params[:id]
+		task.checks.destroy
+		task.destroy
+		true
+	end
+
 	# ------------------------------------------------
 	#
 	# Check Routes
@@ -480,17 +489,6 @@ class API < Sinatra::Base
 			flash.now[:error] = "That task doesn't exist."
 			erb :flash, :layout => false
 		end
-	end
-
-	delete '/:id' do
-		login_required
-		user = current_user
-		task = user.tasks.get params[:id]
-		task.checks.destroy
-		task.destroy
-
-		flash[:notice] = "Task deleted."
-		true
 	end
 
 	# Error routes #################################################################

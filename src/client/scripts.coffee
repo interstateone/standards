@@ -142,45 +142,6 @@ $ ->
 
 	renderColors()
 
-	# Delete a task modal
-	$(document).on "click", 'a.delete', (e) ->
-		$(this).siblings(".deleteModal").modal()
-
-	# Delete a task
-	$(document).on "click", 'a.delete-confirm', (e) ->
-		clicked = this
-		e.preventDefault()
-		$.post(clicked.href, { _method: 'delete' }, (data) ->
-				$(this).parents(".deleteModal").modal('hide')
-				window.location.pathname = "/"
-		, "script")
-
-	# Set the delete button in the delete task modal to be stateful
-	$(document).on "click", ".delete-confirm", ->
-		$('.delete-confirm').button('loading')
-
-	# Check a task
-	$(document).on "click", 'a.target', (e) ->
-		clicked = this
-		e.preventDefault()
-		$(clicked).children('img').toggleClass("complete")
-		if $(clicked).children('img').hasClass("complete")
-			incrementHeight(clicked)
-			_gaq.push(['_trackEvent', 'check', 'complete'])
-		else
-			decrementHeight(clicked)
-			_gaq.push(['_trackEvent', 'check', 'uncomplete'])
-
-		$.post clicked.href, null, (data) ->
-			if data != ''
-				$(clicked).children('img').toggleClass("complete")
-				if $(clicked).children('img').hasClass("complete")
-					incrementHeight(clicked)
-				else
-					decrementHeight(clicked)
-		.error ->
-			$(clicked).children('img').toggleClass("complete")
-
 	# Submit timezone with signup
 	timezone = jstz.determine()
 	name = timezone.name()

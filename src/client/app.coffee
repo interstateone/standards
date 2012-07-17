@@ -183,6 +183,19 @@ define (require) ->
 
   class TaskView extends Backbone.Marionette.ItemView
     template: require('jade!../templates/taskview')()
+    events:
+      'click a.delete': 'clickedDelete'
+      'click a.delete-confirm': 'confirmDelete'
+    clickedDelete: ->
+      @$(".deleteModal").modal()
+    confirmDelete: (e) ->
+        e.preventDefault()
+        @$('.delete-confirm').button('loading')
+        @model.destroy
+          success: =>
+            @$(".deleteModal").modal 'hide'
+            app.router.navigate '', trigger: true
+
     serializeData: ->
       count = @model.get('checks').length
       today = moment()
@@ -223,7 +236,6 @@ define (require) ->
             result += source
             source = ''
         result
-
       switchPronouns: (string) ->
         this.gsub string, /\b(I am|You are|I|You|Your|My)\b/i, (pronoun) ->
           switch pronoun[0].toLowerCase()

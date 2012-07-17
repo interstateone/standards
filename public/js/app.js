@@ -375,6 +375,29 @@
 
       TaskView.prototype.template = require('jade!../templates/taskview')();
 
+      TaskView.prototype.events = {
+        'click a.delete': 'clickedDelete',
+        'click a.delete-confirm': 'confirmDelete'
+      };
+
+      TaskView.prototype.clickedDelete = function() {
+        return this.$(".deleteModal").modal();
+      };
+
+      TaskView.prototype.confirmDelete = function(e) {
+        var _this = this;
+        e.preventDefault();
+        this.$('.delete-confirm').button('loading');
+        return this.model.destroy({
+          success: function() {
+            _this.$(".deleteModal").modal('hide');
+            return app.router.navigate('', {
+              trigger: true
+            });
+          }
+        });
+      };
+
       TaskView.prototype.serializeData = function() {
         var count, createdDay, firstCheckDay, firstDay, percentComplete, timeAgo, today;
         count = this.model.get('checks').length;
