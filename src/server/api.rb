@@ -210,39 +210,31 @@ class API < Sinatra::Base
 
 	# Update User ------------------------------------
 
-	put "/user/:id/?" do
+	put "/user/info/?" do
 
 		login_required
+		user = current_user
+		data = JSON.parse request.body.read.to_s
 
-		# If the authenticated user is the one we're looking for, update it and return it
-		if session[:id] == params[:id]
+		# Update info
+		user.update(
+			:name => data['name'],
+			:email => data['email'],
+			:starting_weekday => data['starting_weekday'],
+			:timezone => data['timezone'],
+			:email_permission => data['email_permission'] || false
+		)
 
-			# Update info
-			user = current_user
-			user.name = params[:name]
-			user.email = params[:email]
-			user.starting_weekday = params[:starting_weekday]
-			user.timezone = params[:timezone]
-			user.email_permission = params[:email_permission] || false
-
-			# Update password if necessary
-			if params[:new_password] != ""
-
-				# Make sure the current password was entered correctly
-				if user = User.authenticate(current_user.email, params[:current_password])
-					user.password = params[:new_password]
-				else
-					# Unauthorized status, don't proceed in the route
-					halt 401
-				end
+		# Update password if necessary
+		unless data['new_password'].nil?
+			if user = User.authenticate(current_user.email, data['current_password'])
+				user.password = data['new_password']
+			else
+				halt 401
 			end
-
-			user.save
-
-			user.to_json
-		else
-			status 401
 		end
+
+		user.attributes.only(:id, :name, :email, :starting_weekday).to_json
 	end
 
 	# Delete User ------------------------------------
