@@ -408,19 +408,39 @@ define (require) ->
       count = @model.get('checks').length
       today = moment()
 
+      @model.get('checks').comparator = (check) -> check.get 'date'
+
       createdDay = moment(@model.get 'created_on')
       firstDay = createdDay
       if @model.get('checks').length
         firstCheckDay = moment(@model.get('checks').sort(silent: true).first().get 'date')
         firstDay = moment(Math.min createdDay.valueOf(), firstCheckDay.valueOf())
 
-      timeAgo = firstDay.fromNow()
       percentComplete = Math.ceil(count * 100 / today.diff firstDay, 'days')
+      timeAgo = firstDay.fromNow()
+      count = @weekdayCount()
+      heatmap = @heatmap count
 
       _.extend super,
         count: count
         percentComplete: percentComplete
         timeAgo: timeAgo
+        heatmap: heatmap
+    weekdayCount: ->
+      weekdayCount = [0,0,0,0,0,0,0]
+      @model.get('checks').each (check) ->
+        weekdayIndex = moment(check.get('date')).day()
+        weekdayCount[weekdayIndex] += 1
+      weekdayCount
+    heatmap: (countArray) ->
+      heatmap = []
+      max = _.max countArray
+      max ||= 1
+      min = _.min countArray
+      for count in countArray
+        temp = $.Color('#FF0000').hue(Math.abs(count - max) / max * 40)
+        heatmap.push count: count, temp: temp.toHexString()
+      heatmap
     templateHelpers:
       sentenceCase: (string) -> string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
       titleCase: (string) -> (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() for word in string.split ' ').join ' '

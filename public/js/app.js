@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, ButtonRadio, CheckView, Checks, ErrorView, Form, InfoForm, Marionette, MultiRegion, NavBarView, NoticeView, PasswordForm, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, Timezone, User, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, ButtonRadio, CheckView, Checks, ErrorView, Form, InfoForm, Marionette, MultiRegion, NavBarView, NoticeView, PasswordForm, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, Timezone, User, colorArray, getWeekdaysAsArray, initialize, renderColors, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -813,9 +813,12 @@
       };
 
       TaskView.prototype.serializeData = function() {
-        var count, createdDay, firstCheckDay, firstDay, percentComplete, timeAgo, today;
+        var count, createdDay, firstCheckDay, firstDay, heatmap, percentComplete, timeAgo, today;
         count = this.model.get('checks').length;
         today = moment();
+        this.model.get('checks').comparator = function(check) {
+          return check.get('date');
+        };
         createdDay = moment(this.model.get('created_on'));
         firstDay = createdDay;
         if (this.model.get('checks').length) {
@@ -824,13 +827,44 @@
           }).first().get('date'));
           firstDay = moment(Math.min(createdDay.valueOf(), firstCheckDay.valueOf()));
         }
-        timeAgo = firstDay.fromNow();
         percentComplete = Math.ceil(count * 100 / today.diff(firstDay, 'days'));
+        timeAgo = firstDay.fromNow();
+        count = this.weekdayCount();
+        heatmap = this.heatmap(count);
         return _.extend(TaskView.__super__.serializeData.apply(this, arguments), {
           count: count,
           percentComplete: percentComplete,
-          timeAgo: timeAgo
+          timeAgo: timeAgo,
+          heatmap: heatmap
         });
+      };
+
+      TaskView.prototype.weekdayCount = function() {
+        var weekdayCount;
+        weekdayCount = [0, 0, 0, 0, 0, 0, 0];
+        this.model.get('checks').each(function(check) {
+          var weekdayIndex;
+          weekdayIndex = moment(check.get('date')).day();
+          return weekdayCount[weekdayIndex] += 1;
+        });
+        return weekdayCount;
+      };
+
+      TaskView.prototype.heatmap = function(countArray) {
+        var count, heatmap, max, min, temp, _i, _len;
+        heatmap = [];
+        max = _.max(countArray);
+        max || (max = 1);
+        min = _.min(countArray);
+        for (_i = 0, _len = countArray.length; _i < _len; _i++) {
+          count = countArray[_i];
+          temp = $.Color('#FF0000').hue(Math.abs(count - max) / max * 40);
+          heatmap.push({
+            count: count,
+            temp: temp.toHexString()
+          });
+        }
+        return heatmap;
       };
 
       TaskView.prototype.templateHelpers = {

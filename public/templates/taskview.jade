@@ -22,10 +22,13 @@ div.row-fluid
         thead
           tr
           <% _.each(getWeekdaysAsArray(true), function (day) { %>
-          th <%= day.format('d') %>
+          th <%= day.format('ddd').slice(0,1) %>
           <% }); %>
         tbody
           tr
+          <% _.each(heatmap, function (day) { %>
+          td(style!="background-color: <%= day.temp %>") <%= day.count %>
+          <% }); %>
 
 a.delete.btn.btn-danger.pull-right Delete
 
