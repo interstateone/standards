@@ -332,6 +332,21 @@ class API < Sinatra::Base
 		end
 	end
 
+	# ------------------------------------------------
+	#
+	# Misc. Routes
+	#
+	# ------------------------------------------------
+
+	get '/timezones/?' do
+		content_type :json
+		result = []
+		TZInfo::Timezone.all.each do |zone|
+			result.push zone.identifier => zone
+		end
+		result.to_json
+	end
+
 
 	get '/' do
 		if logged_in?
