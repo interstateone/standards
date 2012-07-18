@@ -571,14 +571,17 @@
       };
 
       InfoForm.prototype.commitChanges = function(e) {
+        var errors;
         e.preventDefault();
         e.stopPropagation();
-        this.commit();
-        return this.model.save({}, {
-          success: function() {
-            return app.vent.trigger('notice', 'Your info has been updated.');
-          }
-        });
+        errors = this.commit();
+        if (errors == null) {
+          return this.model.save({}, {
+            success: function() {
+              return app.vent.trigger('notice', 'Your info has been updated.');
+            }
+          });
+        }
       };
 
       InfoForm.prototype.schema = {
@@ -589,7 +592,8 @@
         },
         email: {
           title: 'Email',
-          type: 'Text'
+          type: 'Text',
+          validators: ['email', 'required']
         },
         starting_weekday: {
           title: 'Weeks start on',
@@ -656,19 +660,23 @@
       };
 
       PasswordForm.prototype.commitChanges = function(e) {
+        var errors;
         e.preventDefault();
         e.stopPropagation();
-        return $.ajax({
-          url: '/api/user/password',
-          type: 'POST',
-          data: JSON.stringify({
-            current_password: this.$('input[name="current_password"]').val(),
-            new_password: this.$('input[name="new_password"]').val()
-          }),
-          success: function() {
-            return app.vent.trigger('notice', 'Your password has been updated.');
-          }
-        });
+        errors = this.validate();
+        if (errors == null) {
+          return $.ajax({
+            url: '/api/user/password',
+            type: 'POST',
+            data: JSON.stringify({
+              current_password: this.$('input[name="current_password"]').val(),
+              new_password: this.$('input[name="new_password"]').val()
+            }),
+            success: function() {
+              return app.vent.trigger('notice', 'Your password has been updated.');
+            }
+          });
+        }
       };
 
       PasswordForm.prototype.schema = {
@@ -678,7 +686,19 @@
         },
         new_password: {
           title: 'New Password',
-          type: 'Password'
+          type: 'Password',
+          validators: [
+            function(value, formValues) {
+              var lengthError;
+              lengthError = {
+                type: 'Password',
+                message: 'Password must be at least 8 characters long.'
+              };
+              if (value.length < 8) {
+                return lengthError;
+              }
+            }
+          ]
         }
       };
 

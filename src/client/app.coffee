@@ -293,8 +293,8 @@ define (require) ->
     commitChanges: (e) ->
       e.preventDefault()
       e.stopPropagation()
-      @commit()
-      @model.save {}, success: -> app.vent.trigger 'notice', 'Your info has been updated.'
+      errors = @commit()
+      unless errors? then @model.save {}, success: -> app.vent.trigger 'notice', 'Your info has been updated.'
     schema:
       name:
         title: 'Name'
@@ -303,6 +303,7 @@ define (require) ->
       email:
         title: 'Email'
         type: 'Text'
+        validators: ['email', 'required']
       starting_weekday:
         title: 'Weeks start on'
         type: ButtonRadio
@@ -331,7 +332,8 @@ define (require) ->
     commitChanges: (e) ->
       e.preventDefault()
       e.stopPropagation()
-      $.ajax
+      errors = @validate()
+      unless errors? then $.ajax
         url: '/api/user/password'
         type: 'POST'
         data: JSON.stringify
@@ -345,6 +347,13 @@ define (require) ->
       new_password:
         title: 'New Password'
         type: 'Password'
+        validators: [
+          (value, formValues) ->
+            lengthError =
+              type: 'Password'
+              message: 'Password must be at least 8 characters long.'
+            if value.length < 8 then lengthError
+        ]
     fieldsets: [
       legend: 'Change Password'
       fields: ['current_password', 'new_password']
