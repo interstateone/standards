@@ -225,16 +225,22 @@ class API < Sinatra::Base
 			:email_permission => data['email_permission'] || false
 		)
 
-		# Update password if necessary
-		unless data['new_password'].nil?
-			if user = User.authenticate(current_user.email, data['current_password'])
-				user.password = data['new_password']
-			else
-				halt 401
-			end
-		end
+		user.attributes.only(:id, :name, :email, :starting_weekday, :timezone).to_json
+	end
 
-		user.attributes.only(:id, :name, :email, :starting_weekday).to_json
+	# Update Password --------------------------------
+
+	post '/user/password/?' do
+		login_required
+		data = JSON.parse request.body.read.to_s
+
+		if user = User.authenticate(current_user.email, data['current_password'])
+			user.password = data['new_password']
+			user.save
+		else
+			halt 401
+		end
+		return true
 	end
 
 	# Delete User ------------------------------------
