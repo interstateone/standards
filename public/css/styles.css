@@ -5971,9 +5971,6 @@ header hr {
 table {
   width: 100%;
 }
-table#tasksView {
-  margin-top: 5%;
-}
 th {
   color: #AAA;
   font-weight: bold;
