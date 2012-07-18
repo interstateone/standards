@@ -60,7 +60,6 @@ class User
 	end
 
 	def valid_password?(password)
-		reg = /^(?=.*\d)(?=.*([a-z]|[A-Z]))([\x20-\x7E]){8,40}$/
-		return (reg.match(password))? true : false
+		return (password.length >= 8) ? true : false
 	end
 end
