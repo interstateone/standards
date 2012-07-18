@@ -71,29 +71,6 @@ $ ->
 				if button.val() == hidden.val()
 					button.addClass 'active'
 
-	colorArray = (numberOfRows, lightness) ->
-		colors = []
-
-		for i in [0..numberOfRows]
-			hue = i * 340 / (numberOfRows + 2)
-			saturation = 0.8
-			# lightness = 0.5
-			alpha = 1.0
-			color = $.Color({hue: hue, saturation: saturation, lightness: lightness, alpha: alpha}).toHslaString()
-			colors.push($.Color(color).toHexString())
-		colors
-
-	renderColors = ->
-		rows = $('tbody').children()
-		bgColors = colorArray(rows.size(), 0.8)
-		barColors = colorArray(rows.size(), 0.6)
-		$(rows).each (row) ->
-			$ministat = $(this).children('td.title').children('.ministat')
-			$ministat.css("background-color", bgColors[row])
-			$ministat.children('.minibar').css("background-color", barColors[row])
-
-	renderColors()
-
 	# Submit timezone with signup
 	timezone = jstz.determine()
 	name = timezone.name()

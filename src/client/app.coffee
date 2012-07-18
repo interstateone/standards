@@ -41,6 +41,26 @@ define (require) ->
     lengthOfWeek = if full then 6 else Math.min 6, today.diff firstDayOfWeek, 'days'
     week = (firstDayOfWeek.clone().add('d', day) for day in [0..lengthOfWeek])
 
+  colorArray = (numberOfRows) ->
+    colors = []
+    for i in [0..numberOfRows]
+      hue = i * 340 / (numberOfRows + 2)
+      saturation = 0.8
+      lightness = 0.5
+      alpha = 1.0
+      color = $.Color({hue: hue, saturation: saturation, lightness: lightness, alpha: alpha}).toHslaString()
+      colors.push($.Color(color).toHexString())
+    colors
+
+  renderColors = ->
+    rows = $('tbody').children()
+    bgColors = colorArray(rows.size(), 0.8)
+    barColors = colorArray(rows.size(), 0.6)
+    $(rows).each (row) ->
+      $ministat = $(this).children('td.title').children('.ministat')
+      $ministat.css("background-color", bgColors[row])
+      $ministat.children('.minibar').css("background-color", barColors[row])
+
   class CheckView extends Backbone.Marionette.ItemView
     tagName: 'td'
     template: require('jade!../templates/check')()

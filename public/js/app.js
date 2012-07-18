@@ -75,6 +75,36 @@
         return _results;
       })();
     };
+    colorArray = function(numberOfRows) {
+      var alpha, color, colors, hue, i, lightness, saturation, _i;
+      colors = [];
+      for (i = _i = 0; 0 <= numberOfRows ? _i <= numberOfRows : _i >= numberOfRows; i = 0 <= numberOfRows ? ++_i : --_i) {
+        hue = i * 340 / (numberOfRows + 2);
+        saturation = 0.8;
+        lightness = 0.5;
+        alpha = 1.0;
+        color = $.Color({
+          hue: hue,
+          saturation: saturation,
+          lightness: lightness,
+          alpha: alpha
+        }).toHslaString();
+        colors.push($.Color(color).toHexString());
+      }
+      return colors;
+    };
+    renderColors = function() {
+      var barColors, bgColors, rows;
+      rows = $('tbody').children();
+      bgColors = colorArray(rows.size(), 0.8);
+      barColors = colorArray(rows.size(), 0.6);
+      return $(rows).each(function(row) {
+        var $ministat;
+        $ministat = $(this).children('td.title').children('.ministat');
+        $ministat.css("background-color", bgColors[row]);
+        return $ministat.children('.minibar').css("background-color", barColors[row]);
+      });
+    };
     CheckView = (function(_super) {
 
       __extends(CheckView, _super);
