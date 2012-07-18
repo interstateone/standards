@@ -289,7 +289,7 @@ define (require) ->
   class InfoForm extends Form
     template: require('jade!../templates/info-form')()
     events:
-      'click button.update': 'commitChanges'
+      'click button[type="submit"]': 'commitChanges'
     commitChanges: (e) ->
       e.preventDefault()
       e.stopPropagation()

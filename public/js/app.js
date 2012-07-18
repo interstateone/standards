@@ -567,7 +567,7 @@
       InfoForm.prototype.template = require('jade!../templates/info-form')();
 
       InfoForm.prototype.events = {
-        'click button.update': 'commitChanges'
+        'click button[type="submit"]': 'commitChanges'
       };
 
       InfoForm.prototype.commitChanges = function(e) {
