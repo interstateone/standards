@@ -34,10 +34,11 @@ define (require) ->
 
   getWeekdaysAsArray = (full) ->
     today = moment().sod()
-    startingWeekday = app.user.get 'starting_weekday'
+    startingWeekday = parseInt(app.user.get 'starting_weekday') + parseInt(app.offset ? 0)
     firstDayOfWeek = moment().sod()
     firstDayOfWeek.day startingWeekday
-    if firstDayOfWeek.day() > today.day() then firstDayOfWeek.day(startingWeekday - 7)
+    console.log app.offset, firstDayOfWeek.format("dddd, MMMM Do YYYY, h:mm:ss a")
+    if firstDayOfWeek.diff(today, 'days') > 0 then firstDayOfWeek.day(startingWeekday - 7)
     lengthOfWeek = if full then 6 else Math.min 6, today.diff firstDayOfWeek, 'days'
     week = (firstDayOfWeek.clone().add('d', day) for day in [0..lengthOfWeek])
 
@@ -401,25 +402,26 @@ define (require) ->
     clickedDelete: ->
       @$(".deleteModal").modal()
     confirmDelete: (e) ->
-        e.preventDefault()
-        @$('.delete-confirm').button('loading')
-        app.vent.trigger 'task:delete', @model.id
+      e.preventDefault()
+      @$('.delete-confirm').button('loading')
+      app.vent.trigger 'task:delete', @model.id
     serializeData: ->
       count = @model.get('checks').length
-      today = moment()
+      today = moment().sod()
 
       @model.get('checks').comparator = (check) -> check.get 'date'
 
-      createdDay = moment(@model.get 'created_on')
+      createdDay = moment(@model.get 'created_on').sod()
       firstDay = createdDay
       if @model.get('checks').length
         firstCheckDay = moment(@model.get('checks').sort(silent: true).first().get 'date')
         firstDay = moment(Math.min createdDay.valueOf(), firstCheckDay.valueOf())
 
-      percentComplete = Math.ceil(count * 100 / today.diff firstDay, 'days')
-      timeAgo = firstDay.fromNow()
-      count = @weekdayCount()
-      heatmap = @heatmap count
+      percentComplete = Math.ceil(count * 100 / (today.diff(firstDay, 'days') + 1))
+      timeAgo = if today.diff(firstDay, 'hours') > 24 then firstDay.fromNow() else 'today'
+      console.log today.diff(firstDay, 'hours')
+      weekdayCount = @weekdayCount()
+      heatmap = @heatmap weekdayCount
 
       _.extend super,
         count: count
@@ -550,8 +552,10 @@ define (require) ->
         body: '.body'
       @flash = new MultiRegion el: '.flash'
       @navigation.show @navBar
-    showTasks: ->
-      @router.navigate ''
+    showTasks: (offset) ->
+      @offset = offset
+      if offset then @router.navigate 'offset/' + @offset
+      else @router.navigate ''
       @body.show @tasksView = new TasksView collection: @tasks
     showSettings: ->
       @router.navigate 'settings'
@@ -584,6 +588,7 @@ define (require) ->
   class AppRouter extends Backbone.Marionette.AppRouter
     appRoutes:
       '': 'showTasks'
+      'offset/:offset': 'showTasks'
       'settings': 'showSettings'
       'task/:id': 'showTask'
 

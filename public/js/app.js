@@ -57,12 +57,13 @@
       });
     };
     getWeekdaysAsArray = function(full) {
-      var day, firstDayOfWeek, lengthOfWeek, startingWeekday, today, week;
+      var day, firstDayOfWeek, lengthOfWeek, startingWeekday, today, week, _ref;
       today = moment().sod();
-      startingWeekday = app.user.get('starting_weekday');
+      startingWeekday = parseInt(app.user.get('starting_weekday')) + parseInt((_ref = app.offset) != null ? _ref : 0);
       firstDayOfWeek = moment().sod();
       firstDayOfWeek.day(startingWeekday);
-      if (firstDayOfWeek.day() > today.day()) {
+      console.log(app.offset, firstDayOfWeek.format("dddd, MMMM Do YYYY, h:mm:ss a"));
+      if (firstDayOfWeek.diff(today, 'days') > 0) {
         firstDayOfWeek.day(startingWeekday - 7);
       }
       lengthOfWeek = full ? 6 : Math.min(6, today.diff(firstDayOfWeek, 'days'));
@@ -813,13 +814,13 @@
       };
 
       TaskView.prototype.serializeData = function() {
-        var count, createdDay, firstCheckDay, firstDay, heatmap, percentComplete, timeAgo, today;
+        var count, createdDay, firstCheckDay, firstDay, heatmap, percentComplete, timeAgo, today, weekdayCount;
         count = this.model.get('checks').length;
-        today = moment();
+        today = moment().sod();
         this.model.get('checks').comparator = function(check) {
           return check.get('date');
         };
-        createdDay = moment(this.model.get('created_on'));
+        createdDay = moment(this.model.get('created_on')).sod();
         firstDay = createdDay;
         if (this.model.get('checks').length) {
           firstCheckDay = moment(this.model.get('checks').sort({
@@ -827,10 +828,11 @@
           }).first().get('date'));
           firstDay = moment(Math.min(createdDay.valueOf(), firstCheckDay.valueOf()));
         }
-        percentComplete = Math.ceil(count * 100 / today.diff(firstDay, 'days'));
-        timeAgo = firstDay.fromNow();
-        count = this.weekdayCount();
-        heatmap = this.heatmap(count);
+        percentComplete = Math.ceil(count * 100 / (today.diff(firstDay, 'days') + 1));
+        timeAgo = today.diff(firstDay, 'hours') > 24 ? firstDay.fromNow() : 'today';
+        console.log(today.diff(firstDay, 'hours'));
+        weekdayCount = this.weekdayCount();
+        heatmap = this.heatmap(weekdayCount);
         return _.extend(TaskView.__super__.serializeData.apply(this, arguments), {
           count: count,
           percentComplete: percentComplete,
@@ -1059,8 +1061,13 @@
         return this.navigation.show(this.navBar);
       };
 
-      App.prototype.showTasks = function() {
-        this.router.navigate('');
+      App.prototype.showTasks = function(offset) {
+        this.offset = offset;
+        if (offset) {
+          this.router.navigate('offset/' + this.offset);
+        } else {
+          this.router.navigate('');
+        }
         return this.body.show(this.tasksView = new TasksView({
           collection: this.tasks
         }));
@@ -1134,6 +1141,7 @@
 
       AppRouter.prototype.appRoutes = {
         '': 'showTasks',
+        'offset/:offset': 'showTasks',
         'settings': 'showSettings',
         'task/:id': 'showTask'
       };
