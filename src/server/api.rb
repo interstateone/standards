@@ -60,7 +60,7 @@ class API < Sinatra::Base
 		if user = User.authenticate(params[:email], params[:password])
 			content_type :json
 			session[:id] = user.id
-			user.attributes.only(:id, :name, :email, :starting_weekday).to_json
+			user.attributes.only(:id, :name, :email, :starting_weekday, :timezone).to_json
 		else
 			status 401
 		end
