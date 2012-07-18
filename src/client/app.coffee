@@ -223,50 +223,78 @@ define (require) ->
   class Timezone extends Backbone.Form.editors.Select
     tagName: 'div'
     events:
-      'change select[name="timezone"]': 'resetButton'
+      'change select': 'resetButton'
       'click button': 'getLocation'
+    render: ->
+      options = @schema.options
+
+      if options instanceof Backbone.Collection
+        collection = options
+        if collection.length > 0
+          @renderOptions options
+        else
+          collection.fetch
+            success: (collection) =>
+              @renderOptions options
+      else if _.isFunction options
+        options (result) =>
+          @renderOptions result
+          @disableButton()
+      else @renderOptions options
+      @
+    disableButton: -> unless navigator.geolocation? then @$('button').attr 'disabled', 'disabled'
     resetButton: -> @$('button').css 'color', '#333333'
     getLocation: ->
       $button = @$ 'button'
-      navigator.geolocation.getCurrentPosition (position) =>
-          # lookup in geonames
-          lat = position.coords.latitude
-          long = position.coords.longitude
-          urlbase = "http://api.geonames.org/timezoneJSON?"
-          username = "interstateone"
+      unless $button.attr('disabled')?
+        navigator.geolocation.getCurrentPosition (position) =>
+            # lookup in geonames
+            lat = position.coords.latitude
+            long = position.coords.longitude
+            urlbase = "http://api.geonames.org/timezoneJSON?"
+            username = "interstateone"
 
-          url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username
+            url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username
 
-          $.get url, (data) =>
-            $button.css('color', 'green')
-            @setValue data.timezoneId
-          .error -> $button.css('color', 'red')
-        # error function
-        (error) ->
-          switch (error.code)
-            when error.TIMEOUT then app.trigger 'error', 'Geolocation error: Timeout'
-            when error.POSITION_UNAVAILABLE then app.trigger 'error', 'Geolocation error: Position unavailable'
-            when error.PERMISSION_DENIED then app.trigger 'error', 'Geolocation error: Permission denied'
-            when error.UNKNOWN_ERROR then app.trigger 'error', 'Geolocation error: Unknown error'
-        timeout: 5000
+            $.get url, (data) =>
+              $button.css('color', 'green')
+              @setValue data.timezoneId
+            .error -> $button.css('color', 'red')
+          # error function
+          (error) ->
+            switch (error.code)
+              when error.TIMEOUT then app.trigger 'error', 'Geolocation error: Timeout'
+              when error.POSITION_UNAVAILABLE then app.trigger 'error', 'Geolocation error: Position unavailable'
+              when error.PERMISSION_DENIED then app.trigger 'error', 'Geolocation error: Permission denied'
+              when error.UNKNOWN_ERROR then app.trigger 'error', 'Geolocation error: Unknown error'
+          timeout: 5000
     getValue: -> @$('select').val()
     setValue: (value) -> @$('select').val value
     _arrayToHtml: (array) ->
       html = []
 
-      html.push '<select class="input-xlarge" id="timezone" name="timezone">'
+      html.push '<select id="timezone" name="timezone">'
 
       _.each array, (option) ->
         if _.isObject option then html.push "<option value=\"#{ option.val ? '' }\">#{ option.label }</option>"
         else html.push "<option>#{ option }</option>"
 
-      html.push '</select>'
-      if navigator.geolocation? then html.push '<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>'
+      html.push '''
+        </select>
+        <button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>
+        '''
 
       html.join ''
 
   class InfoForm extends Form
     template: require('jade!../templates/info-form')()
+    events:
+      'click button.update': 'commitChanges'
+    commitChanges: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      @commit()
+      @model.save {}, success: -> app.vent.trigger 'notice', 'Your info has been updated.'
     schema:
       name:
         title: 'Name'
@@ -451,6 +479,7 @@ define (require) ->
       app.vent.on 'task:check', @check, @
       app.vent.on 'task:uncheck', @uncheck, @
       app.vent.on 'error', @showError, @
+      app.vent.on 'notice', @showNotice, @
 
       # Routes
       app.vent.on 'task:clicked', @showTask, @
@@ -485,8 +514,8 @@ define (require) ->
           $(".deleteModal").modal 'hide'
           @showTasks()
     showError: (message) -> @flash.append @error = new ErrorView message: message
-    hideErrors: -> @flash.close()
     showNotice: (message) -> @flash.append @notice = new NoticeView message: message
+    hideErrors: -> @flash.close()
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
     # uncheck: (model) ->

@@ -71,54 +71,6 @@ $ ->
 				if button.val() == hidden.val()
 					button.addClass 'active'
 
-	# Timezone stuff
-	# If the selection is manually changed, turn the button to it's regular color
-	$('select[name="timezone"]').change (event) ->
-		$button = $('button.geolocate')
-		if $button.length
-			$button.css('color', '#333333')
-
-	# Check for browser support of geolocation
-	if (navigator.geolocation)
-		# Display the gelocate button
-		$('select[name="timezone"]').parent().append('<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>')
-		$button = $('button.geolocate')
-
-		# Find the timezone when the button is clicked
-		$('button.geolocate').click ->
-			# Find the current location
-			navigator.geolocation.getCurrentPosition(
-				# success function
-				->
-					# change to seperate function later
-					# lookup in geonames
-					lat = position.coords.latitude
-					long = position.coords.longitude
-
-					urlbase = "http://api.geonames.org/timezoneJSON?"
-					username = "interstateone"
-
-					url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username
-
-					$.get url, (data) ->
-						# success state for geolocate button
-						$button.css('color', 'green')
-
-						# select the proper option in the menu
-						$('select[name="timezone"]').val(data.timezoneId)
-					.error ->
-						# error state for geolocate button
-						$button.css('color', 'red')
-
-				# error function
-				(error) ->
-					switch (error.code)
-						when error.TIMEOUT then	alert 'Timeout'
-						when error.POSITION_UNAVAILABLE then alert 'Position unavailable'
-						when error.PERMISSION_DENIED then alert 'Permission denied'
-						when error.UNKNOWN_ERROR then alert 'Unknown error'
-			)
-
 	colorArray = (numberOfRows, lightness) ->
 		colors = []
 

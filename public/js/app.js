@@ -452,8 +452,40 @@
       Timezone.prototype.tagName = 'div';
 
       Timezone.prototype.events = {
-        'change select[name="timezone"]': 'resetButton',
+        'change select': 'resetButton',
         'click button': 'getLocation'
+      };
+
+      Timezone.prototype.render = function() {
+        var collection, options,
+          _this = this;
+        options = this.schema.options;
+        if (options instanceof Backbone.Collection) {
+          collection = options;
+          if (collection.length > 0) {
+            this.renderOptions(options);
+          } else {
+            collection.fetch({
+              success: function(collection) {
+                return _this.renderOptions(options);
+              }
+            });
+          }
+        } else if (_.isFunction(options)) {
+          options(function(result) {
+            _this.renderOptions(result);
+            return _this.disableButton();
+          });
+        } else {
+          this.renderOptions(options);
+        }
+        return this;
+      };
+
+      Timezone.prototype.disableButton = function() {
+        if (navigator.geolocation == null) {
+          return this.$('button').attr('disabled', 'disabled');
+        }
       };
 
       Timezone.prototype.resetButton = function() {
@@ -464,35 +496,37 @@
         var $button,
           _this = this;
         $button = this.$('button');
-        navigator.geolocation.getCurrentPosition(function(position) {
-          var lat, long, url, urlbase, username;
-          lat = position.coords.latitude;
-          long = position.coords.longitude;
-          urlbase = "http://api.geonames.org/timezoneJSON?";
-          username = "interstateone";
-          url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username;
-          return $.get(url, function(data) {
-            $button.css('color', 'green');
-            return _this.setValue(data.timezoneId);
-          }).error(function() {
-            return $button.css('color', 'red');
+        if ($button.attr('disabled') == null) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var lat, long, url, urlbase, username;
+            lat = position.coords.latitude;
+            long = position.coords.longitude;
+            urlbase = "http://api.geonames.org/timezoneJSON?";
+            username = "interstateone";
+            url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username;
+            return $.get(url, function(data) {
+              $button.css('color', 'green');
+              return _this.setValue(data.timezoneId);
+            }).error(function() {
+              return $button.css('color', 'red');
+            });
           });
-        });
-        (function(error) {
-          switch (error.code) {
-            case error.TIMEOUT:
-              return app.trigger('error', 'Geolocation error: Timeout');
-            case error.POSITION_UNAVAILABLE:
-              return app.trigger('error', 'Geolocation error: Position unavailable');
-            case error.PERMISSION_DENIED:
-              return app.trigger('error', 'Geolocation error: Permission denied');
-            case error.UNKNOWN_ERROR:
-              return app.trigger('error', 'Geolocation error: Unknown error');
-          }
-        });
-        return {
-          timeout: 5000
-        };
+          (function(error) {
+            switch (error.code) {
+              case error.TIMEOUT:
+                return app.trigger('error', 'Geolocation error: Timeout');
+              case error.POSITION_UNAVAILABLE:
+                return app.trigger('error', 'Geolocation error: Position unavailable');
+              case error.PERMISSION_DENIED:
+                return app.trigger('error', 'Geolocation error: Permission denied');
+              case error.UNKNOWN_ERROR:
+                return app.trigger('error', 'Geolocation error: Unknown error');
+            }
+          });
+          return {
+            timeout: 5000
+          };
+        }
       };
 
       Timezone.prototype.getValue = function() {
@@ -506,7 +540,7 @@
       Timezone.prototype._arrayToHtml = function(array) {
         var html;
         html = [];
-        html.push('<select class="input-xlarge" id="timezone" name="timezone">');
+        html.push('<select id="timezone" name="timezone">');
         _.each(array, function(option) {
           var _ref;
           if (_.isObject(option)) {
@@ -515,10 +549,7 @@
             return html.push("<option>" + option + "</option>");
           }
         });
-        html.push('</select>');
-        if (navigator.geolocation != null) {
-          html.push('<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>');
-        }
+        html.push('</select>\n<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>');
         return html.join('');
       };
 
@@ -534,6 +565,21 @@
       }
 
       InfoForm.prototype.template = require('jade!../templates/info-form')();
+
+      InfoForm.prototype.events = {
+        'click button.update': 'commitChanges'
+      };
+
+      InfoForm.prototype.commitChanges = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.commit();
+        return this.model.save({}, {
+          success: function() {
+            return app.vent.trigger('notice', 'Your info has been updated.');
+          }
+        });
+      };
 
       InfoForm.prototype.schema = {
         name: {
@@ -898,6 +944,7 @@
         app.vent.on('task:check', this.check, this);
         app.vent.on('task:uncheck', this.uncheck, this);
         app.vent.on('error', this.showError, this);
+        app.vent.on('notice', this.showNotice, this);
         app.vent.on('task:clicked', this.showTask, this);
         app.vent.on('task:delete', this.deleteTask, this);
         app.vent.on('settings:clicked', this.showSettings, this);
@@ -963,14 +1010,14 @@
         }));
       };
 
-      App.prototype.hideErrors = function() {
-        return this.flash.close();
-      };
-
       App.prototype.showNotice = function(message) {
         return this.flash.append(this.notice = new NoticeView({
           message: message
         }));
+      };
+
+      App.prototype.hideErrors = function() {
+        return this.flash.close();
       };
 
       return App;

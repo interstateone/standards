@@ -2,7 +2,7 @@
 (function() {
 
   $(function() {
-    var $button, $select, colorArray, name, renderColors, timezone;
+    var $select, colorArray, name, renderColors, timezone;
     $(document).on(function() {
       'click';
 
@@ -78,44 +78,6 @@
           });
           if (button.val() === hidden.val()) {
             return button.addClass('active');
-          }
-        });
-      });
-    }
-    $('select[name="timezone"]').change(function(event) {
-      var $button;
-      $button = $('button.geolocate');
-      if ($button.length) {
-        return $button.css('color', '#333333');
-      }
-    });
-    if (navigator.geolocation) {
-      $('select[name="timezone"]').parent().append('<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>');
-      $button = $('button.geolocate');
-      $('button.geolocate').click(function() {
-        return navigator.geolocation.getCurrentPosition(function() {
-          var lat, long, url, urlbase, username;
-          lat = position.coords.latitude;
-          long = position.coords.longitude;
-          urlbase = "http://api.geonames.org/timezoneJSON?";
-          username = "interstateone";
-          url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username;
-          return $.get(url, function(data) {
-            $button.css('color', 'green');
-            return $('select[name="timezone"]').val(data.timezoneId);
-          }).error(function() {
-            return $button.css('color', 'red');
-          });
-        }, function(error) {
-          switch (error.code) {
-            case error.TIMEOUT:
-              return alert('Timeout');
-            case error.POSITION_UNAVAILABLE:
-              return alert('Position unavailable');
-            case error.PERMISSION_DENIED:
-              return alert('Permission denied');
-            case error.UNKNOWN_ERROR:
-              return alert('Unknown error');
           }
         });
       });
