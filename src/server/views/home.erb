@@ -1,6 +1,6 @@
 <!-- bootstrap user's data -->
 <script>
 	bootstrap = {};
-	bootstrap.user = <%= current_user.attributes.only(:id, :name, :email, :starting_weekday, :timezone).to_json %>;
+	bootstrap.user = <%= current_user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission).to_json %>;
 	bootstrap.tasks = <%= current_user.tasks.to_json :methods => [:checks] %>;
 </script>

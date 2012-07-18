@@ -124,7 +124,7 @@ class API < Sinatra::Base
 	get "/user/info/?" do
 		content_type :json
 		login_required
-		current_user.attributes.only(:id, :name, :email, :starting_weekday).to_json
+		current_user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission).to_json
 	end
 
 	# Forgot password --------------------------------
@@ -225,7 +225,7 @@ class API < Sinatra::Base
 			:email_permission => data['email_permission'] || false
 		)
 
-		user.attributes.only(:id, :name, :email, :starting_weekday, :timezone).to_json
+		user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission).to_json
 	end
 
 	# Update Password --------------------------------
