@@ -1037,15 +1037,21 @@
       };
 
       App.prototype.showError = function(message) {
-        return this.flash.append(this.error = new ErrorView({
+        var error;
+        return this.flash.append(error = new ErrorView({
           message: message
         }));
       };
 
       App.prototype.showNotice = function(message) {
-        return this.flash.append(this.notice = new NoticeView({
+        var notice,
+          _this = this;
+        this.flash.append(notice = new NoticeView({
           message: message
         }));
+        return window.setTimeout((function() {
+          return notice.$(".alert").alert('close');
+        }), 2000);
       };
 
       App.prototype.hideErrors = function() {

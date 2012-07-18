@@ -532,8 +532,10 @@ define (require) ->
         success: =>
           $(".deleteModal").modal 'hide'
           @showTasks()
-    showError: (message) -> @flash.append @error = new ErrorView message: message
-    showNotice: (message) -> @flash.append @notice = new NoticeView message: message
+    showError: (message) -> @flash.append error = new ErrorView message: message
+    showNotice: (message) ->
+      @flash.append notice = new NoticeView message: message
+      window.setTimeout (=> notice.$(".alert").alert('close')), 2000
     hideErrors: -> @flash.close()
     # check: (options) ->
     #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
