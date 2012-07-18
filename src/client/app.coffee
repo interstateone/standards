@@ -6,6 +6,7 @@ define (require) ->
   Backbone = require 'backbone'
   Marionette = require 'marionette'
   require 'moment'
+  require 'jstz'
 
   # App Libs
   require 'plugins'
@@ -180,6 +181,137 @@ define (require) ->
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
+    regions:
+      info: '.info'
+      password: '.password'
+
+  class ButtonRadio extends Backbone.Form.editors.Select
+    tagName: 'div'
+    events:
+      'click button': 'clickedButton'
+    render: ->
+      el = super
+      @updateButtons()
+      el
+    updateButtons: ->
+      @$('button').each (index, button) => if $(button).val() is @getValue() then $(button).addClass 'active'
+    clickedButton: (e) ->
+      @setValue $(e.target).val()
+      @$('button').each (index, button) => if $(button).val() is @getValue() then $(button).addClass 'active'
+    getValue: -> @$('input').val()
+    setValue: (value) -> @$('input').val value ? @getValue()
+    _arrayToHtml: (array) ->
+      html = []
+
+      html.push '<div class="btn-group" data-toggle="buttons-radio" data-toggle-name="starting_weekday" name="starting_weekday">'
+
+      _.each array, (option, index) =>
+        if _.isObject option
+          val = option.val ? ''
+          itemHtml = '<button type="button" class="btn" name="'+@id+'" value="'+val+'" id="'+@id+'-'+index+'" data-toggle="button">'+option.label+'</button>'
+        else
+          itemHtml = '<button type="button" class="btn" name="'+@id+'" value="'+option+'" id="'+@id+'-'+index+'" data-toggle="button">'+option.label+'</button>'
+        html.push itemHtml
+
+      html.push '''
+        </div>
+        <input type="hidden" name="starting_weekday">
+        '''
+
+      html.join ''
+
+  class Timezone extends Backbone.Form.editors.Select
+    tagName: 'div'
+    events:
+      'change select[name="timezone"]': 'resetButton'
+      'click button': 'getLocation'
+    resetButton: -> @$('button').css 'color', '#333333'
+    getLocation: ->
+      $button = @$ 'button'
+      navigator.geolocation.getCurrentPosition (position) =>
+          # lookup in geonames
+          lat = position.coords.latitude
+          long = position.coords.longitude
+          urlbase = "http://api.geonames.org/timezoneJSON?"
+          username = "interstateone"
+
+          url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username
+
+          $.get url, (data) =>
+            $button.css('color', 'green')
+            @setValue data.timezoneId
+          .error -> $button.css('color', 'red')
+        # error function
+        (error) ->
+          switch (error.code)
+            when error.TIMEOUT then app.trigger 'error', 'Geolocation error: Timeout'
+            when error.POSITION_UNAVAILABLE then app.trigger 'error', 'Geolocation error: Position unavailable'
+            when error.PERMISSION_DENIED then app.trigger 'error', 'Geolocation error: Permission denied'
+            when error.UNKNOWN_ERROR then app.trigger 'error', 'Geolocation error: Unknown error'
+        timeout: 5000
+    getValue: -> @$('select').val()
+    setValue: (value) -> @$('select').val value
+    _arrayToHtml: (array) ->
+      html = []
+
+      html.push '<select class="input-xlarge" id="timezone" name="timezone">'
+
+      _.each array, (option) ->
+        if _.isObject option then html.push "<option value=\"#{ option.val ? '' }\">#{ option.label }</option>"
+        else html.push "<option>#{ option }</option>"
+
+      html.push '</select>'
+      if navigator.geolocation? then html.push '<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>'
+
+      html.join ''
+
+  class InfoForm extends Form
+    template: require('jade!../templates/info-form')()
+    schema:
+      name:
+        title: 'Name'
+        type: 'Text'
+        validators: ['required']
+      email:
+        title: 'Email'
+        type: 'Text'
+      starting_weekday:
+        title: 'Weeks start on'
+        type: ButtonRadio
+        options: (callback) -> callback(val: day, label: moment().day(day).format('ddd').slice 0,1 for day in [0..6])
+      timezone:
+        title: 'Timezone'
+        type: Timezone
+        options: (callback) ->
+          $.get '/api/timezones', (data) ->
+            result = _.map data, (obj) ->
+              val: _.keys(obj)[0]
+              label: _.values(obj)[0]
+            callback result
+      email_permission:
+        title: 'Do you want to receive email updates about Standards?'
+        type: 'Checkbox'
+    fieldsets: [
+      legend: 'Info'
+      fields: ['name', 'email', 'starting_weekday', 'timezone', 'email_permission']
+    ]
+
+  class PasswordForm extends Form
+    template: require('jade!../templates/password-form')()
+    templateHelpers:
+      weekdayFromIndex: (index) -> moment().day(index).format 'd'
+    schema:
+      current_password:
+        title: 'Current Password'
+        type: 'Password'
+      new_password:
+        title: 'New Password'
+        type: 'Password'
+    fieldsets: [
+      legend: 'Change Password'
+      fields: ['current_password', 'new_password']
+    ]
+
 
   class ErrorView extends Backbone.Marionette.View
     template: require('jade!../templates/error-flash')()
@@ -336,7 +468,9 @@ define (require) ->
       @body.show @tasksView = new TasksView collection: @tasks
     showSettings: ->
       @router.navigate 'settings'
-      @body.show @settingsView = new SettingsView model: @user
+      @body.show @settingsView = new SettingsView
+      @settingsView.info.show @infoForm = new InfoForm model: @user
+      @settingsView.password.show @passwordForm = new PasswordForm model: @user
     showTask: (id) ->
       task = @tasks.get id
       unless task?

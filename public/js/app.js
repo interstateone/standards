@@ -4,12 +4,13 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, CheckView, Checks, ErrorView, Form, Marionette, MultiRegion, NavBarView, NoticeView, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, User, getWeekdaysAsArray, initialize, _;
+    var $, App, AppRouter, Backbone, ButtonRadio, CheckView, Checks, ErrorView, Form, InfoForm, Marionette, MultiRegion, NavBarView, NoticeView, PasswordForm, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, Timezone, User, getWeekdaysAsArray, initialize, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('moment');
+    require('jstz');
     require('plugins');
     User = require('user');
     Task = require('task');
@@ -362,9 +363,275 @@
 
       SettingsView.prototype.template = require('jade!../templates/settings')();
 
+      SettingsView.prototype.regions = {
+        info: '.info',
+        password: '.password'
+      };
+
       return SettingsView;
 
     })(Backbone.Marionette.Layout);
+    ButtonRadio = (function(_super) {
+
+      __extends(ButtonRadio, _super);
+
+      function ButtonRadio() {
+        return ButtonRadio.__super__.constructor.apply(this, arguments);
+      }
+
+      ButtonRadio.prototype.tagName = 'div';
+
+      ButtonRadio.prototype.events = {
+        'click button': 'clickedButton'
+      };
+
+      ButtonRadio.prototype.render = function() {
+        var el;
+        el = ButtonRadio.__super__.render.apply(this, arguments);
+        this.updateButtons();
+        return el;
+      };
+
+      ButtonRadio.prototype.updateButtons = function() {
+        var _this = this;
+        return this.$('button').each(function(index, button) {
+          if ($(button).val() === _this.getValue()) {
+            return $(button).addClass('active');
+          }
+        });
+      };
+
+      ButtonRadio.prototype.clickedButton = function(e) {
+        var _this = this;
+        this.setValue($(e.target).val());
+        return this.$('button').each(function(index, button) {
+          if ($(button).val() === _this.getValue()) {
+            return $(button).addClass('active');
+          }
+        });
+      };
+
+      ButtonRadio.prototype.getValue = function() {
+        return this.$('input').val();
+      };
+
+      ButtonRadio.prototype.setValue = function(value) {
+        return this.$('input').val(value != null ? value : this.getValue());
+      };
+
+      ButtonRadio.prototype._arrayToHtml = function(array) {
+        var html,
+          _this = this;
+        html = [];
+        html.push('<div class="btn-group" data-toggle="buttons-radio" data-toggle-name="starting_weekday" name="starting_weekday">');
+        _.each(array, function(option, index) {
+          var itemHtml, val, _ref;
+          if (_.isObject(option)) {
+            val = (_ref = option.val) != null ? _ref : '';
+            itemHtml = '<button type="button" class="btn" name="' + _this.id + '" value="' + val + '" id="' + _this.id + '-' + index + '" data-toggle="button">' + option.label + '</button>';
+          } else {
+            itemHtml = '<button type="button" class="btn" name="' + _this.id + '" value="' + option + '" id="' + _this.id + '-' + index + '" data-toggle="button">' + option.label + '</button>';
+          }
+          return html.push(itemHtml);
+        });
+        html.push('</div>\n<input type="hidden" name="starting_weekday">');
+        return html.join('');
+      };
+
+      return ButtonRadio;
+
+    })(Backbone.Form.editors.Select);
+    Timezone = (function(_super) {
+
+      __extends(Timezone, _super);
+
+      function Timezone() {
+        return Timezone.__super__.constructor.apply(this, arguments);
+      }
+
+      Timezone.prototype.tagName = 'div';
+
+      Timezone.prototype.events = {
+        'change select[name="timezone"]': 'resetButton',
+        'click button': 'getLocation'
+      };
+
+      Timezone.prototype.resetButton = function() {
+        return this.$('button').css('color', '#333333');
+      };
+
+      Timezone.prototype.getLocation = function() {
+        var $button,
+          _this = this;
+        $button = this.$('button');
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var lat, long, url, urlbase, username;
+          lat = position.coords.latitude;
+          long = position.coords.longitude;
+          urlbase = "http://api.geonames.org/timezoneJSON?";
+          username = "interstateone";
+          url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username;
+          return $.get(url, function(data) {
+            $button.css('color', 'green');
+            return _this.setValue(data.timezoneId);
+          }).error(function() {
+            return $button.css('color', 'red');
+          });
+        });
+        (function(error) {
+          switch (error.code) {
+            case error.TIMEOUT:
+              return app.trigger('error', 'Geolocation error: Timeout');
+            case error.POSITION_UNAVAILABLE:
+              return app.trigger('error', 'Geolocation error: Position unavailable');
+            case error.PERMISSION_DENIED:
+              return app.trigger('error', 'Geolocation error: Permission denied');
+            case error.UNKNOWN_ERROR:
+              return app.trigger('error', 'Geolocation error: Unknown error');
+          }
+        });
+        return {
+          timeout: 5000
+        };
+      };
+
+      Timezone.prototype.getValue = function() {
+        return this.$('select').val();
+      };
+
+      Timezone.prototype.setValue = function(value) {
+        return this.$('select').val(value);
+      };
+
+      Timezone.prototype._arrayToHtml = function(array) {
+        var html;
+        html = [];
+        html.push('<select class="input-xlarge" id="timezone" name="timezone">');
+        _.each(array, function(option) {
+          var _ref;
+          if (_.isObject(option)) {
+            return html.push("<option value=\"" + ((_ref = option.val) != null ? _ref : '') + "\">" + option.label + "</option>");
+          } else {
+            return html.push("<option>" + option + "</option>");
+          }
+        });
+        html.push('</select>');
+        if (navigator.geolocation != null) {
+          html.push('<button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>');
+        }
+        return html.join('');
+      };
+
+      return Timezone;
+
+    })(Backbone.Form.editors.Select);
+    InfoForm = (function(_super) {
+
+      __extends(InfoForm, _super);
+
+      function InfoForm() {
+        return InfoForm.__super__.constructor.apply(this, arguments);
+      }
+
+      InfoForm.prototype.template = require('jade!../templates/info-form')();
+
+      InfoForm.prototype.schema = {
+        name: {
+          title: 'Name',
+          type: 'Text',
+          validators: ['required']
+        },
+        email: {
+          title: 'Email',
+          type: 'Text'
+        },
+        starting_weekday: {
+          title: 'Weeks start on',
+          type: ButtonRadio,
+          options: function(callback) {
+            var day;
+            return callback((function() {
+              var _i, _results;
+              _results = [];
+              for (day = _i = 0; _i <= 6; day = ++_i) {
+                _results.push({
+                  val: day,
+                  label: moment().day(day).format('ddd').slice(0, 1)
+                });
+              }
+              return _results;
+            })());
+          }
+        },
+        timezone: {
+          title: 'Timezone',
+          type: Timezone,
+          options: function(callback) {
+            return $.get('/api/timezones', function(data) {
+              var result;
+              result = _.map(data, function(obj) {
+                return {
+                  val: _.keys(obj)[0],
+                  label: _.values(obj)[0]
+                };
+              });
+              return callback(result);
+            });
+          }
+        },
+        email_permission: {
+          title: 'Do you want to receive email updates about Standards?',
+          type: 'Checkbox'
+        }
+      };
+
+      InfoForm.prototype.fieldsets = [
+        {
+          legend: 'Info',
+          fields: ['name', 'email', 'starting_weekday', 'timezone', 'email_permission']
+        }
+      ];
+
+      return InfoForm;
+
+    })(Form);
+    PasswordForm = (function(_super) {
+
+      __extends(PasswordForm, _super);
+
+      function PasswordForm() {
+        return PasswordForm.__super__.constructor.apply(this, arguments);
+      }
+
+      PasswordForm.prototype.template = require('jade!../templates/password-form')();
+
+      PasswordForm.prototype.templateHelpers = {
+        weekdayFromIndex: function(index) {
+          return moment().day(index).format('d');
+        }
+      };
+
+      PasswordForm.prototype.schema = {
+        current_password: {
+          title: 'Current Password',
+          type: 'Password'
+        },
+        new_password: {
+          title: 'New Password',
+          type: 'Password'
+        }
+      };
+
+      PasswordForm.prototype.fieldsets = [
+        {
+          legend: 'Change Password',
+          fields: ['current_password', 'new_password']
+        }
+      ];
+
+      return PasswordForm;
+
+    })(Form);
     ErrorView = (function(_super) {
 
       __extends(ErrorView, _super);
@@ -657,7 +924,11 @@
 
       App.prototype.showSettings = function() {
         this.router.navigate('settings');
-        return this.body.show(this.settingsView = new SettingsView({
+        this.body.show(this.settingsView = new SettingsView);
+        this.settingsView.info.show(this.infoForm = new InfoForm({
+          model: this.user
+        }));
+        return this.settingsView.password.show(this.passwordForm = new PasswordForm({
           model: this.user
         }));
       };
