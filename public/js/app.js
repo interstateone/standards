@@ -10,7 +10,6 @@
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('moment');
-    require('jstz');
     require('plugins');
     User = require('user');
     Task = require('task');

@@ -15,7 +15,6 @@
       'backbone-forms-bootstrap': 'lib/backbone-forms.bootstrap',
       'backbone-forms-modal': 'lib/backbone-forms.bootstrap-modal',
       moment: 'lib/moment',
-      jstz: 'lib/jstz',
       plugins: 'plugins',
       app: 'app'
     },

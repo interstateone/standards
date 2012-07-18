@@ -6,7 +6,6 @@ define (require) ->
   Backbone = require 'backbone'
   Marionette = require 'marionette'
   require 'moment'
-  require 'jstz'
 
   # App Libs
   require 'plugins'
