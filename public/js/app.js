@@ -651,10 +651,24 @@
 
       PasswordForm.prototype.template = require('jade!../templates/password-form')();
 
-      PasswordForm.prototype.templateHelpers = {
-        weekdayFromIndex: function(index) {
-          return moment().day(index).format('d');
-        }
+      PasswordForm.prototype.events = {
+        'click button[type="submit"]': 'commitChanges'
+      };
+
+      PasswordForm.prototype.commitChanges = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return $.ajax({
+          url: '/api/user/password',
+          type: 'POST',
+          data: JSON.stringify({
+            current_password: this.$('input[name="current_password"]').val(),
+            new_password: this.$('input[name="new_password"]').val()
+          }),
+          success: function() {
+            return app.vent.trigger('notice', 'Your password has been updated.');
+          }
+        });
       };
 
       PasswordForm.prototype.schema = {
@@ -975,9 +989,7 @@
         this.settingsView.info.show(this.infoForm = new InfoForm({
           model: this.user
         }));
-        return this.settingsView.password.show(this.passwordForm = new PasswordForm({
-          model: this.user
-        }));
+        return this.settingsView.password.show(this.passwordForm = new PasswordForm);
       };
 
       App.prototype.showTask = function(id) {

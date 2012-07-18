@@ -326,8 +326,18 @@ define (require) ->
 
   class PasswordForm extends Form
     template: require('jade!../templates/password-form')()
-    templateHelpers:
-      weekdayFromIndex: (index) -> moment().day(index).format 'd'
+    events:
+      'click button[type="submit"]': 'commitChanges'
+    commitChanges: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      $.ajax
+        url: '/api/user/password'
+        type: 'POST'
+        data: JSON.stringify
+          current_password: @$('input[name="current_password"]').val()
+          new_password: @$('input[name="new_password"]').val()
+        success: -> app.vent.trigger 'notice', 'Your password has been updated.'
     schema:
       current_password:
         title: 'Current Password'
@@ -499,7 +509,7 @@ define (require) ->
       @router.navigate 'settings'
       @body.show @settingsView = new SettingsView
       @settingsView.info.show @infoForm = new InfoForm model: @user
-      @settingsView.password.show @passwordForm = new PasswordForm model: @user
+      @settingsView.password.show @passwordForm = new PasswordForm
     showTask: (id) ->
       task = @tasks.get id
       unless task?
