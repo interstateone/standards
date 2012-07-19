@@ -554,6 +554,11 @@ define (require) ->
       # Events
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       $(window).bind 'resize', => @toggleWidth()
+      $(window).bind 'keyup', (e) =>
+        key = e.which ? e.keyCode
+        switch key
+          when 37 then @vent.trigger 'app:moveBackward'
+          when 39 then @vent.trigger 'app:moveForward'
 
       app.vent.on 'task:check', @check, @
       app.vent.on 'task:uncheck', @uncheck, @

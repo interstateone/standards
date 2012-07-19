@@ -1090,6 +1090,16 @@
         $(window).bind('resize', function() {
           return _this.toggleWidth();
         });
+        $(window).bind('keyup', function(e) {
+          var key, _ref;
+          key = (_ref = e.which) != null ? _ref : e.keyCode;
+          switch (key) {
+            case 37:
+              return _this.vent.trigger('app:moveBackward');
+            case 39:
+              return _this.vent.trigger('app:moveForward');
+          }
+        });
         app.vent.on('task:check', this.check, this);
         app.vent.on('task:uncheck', this.uncheck, this);
         app.vent.on('error', this.showError, this);
