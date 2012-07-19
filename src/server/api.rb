@@ -16,6 +16,9 @@ class API < Sinatra::Base
 	require 'active_support/core_ext/time/conversions'
 	require_relative 'workers/emailworker'
 
+	use Rack::Cache
+	use Rack::Deflater
+
 	configure :production do
 		DataMapper.setup(:default, ENV['DATABASE_URL'])
 		use Rack::Session::Cookie, :expire_after => 2592000

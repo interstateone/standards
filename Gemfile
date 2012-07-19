@@ -22,6 +22,7 @@ gem 'foreman', '0.27.0'
 gem 'thin'
 gem 'garb'
 gem 'json'
+gem 'rack-cache'
 
 group :test do
 	gem 'rack-test', :require => 'rack/test'

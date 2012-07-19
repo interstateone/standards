@@ -12,6 +12,9 @@ class Standards < Sinatra::Base
 	require_relative 'workers/emailworker'
 	register Sinatra::Flash
 
+	use Rack::Cache
+	use Rack::Deflater
+
 	SITE_TITLE = "Standards"
 
 	configure :production do
