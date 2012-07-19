@@ -545,11 +545,11 @@ define (require) ->
       Backbone.history.start
         pushState: true
 
-      $(document).ajaxError (e, xhr, settings, error) ->
+      $(document).ajaxError (e, xhr, settings, error) =>
         switch xhr.status
-          when 401 then app.vent.trigger 'error', 'Authentication error, try logging in again.'
-          when 404 then app.vent.trigger 'error', 'The server didn\'t understand that action.'
-          when 500 then app.vent.trigger 'error', 'There was a server error, try again.'
+          when 401 then @vent.trigger 'error', 'Authentication error, try logging in again.'
+          when 404 then @vent.trigger 'error', 'The server didn\'t understand that action.'
+          when 500 then @vent.trigger 'error', 'There was a server error, try again.'
 
       # Events
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
