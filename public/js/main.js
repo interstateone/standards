@@ -13,7 +13,6 @@
       relational: 'lib/backbone-relational',
       'backbone-forms': 'lib/backbone-forms',
       'backbone-forms-bootstrap': 'lib/backbone-forms.bootstrap',
-      'backbone-forms-modal': 'lib/backbone-forms.bootstrap-modal',
       moment: 'lib/moment',
       hammer: 'lib/hammer',
       'jquery-hammer': 'lib/jquery.hammer',
@@ -21,22 +20,9 @@
       app: 'app'
     },
     shim: {
-      'underscore': {
-        deps: ['jquery'],
-        exports: '_'
-      },
-      'backbone': {
-        deps: ['jquery', 'underscore'],
-        exports: 'Backbone'
-      },
-      'marionette': {
-        deps: ['backbone'],
-        exports: 'Marionette'
-      },
-      'relational': ['backbone'],
-      'backbone-forms-modal': ['backbone-forms'],
+      relational: ['backbone'],
       'jquery-hammer': ['jquery', 'hammer'],
-      'plugins': ['jquery']
+      plugins: ['jquery']
     }
   });
 
