@@ -6,6 +6,7 @@ define (require) ->
   Backbone = require 'backbone'
   Marionette = require 'marionette'
   require 'moment'
+  require 'jquery-hammer'
 
   # App Libs
   require 'plugins'
@@ -556,6 +557,10 @@ define (require) ->
       @offset = offset
       if offset then @router.navigate 'offset/' + @offset
       else @router.navigate ''
+      $(@body.el).hammer().bind 'swipe', (ev) =>
+        switch ev.direction
+          when 'left' then @vent.trigger 'app:moveForward'
+          when 'right' then @vent.trigger 'app:moveBackward'
       @body.show @tasksView = new TasksView collection: @tasks
     showSettings: ->
       @router.navigate 'settings'

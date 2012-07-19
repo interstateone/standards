@@ -10,6 +10,7 @@
     Backbone = require('backbone');
     Marionette = require('marionette');
     require('moment');
+    require('jquery-hammer');
     require('plugins');
     User = require('user');
     Task = require('task');
@@ -1059,6 +1060,15 @@
           el: '.flash'
         });
         return this.navigation.show(this.navBar);
+        this.navigation.show(this.navBar);
+        return $(this.body.el).hammer().bind('swipe', function(ev) {
+          switch (ev.direction) {
+            case 'left':
+              return _this.vent.trigger('app:moveForward');
+            case 'right':
+              return _this.vent.trigger('app:moveBackward');
+          }
+        });
       };
 
       App.prototype.showTasks = function(offset) {

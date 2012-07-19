@@ -15,6 +15,8 @@
       'backbone-forms-bootstrap': 'lib/backbone-forms.bootstrap',
       'backbone-forms-modal': 'lib/backbone-forms.bootstrap-modal',
       moment: 'lib/moment',
+      hammer: 'lib/hammer',
+      'jquery-hammer': 'lib/jquery.hammer',
       plugins: 'plugins',
       app: 'app'
     },
@@ -33,6 +35,10 @@
       },
       'relational': ['backbone'],
       'backbone-forms-modal': ['backbone-forms'],
+      hammer: {
+        exports: 'Hammer'
+      },
+      'jquery-hammer': ['jquery', 'hammer'],
       'plugins': ['jquery']
     }
   });
