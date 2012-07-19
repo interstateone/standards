@@ -1,23 +1,36 @@
 ({
-    appDir: '.',
-    baseUrl: 'lib',
-    //Uncomment to turn off uglify minification.
-    //optimize: 'none',
-    dir: '../demo-build',
-    paths: {
-        jade: '../../jade'
+    mainConfigFile: '../public/js/main.js',
+    baseUrl: '../public/js/',
+    include: ["main"],
+    name: 'main',
+    out: "../public/js/main-built.js",
+    optimize: "none",
+    uglify: {
+        toplevel: true,
+        ascii_only: true,
+        beautify: true,
+        max_line_length: 1000
     },
-    //This pragma excludes the CoffeeScript compiler code
-    //from the optimized source, since all CoffeeScript files
-    //are converted and inlined into the main.js built file.
-    //If you still want to allow dynamic loading of CoffeeScript
-    //files after a build, comment out the pragmasOnSave section.
+    inlineText: true,
+    useStrict: false,
     pragmasOnSave: {
-        excludeJade: true
+        // excludeJade : true
     },
-    modules: [
-        {
-            name: "main"
-        }
-    ]
+    skipModuleInsertion: false,
+    stubModules: ['text', 'jade'],
+    optimizeAllPluginResources: false,
+    findNestedDependencies: false,
+    removeCombined: false,
+    preserveLicenseComments: false,
+
+    //Sets the logging level. It is a number. If you want "silent" running,
+    //set logLevel to 4. From the logger.js file:
+    //TRACE: 0,
+    //INFO: 1,
+    //WARN: 2,
+    //ERROR: 3,
+    //SILENT: 4
+    //Default is 0.
+    logLevel: 0,
+    cjsTranslate: true
 })
