@@ -14,10 +14,10 @@
     inlineText: true,
     useStrict: false,
     pragmasOnSave: {
-        // excludeJade : true
+        excludeJade : true
     },
     skipModuleInsertion: false,
-    stubModules: ['text', 'jade'],
+    stubModules: ['text'],
     optimizeAllPluginResources: false,
     findNestedDependencies: false,
     removeCombined: false,
