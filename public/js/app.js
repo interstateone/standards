@@ -1239,9 +1239,9 @@
       }
 
       AppRouter.prototype.appRoutes = {
-        '': 'showTasks',
         'settings': 'showSettings',
-        'task/:id': 'showTask'
+        'task/:id': 'showTask',
+        '*anything': 'showTasks'
       };
 
       return AppRouter;

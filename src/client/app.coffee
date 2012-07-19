@@ -628,9 +628,9 @@ define (require) ->
 
   class AppRouter extends Backbone.Marionette.AppRouter
     appRoutes:
-      '': 'showTasks'
       'settings': 'showSettings'
       'task/:id': 'showTask'
+      '*anything': 'showTasks'
 
   initialize = ->
      window.app = new App
