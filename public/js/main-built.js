@@ -21727,8 +21727,11 @@ buf.push(attrs({ "class": ("ministat") }, {"class":true}));
 buf.push('><div');
 buf.push(attrs({ "class": ("minibar") }, {"class":true}));
 buf.push('></div></div><a');
-buf.push(attrs({ 'title':("<%= purpose %>"), "class": ("task") }, {"class":true,"title":true}));
-buf.push('><%= title %></a></td>');
+buf.push(attrs({ 'title':(purpose), "class": ("task") }, {"class":true,"title":true}));
+buf.push('>');
+var __val__ = title
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</a></td>');
 }
 return buf.join("");
 }});
@@ -21738,7 +21741,33 @@ var attrs = jade.attrs, escape = jade.escape, rethrow = jade.rethrow;
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<thead><tr><th></th><% _.each(getWeekdaysAsArray(true), function (day) { %><th><%= day.format(\'ddd\') %></th><% }); %></tr></thead><tfoot><tr><td');
+buf.push('<thead><tr><th></th>');
+// iterate getWeekdaysAsArray(true)
+;(function(){
+  if ('number' == typeof getWeekdaysAsArray(true).length) {
+    for (var $index = 0, $$l = getWeekdaysAsArray(true).length; $index < $$l; $index++) {
+      var day = getWeekdaysAsArray(true)[$index];
+
+buf.push('<th>');
+var __val__ = day.format('ddd')
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</th>');
+    }
+  } else {
+    for (var $index in getWeekdaysAsArray(true)) {
+      if (getWeekdaysAsArray(true).hasOwnProperty($index)){      var day = getWeekdaysAsArray(true)[$index];
+
+buf.push('<th>');
+var __val__ = day.format('ddd')
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</th>');
+      }
+
+   }
+  }
+}).call(this);
+
+buf.push('</tr></thead><tfoot><tr><td');
 buf.push(attrs({ 'style':("height: 50px;"), 'colspan':("8"), "class": ("title add") }, {"class":true,"style":true,"colspan":true}));
 buf.push('><div');
 buf.push(attrs({ "class": ("ministat") }, {"class":true}));
@@ -21796,7 +21825,10 @@ buf.push('></i><b');
 buf.push(attrs({ "class": ('caret') }, {}));
 buf.push('></b></a><ul');
 buf.push(attrs({ "class": ('dropdown-menu') }, {}));
-buf.push('><li><p><%= name %></p></li><li');
+buf.push('><li><p>');
+var __val__ = name
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</p></li><li');
 buf.push(attrs({ "class": ('divider') }, {}));
 buf.push('></li><li><a');
 buf.push(attrs({ 'href':("/settings"), 'title':("Settings"), "class": ('settings') }, {"href":true,"title":true}));
@@ -21862,7 +21894,10 @@ buf.push('<div');
 buf.push(attrs({ "class": ('alert') + ' ' + ('alert-error') + ' ' + ('fade') + ' ' + ('in') }, {}));
 buf.push('><a');
 buf.push(attrs({ 'data-dismiss':("alert"), "class": ('close') }, {"data-dismiss":true}));
-buf.push('>&times;</a><p><%= message %></p></div>');
+buf.push('>&times;</a><p>');
+var __val__ = message
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</p></div>');
 }
 return buf.join("");
 }});
@@ -21876,7 +21911,10 @@ buf.push('<div');
 buf.push(attrs({ "class": ('alert') + ' ' + ('alert-info') + ' ' + ('fade') + ' ' + ('in') }, {}));
 buf.push('><a');
 buf.push(attrs({ 'data-dismiss':("alert"), "class": ('close') }, {"data-dismiss":true}));
-buf.push('>&times;</a><p><%= message %></p></div>');
+buf.push('>&times;</a><p>');
+var __val__ = message
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</p></div>');
 }
 return buf.join("");
 }});
@@ -21886,7 +21924,10 @@ var attrs = jade.attrs, escape = jade.escape, rethrow = jade.rethrow;
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2><%= titleCase(title) %></h2><p>Remember! You\'re doing this because <%= switchPronouns(purpose) %>.</p><div');
+buf.push('<h2>');
+var __val__ = titleCase(title)
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</h2><p>Remember! You\'re doing this because ' + escape((interp = switchPronouns(purpose)) == null ? '' : interp) + '.</p><div');
 buf.push(attrs({ "class": ('row-fluid') }, {}));
 buf.push('><div');
 buf.push(attrs({ "class": ('span3') }, {}));
@@ -21894,21 +21935,87 @@ buf.push('><div');
 buf.push(attrs({ "class": ('well') }, {}));
 buf.push('><span');
 buf.push(attrs({ "class": ('large-stat') }, {}));
-buf.push('><%= percentComplete %>%</span><p>Completion</p></div></div><div');
+buf.push('>' + escape((interp = percentComplete) == null ? '' : interp) + '%</span><p>Completion</p></div></div><div');
 buf.push(attrs({ "class": ('span3') }, {}));
 buf.push('><div');
 buf.push(attrs({ "class": ('well') }, {}));
-buf.push('><% if (count > 0) { %><p>You\'ve done this</p><span');
+buf.push('>');
+if ( count > 0)
+{
+buf.push('<p>You\'ve done this</p><span');
 buf.push(attrs({ "class": ('large-stat') }, {}));
-buf.push('><%= count %></span><p><%= pluralize(\'time\', count) %> since you started <%= timeAgo %>.</p><% } else { %><p>You haven\'t done this since you started <%= timeAgo %>.</p><% } %></div></div><div');
+buf.push('>');
+var __val__ = count
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</span><p>' + escape((interp = pluralize('time', count)) == null ? '' : interp) + ' since you started ' + escape((interp = timeAgo) == null ? '' : interp) + '.</p>');
+}
+else
+{
+buf.push('<p>You haven\'t done this since you started ' + escape((interp = timeAgo) == null ? '' : interp) + '.</p>');
+}
+buf.push('</div></div><div');
 buf.push(attrs({ "class": ('span6') }, {}));
 buf.push('><div');
 buf.push(attrs({ "class": ('well') }, {}));
 buf.push('><h3>Weekday Heatmap</h3><table');
 buf.push(attrs({ "class": ('weekday-heatmap') }, {}));
-buf.push('><thead><tr></tr><% _.each(heatmapHeader(), function (day) { %><th><%= day.format(\'ddd\').slice(0,1) %></th><% }); %></thead><tbody><tr></tr><% _.each(heatmap, function (day) { %><td');
-buf.push(attrs({ 'style':("background-color: <%= day.temp %>") }, {"style":false}));
-buf.push('><%= day.count %></td><% }); %></tbody></table></div></div></div><a');
+buf.push('><thead><tr></tr>');
+// iterate heatmapHeader()
+;(function(){
+  if ('number' == typeof heatmapHeader().length) {
+    for (var $index = 0, $$l = heatmapHeader().length; $index < $$l; $index++) {
+      var day = heatmapHeader()[$index];
+
+buf.push('<th>');
+var __val__ = day.format('ddd').slice(0,1)
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</th>');
+    }
+  } else {
+    for (var $index in heatmapHeader()) {
+      if (heatmapHeader().hasOwnProperty($index)){      var day = heatmapHeader()[$index];
+
+buf.push('<th>');
+var __val__ = day.format('ddd').slice(0,1)
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</th>');
+      }
+
+   }
+  }
+}).call(this);
+
+buf.push('</thead><tbody><tr></tr>');
+// iterate heatmap
+;(function(){
+  if ('number' == typeof heatmap.length) {
+    for (var $index = 0, $$l = heatmap.length; $index < $$l; $index++) {
+      var day = heatmap[$index];
+
+buf.push('<td');
+buf.push(attrs({ 'style':("background-color: " + (day.temp) + "") }, {"style":true}));
+buf.push('>');
+var __val__ = day.count
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</td>');
+    }
+  } else {
+    for (var $index in heatmap) {
+      if (heatmap.hasOwnProperty($index)){      var day = heatmap[$index];
+
+buf.push('<td');
+buf.push(attrs({ 'style':("background-color: " + (day.temp) + "") }, {"style":true}));
+buf.push('>');
+var __val__ = day.count
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</td>');
+      }
+
+   }
+  }
+}).call(this);
+
+buf.push('</tbody></table></div></div></div><a');
 buf.push(attrs({ "class": ('delete') + ' ' + ('btn') + ' ' + ('btn-danger') + ' ' + ('pull-right') }, {}));
 buf.push('>Delete</a><div');
 buf.push(attrs({ "class": ('modal') + ' ' + ('hide') + ' ' + ('fade') + ' ' + ('deleteModal') }, {}));
@@ -21916,7 +22023,7 @@ buf.push('><div');
 buf.push(attrs({ "class": ('modal-header') }, {}));
 buf.push('><h3>Delete</h3></div><div');
 buf.push(attrs({ "class": ('modal-body') }, {}));
-buf.push('><p>Are you sure you want to delete the task "<%= title %>"?</p></div><div');
+buf.push('><p>Are you sure you want to delete the task "' + escape((interp = title) == null ? '' : interp) + '"?</p></div><div');
 buf.push(attrs({ "class": ('modal-footer') }, {}));
 buf.push('><a');
 buf.push(attrs({ 'href':("#"), 'data-dismiss':("modal"), "class": ('btn') }, {"href":true,"data-dismiss":true}));
@@ -21979,7 +22086,7 @@ return buf.join("");
 
     })(Backbone.Collection);
     Backbone.Marionette.Renderer.render = function(template, data) {
-      return _.template(template, data);
+      return template(data);
     };
     jQuery.fn.reset = function() {
       return $(this).each(function() {
@@ -22061,7 +22168,7 @@ return buf.join("");
 
       CheckView.prototype.tagName = 'td';
 
-      CheckView.prototype.template = require('jade!../templates/check')();
+      CheckView.prototype.template = require('jade!../templates/check');
 
       CheckView.prototype.initialize = function() {
         if (this.model.isNew != null) {
@@ -22084,7 +22191,7 @@ return buf.join("");
       };
 
       CheckView.prototype.render = function() {
-        this.$el.html(this.template);
+        this.$el.html(this.template());
         if (this.model.isNew != null) {
           this.$('img').addClass('complete');
         }
@@ -22104,7 +22211,7 @@ return buf.join("");
 
       TaskRowView.prototype.tagName = 'tr';
 
-      TaskRowView.prototype.template = require('jade!../templates/task-row')();
+      TaskRowView.prototype.template = require('jade!../templates/task-row');
 
       TaskRowView.prototype.itemView = CheckView;
 
@@ -22213,7 +22320,7 @@ return buf.join("");
 
       TasksView.prototype.itemViewContainer = 'tbody';
 
-      TasksView.prototype.template = require('jade!../templates/tasks-table')();
+      TasksView.prototype.template = require('jade!../templates/tasks-table');
 
       TasksView.prototype.events = {
         'click a.add': 'clickedAdd',
@@ -22301,7 +22408,7 @@ return buf.join("");
         return NavBarView.__super__.constructor.apply(this, arguments);
       }
 
-      NavBarView.prototype.template = require('jade!../templates/navbar')();
+      NavBarView.prototype.template = require('jade!../templates/navbar');
 
       NavBarView.prototype.events = {
         'click .brand': 'clickedHome',
@@ -22363,7 +22470,7 @@ return buf.join("");
         return SettingsView.__super__.constructor.apply(this, arguments);
       }
 
-      SettingsView.prototype.template = require('jade!../templates/settings')();
+      SettingsView.prototype.template = require('jade!../templates/settings');
 
       SettingsView.prototype.regions = {
         info: '.info',
@@ -22722,10 +22829,10 @@ return buf.join("");
         return ErrorView.__super__.constructor.apply(this, arguments);
       }
 
-      ErrorView.prototype.template = require('jade!../templates/error-flash')();
+      ErrorView.prototype.template = require('jade!../templates/error-flash');
 
       ErrorView.prototype.render = function() {
-        return this.$el.html(_.template(this.template, this.serializeData()));
+        return this.$el.html(this.template(this.serializeData()));
       };
 
       ErrorView.prototype.serializeData = function() {
@@ -22745,10 +22852,10 @@ return buf.join("");
         return NoticeView.__super__.constructor.apply(this, arguments);
       }
 
-      NoticeView.prototype.template = require('jade!../templates/notice-flash')();
+      NoticeView.prototype.template = require('jade!../templates/notice-flash');
 
       NoticeView.prototype.render = function() {
-        return this.$el.html(_.template(this.template, this.serializeData()));
+        return this.$el.html(this.template(this.serializeData()));
       };
 
       NoticeView.prototype.serializeData = function() {
@@ -22768,7 +22875,7 @@ return buf.join("");
         return TaskView.__super__.constructor.apply(this, arguments);
       }
 
-      TaskView.prototype.template = require('jade!../templates/taskview')();
+      TaskView.prototype.template = require('jade!../templates/taskview');
 
       TaskView.prototype.events = {
         'click a.delete': 'clickedDelete',
