@@ -611,7 +611,9 @@ define (require) ->
         success: =>
           $(".deleteModal").modal 'hide'
           @showTasks()
-    showError: (message) -> @flash.append error = new ErrorView message: message
+    showError: (message) ->
+      @flash.append error = new ErrorView message: message
+      window.setTimeout (=> error.$(".alert").alert('close')), 2000
     showNotice: (message) ->
       @flash.append notice = new NoticeView message: message
       window.setTimeout (=> notice.$(".alert").alert('close')), 2000
