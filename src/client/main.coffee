@@ -28,8 +28,6 @@ require.config
       exports: 'Marionette'
     'relational': ['backbone']
     'backbone-forms-modal': ['backbone-forms']
-    hammer:
-      exports: 'Hammer'
     'jquery-hammer': ['jquery', 'hammer']
     'plugins': ['jquery']
 
