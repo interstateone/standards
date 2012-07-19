@@ -209,6 +209,8 @@ define (require) ->
       app.vent.trigger 'app:moveForward'
     clickedMoveBackward: ->
       app.vent.trigger 'app:moveBackward'
+    showArrows: -> @$('.arrow').each -> $(@).show()
+    hideArrows: -> @$('.arrow').each -> $(@).hide()
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
@@ -553,7 +555,6 @@ define (require) ->
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       $(window).bind 'resize', => @toggleWidth()
 
-
       app.vent.on 'task:check', @check, @
       app.vent.on 'task:uncheck', @uncheck, @
       app.vent.on 'error', @showError, @
@@ -583,9 +584,11 @@ define (require) ->
     showTasks: ->
       @offset = 0
       @router.navigate ''
+      @navBar.showArrows()
       @body.show @tasksView = new TasksView collection: @tasks
     showSettings: ->
       @router.navigate 'settings'
+      @navBar.hideArrows()
       @body.show @settingsView = new SettingsView
       @settingsView.info.show @infoForm = new InfoForm model: @user
       @settingsView.password.show @passwordForm = new PasswordForm
@@ -596,6 +599,7 @@ define (require) ->
         @showError 'That task doesn\'t exist.'
       else
         @router.navigate "task/#{ task.id }"
+        @navBar.hideArrows()
         @body.show @taskView = new TaskView model: task
     deleteTask: (id) ->
       @tasks.get(id).destroy

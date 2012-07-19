@@ -411,6 +411,18 @@
         return app.vent.trigger('app:moveBackward');
       };
 
+      NavBarView.prototype.showArrows = function() {
+        return this.$('.arrow').each(function() {
+          return $(this).show();
+        });
+      };
+
+      NavBarView.prototype.hideArrows = function() {
+        return this.$('.arrow').each(function() {
+          return $(this).hide();
+        });
+      };
+
       return NavBarView;
 
     })(Backbone.Marionette.ItemView);
@@ -1122,6 +1134,7 @@
       App.prototype.showTasks = function() {
         this.offset = 0;
         this.router.navigate('');
+        this.navBar.showArrows();
         return this.body.show(this.tasksView = new TasksView({
           collection: this.tasks
         }));
@@ -1129,6 +1142,7 @@
 
       App.prototype.showSettings = function() {
         this.router.navigate('settings');
+        this.navBar.hideArrows();
         this.body.show(this.settingsView = new SettingsView);
         this.settingsView.info.show(this.infoForm = new InfoForm({
           model: this.user
@@ -1144,6 +1158,7 @@
           return this.showError('That task doesn\'t exist.');
         } else {
           this.router.navigate("task/" + task.id);
+          this.navBar.hideArrows();
           return this.body.show(this.taskView = new TaskView({
             model: task
           }));
