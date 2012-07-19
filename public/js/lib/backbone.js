@@ -4,15 +4,26 @@
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
-
-(function(){
+(function(root, factory) {
+  // Set up Backbone appropriately for the environment.
+  if (typeof exports !== 'undefined') {
+    // Node/CommonJS, no need for jQuery in that case.
+    factory(root, exports, require('underscore'));
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['underscore', 'jquery', 'exports'], function(_, $, exports) {
+      // Export global even in AMD case in case this script is loaded with
+      // others that may still expect a global Backbone.
+      root.Backbone = factory(root, exports, _, $);
+    });
+  } else {
+    // Browser globals
+    root.Backbone = factory(root, {}, root._, (root.jQuery || root.Zepto || root.ender));
+  }
+}(this, function(root, Backbone, _, $) {
 
   // Initial Setup
   // -------------
-
-  // Save a reference to the global object (`window` in the browser, `global`
-  // on the server).
-  var root = this;
 
   // Save the previous value of the `Backbone` variable, so that it can be
   // restored later on, if `noConflict` is used.
@@ -22,24 +33,8 @@
   var slice = Array.prototype.slice;
   var splice = Array.prototype.splice;
 
-  // The top-level namespace. All public Backbone classes and modules will
-  // be attached to this. Exported for both CommonJS and the browser.
-  var Backbone;
-  if (typeof exports !== 'undefined') {
-    Backbone = exports;
-  } else {
-    Backbone = root.Backbone = {};
-  }
-
   // Current version of the library. Keep in sync with `package.json`.
   Backbone.VERSION = '0.9.2';
-
-  // Require Underscore, if we're on the server, and it's not already present.
-  var _ = root._;
-  if (!_ && (typeof require !== 'undefined')) _ = require('underscore');
-
-  // For Backbone's purposes, jQuery, Zepto, or Ender owns the `$` variable.
-  var $ = root.jQuery || root.Zepto || root.ender;
 
   // Set the JavaScript library that will be used for DOM manipulation and
   // Ajax calls (a.k.a. the `$` variable). By default Backbone will use: jQuery,
@@ -54,7 +49,7 @@
   // to its previous owner. Returns a reference to this Backbone object.
   Backbone.noConflict = function() {
     root.Backbone = previousBackbone;
-    return this;
+    return Backbone;
   };
 
   // Turn on `emulateHTTP` to support legacy HTTP servers. Setting this option
@@ -103,7 +98,10 @@
         node.next = tail = {};
         node.context = context;
         node.callback = callback;
-        calls[event] = {tail: tail, next: list ? list.next : node};
+        calls[event] = {
+          tail: tail,
+          next: list ? list.next : node
+        };
       }
 
       return this;
@@ -178,7 +176,7 @@
   };
 
   // Aliases for backwards compatibility.
-  Events.bind   = Events.on;
+  Events.bind = Events.on;
   Events.unbind = Events.off;
 
   // Backbone.Model
@@ -187,27 +185,29 @@
   // Create a new model, with defined attributes. A client id (`cid`)
   // is automatically generated and assigned for you.
   var Model = Backbone.Model = function(attributes, options) {
-    var defaults;
-    attributes || (attributes = {});
-    if (options && options.parse) attributes = this.parse(attributes);
-    if (defaults = getValue(this, 'defaults')) {
-      attributes = _.extend({}, defaults, attributes);
-    }
-    if (options && options.collection) this.collection = options.collection;
-    this.attributes = {};
-    this._escapedAttributes = {};
-    this.cid = _.uniqueId('c');
-    this.changed = {};
-    this._silent = {};
-    this._pending = {};
-    this.set(attributes, {silent: true});
-    // Reset change tracking.
-    this.changed = {};
-    this._silent = {};
-    this._pending = {};
-    this._previousAttributes = _.clone(this.attributes);
-    this.initialize.apply(this, arguments);
-  };
+      var defaults;
+      attributes || (attributes = {});
+      if (options && options.parse) attributes = this.parse(attributes);
+      if (defaults = getValue(this, 'defaults')) {
+        attributes = _.extend({}, defaults, attributes);
+      }
+      if (options && options.collection) this.collection = options.collection;
+      this.attributes = {};
+      this._escapedAttributes = {};
+      this.cid = _.uniqueId('c');
+      this.changed = {};
+      this._silent = {};
+      this._pending = {};
+      this.set(attributes, {
+        silent: true
+      });
+      // Reset change tracking.
+      this.changed = {};
+      this._silent = {};
+      this._pending = {};
+      this._previousAttributes = _.clone(this.attributes);
+      this.initialize.apply(this, arguments);
+    };
 
   // Attach all inheritable methods to the Model prototype.
   _.extend(Model.prototype, Events, {
@@ -229,7 +229,7 @@
 
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
-    initialize: function(){},
+    initialize: function() {},
 
     // Return a copy of the model's `attributes` object.
     toJSON: function(options) {
@@ -367,7 +367,9 @@
       }
 
       // Regular saves `set` attributes before persisting to the server.
-      var silentOptions = _.extend({}, options, {silent: true});
+      var silentOptions = _.extend({}, options, {
+        silent: true
+      });
       if (attrs && !this.set(attrs, options.wait ? silentOptions : options)) {
         return false;
       }
@@ -407,8 +409,8 @@
       var success = options.success;
 
       var triggerDestroy = function() {
-        model.trigger('destroy', model, model.collection, options);
-      };
+          model.trigger('destroy', model, model.collection, options);
+        };
 
       if (this.isNew()) {
         triggerDestroy();
@@ -505,7 +507,8 @@
     // determining if there *would be* a change.
     changedAttributes: function(diff) {
       if (!diff) return this.hasChanged() ? _.clone(this.changed) : false;
-      var val, changed = false, old = this._previousAttributes;
+      var val, changed = false,
+        old = this._previousAttributes;
       for (var attr in diff) {
         if (_.isEqual(old[attr], (val = diff[attr]))) continue;
         (changed || (changed = {}))[attr] = val;
@@ -557,13 +560,16 @@
   // or unordered. If a `comparator` is specified, the Collection will maintain
   // its models in sort order, as they're added and removed.
   var Collection = Backbone.Collection = function(models, options) {
-    options || (options = {});
-    if (options.model) this.model = options.model;
-    if (options.comparator) this.comparator = options.comparator;
-    this._reset();
-    this.initialize.apply(this, arguments);
-    if (models) this.reset(models, {silent: true, parse: options.parse});
-  };
+      options || (options = {});
+      if (options.model) this.model = options.model;
+      if (options.comparator) this.comparator = options.comparator;
+      this._reset();
+      this.initialize.apply(this, arguments);
+      if (models) this.reset(models, {
+        silent: true,
+        parse: options.parse
+      });
+    };
 
   // Define the Collection's inheritable methods.
   _.extend(Collection.prototype, Events, {
@@ -574,18 +580,22 @@
 
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
-    initialize: function(){},
+    initialize: function() {},
 
     // The JSON representation of a Collection is an array of the
     // models' attributes.
     toJSON: function(options) {
-      return this.map(function(model){ return model.toJSON(options); });
+      return this.map(function(model) {
+        return model.toJSON(options);
+      });
     },
 
     // Add a model, or list of models to the set. Pass **silent** to avoid
     // firing the `add` event for every new model.
     add: function(models, options) {
-      var i, index, length, model, cid, id, cids = {}, ids = {}, dups = [];
+      var i, index, length, model, cid, id, cids = {},
+        ids = {},
+        dups = [];
       options || (options = {});
       models = _.isArray(models) ? models.slice() : [models];
 
@@ -623,7 +633,9 @@
       this.length += length;
       index = options.at != null ? options.at : this.models.length;
       splice.apply(this.models, [index, 0].concat(models));
-      if (this.comparator) this.sort({silent: true});
+      if (this.comparator) this.sort({
+        silent: true
+      });
       if (options.silent) return this;
       for (i = 0, length = this.models.length; i < length; i++) {
         if (!cids[(model = this.models[i]).cid]) continue;
@@ -673,7 +685,9 @@
     // Add a model to the beginning of the collection.
     unshift: function(model, options) {
       model = this._prepareModel(model, options);
-      this.add(model, _.extend({at: 0}, options));
+      this.add(model, _.extend({
+        at: 0
+      }, options));
       return model;
     },
 
@@ -729,20 +743,24 @@
 
     // Pluck an attribute from each model in the collection.
     pluck: function(attr) {
-      return _.map(this.models, function(model){ return model.get(attr); });
+      return _.map(this.models, function(model) {
+        return model.get(attr);
+      });
     },
 
     // When you have more items than you want to add or remove individually,
     // you can reset the entire set with a new list of models, without firing
     // any `add` or `remove` events. Fires `reset` when finished.
     reset: function(models, options) {
-      models  || (models = []);
+      models || (models = []);
       options || (options = {});
       for (var i = 0, l = this.models.length; i < l; i++) {
         this._removeReference(this.models[i]);
       }
       this._reset();
-      this.add(models, _.extend({silent: true}, options));
+      this.add(models, _.extend({
+        silent: true
+      }, options));
       if (!options.silent) this.trigger('reset', this, options);
       return this;
     },
@@ -794,7 +812,7 @@
     // Proxy to _'s chain. Can't be proxied the same way the rest of the
     // underscore methods are proxied because it relies on the underscore
     // constructor.
-    chain: function () {
+    chain: function() {
       return _(this.models).chain();
     },
 
@@ -802,7 +820,7 @@
     _reset: function(options) {
       this.length = 0;
       this.models = [];
-      this._byId  = {};
+      this._byId = {};
       this._byCid = {};
     },
 
@@ -847,11 +865,7 @@
   });
 
   // Underscore methods that we want to implement on the Collection.
-  var methods = ['forEach', 'each', 'map', 'reduce', 'reduceRight', 'find',
-    'detect', 'filter', 'select', 'reject', 'every', 'all', 'some', 'any',
-    'include', 'contains', 'invoke', 'max', 'min', 'sortBy', 'sortedIndex',
-    'toArray', 'size', 'first', 'initial', 'rest', 'last', 'without', 'indexOf',
-    'shuffle', 'lastIndexOf', 'isEmpty', 'groupBy'];
+  var methods = ['forEach', 'each', 'map', 'reduce', 'reduceRight', 'find', 'detect', 'filter', 'select', 'reject', 'every', 'all', 'some', 'any', 'include', 'contains', 'invoke', 'max', 'min', 'sortBy', 'sortedIndex', 'toArray', 'size', 'first', 'initial', 'rest', 'last', 'without', 'indexOf', 'shuffle', 'lastIndexOf', 'isEmpty', 'groupBy'];
 
   // Mix in each Underscore method as a proxy to `Collection#models`.
   _.each(methods, function(method) {
@@ -866,24 +880,24 @@
   // Routers map faux-URLs to actions, and fire events when routes are
   // matched. Creating a new one sets its `routes` hash, if not set statically.
   var Router = Backbone.Router = function(options) {
-    options || (options = {});
-    if (options.routes) this.routes = options.routes;
-    this._bindRoutes();
-    this.initialize.apply(this, arguments);
-  };
+      options || (options = {});
+      if (options.routes) this.routes = options.routes;
+      this._bindRoutes();
+      this.initialize.apply(this, arguments);
+    };
 
   // Cached regular expressions for matching named param parts and splatted
   // parts of route strings.
-  var namedParam    = /:\w+/g;
-  var splatParam    = /\*\w+/g;
-  var escapeRegExp  = /[-[\]{}()+?.,\\^$|#\s]/g;
+  var namedParam = /:\w+/g;
+  var splatParam = /\*\w+/g;
+  var escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g;
 
   // Set up all inheritable **Backbone.Router** properties and methods.
   _.extend(Router.prototype, Events, {
 
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
-    initialize: function(){},
+    initialize: function() {},
 
     // Manually bind a single named route to a callback. For example:
     //
@@ -926,9 +940,7 @@
     // Convert a route string into a regular expression, suitable for matching
     // against the current location hash.
     _routeToRegExp: function(route) {
-      route = route.replace(escapeRegExp, '\\$&')
-                   .replace(namedParam, '([^\/]+)')
-                   .replace(splatParam, '(.*?)');
+      route = route.replace(escapeRegExp, '\\$&').replace(namedParam, '([^\/]+)').replace(splatParam, '(.*?)');
       return new RegExp('^' + route + '$');
     },
 
@@ -946,9 +958,9 @@
   // Handles cross-browser history management, based on URL fragments. If the
   // browser does not support `onhashchange`, falls back to polling.
   var History = Backbone.History = function() {
-    this.handlers = [];
-    _.bindAll(this, 'checkUrl');
-  };
+      this.handlers = [];
+      _.bindAll(this, 'checkUrl');
+    };
 
   // Cached regex for cleaning leading hashes and slashes .
   var routeStripper = /^[#\/]/;
@@ -998,13 +1010,15 @@
 
       // Figure out the initial configuration. Do we need an iframe?
       // Is pushState desired ... is it available?
-      this.options          = _.extend({}, {root: '/'}, this.options, options);
+      this.options = _.extend({}, {
+        root: '/'
+      }, this.options, options);
       this._wantsHashChange = this.options.hashChange !== false;
-      this._wantsPushState  = !!this.options.pushState;
-      this._hasPushState    = !!(this.options.pushState && window.history && window.history.pushState);
-      var fragment          = this.getFragment();
-      var docMode           = document.documentMode;
-      var oldIE             = (isExplorer.exec(navigator.userAgent.toLowerCase()) && (!docMode || docMode <= 7));
+      this._wantsPushState = !! this.options.pushState;
+      this._hasPushState = !! (this.options.pushState && window.history && window.history.pushState);
+      var fragment = this.getFragment();
+      var docMode = document.documentMode;
+      var oldIE = (isExplorer.exec(navigator.userAgent.toLowerCase()) && (!docMode || docMode <= 7));
 
       if (oldIE) {
         this.iframe = $('<iframe src="javascript:0" tabindex="-1" />').hide().appendTo('body')[0].contentWindow;
@@ -1025,7 +1039,7 @@
       // opened by a non-pushState browser.
       this.fragment = fragment;
       var loc = window.location;
-      var atRoot  = loc.pathname == this.options.root;
+      var atRoot = loc.pathname == this.options.root;
 
       // If we've started off with a route from a `pushState`-enabled browser,
       // but we're currently in a browser that doesn't support it...
@@ -1035,8 +1049,8 @@
         // Return immediately as browser will do redirect to new url
         return true;
 
-      // Or if we've started out with a hash-based route, but we're currently
-      // in a browser where it could be `pushState`-based instead...
+        // Or if we've started out with a hash-based route, but we're currently
+        // in a browser where it could be `pushState`-based instead...
       } else if (this._wantsPushState && this._hasPushState && atRoot && loc.hash) {
         this.fragment = this.getHash().replace(routeStripper, '');
         window.history.replaceState({}, document.title, loc.protocol + '//' + loc.host + this.options.root + this.fragment);
@@ -1058,7 +1072,10 @@
     // Add a route to be tested when the fragment changes. Routes added later
     // may override previous routes.
     route: function(route, callback) {
-      this.handlers.unshift({route: route, callback: callback});
+      this.handlers.unshift({
+        route: route,
+        callback: callback
+      });
     },
 
     // Checks the current URL to see if it has changed, and if it has,
@@ -1094,7 +1111,9 @@
     // you wish to modify the current URL without adding an entry to the history.
     navigate: function(fragment, options) {
       if (!History.started) return false;
-      if (!options || options === true) options = {trigger: options};
+      if (!options || options === true) options = {
+        trigger: options
+      };
       var frag = (fragment || '').replace(routeStripper, '');
       if (this.fragment == frag) return;
 
@@ -1104,20 +1123,20 @@
         this.fragment = frag;
         window.history[options.replace ? 'replaceState' : 'pushState']({}, document.title, frag);
 
-      // If hash changes haven't been explicitly disabled, update the hash
-      // fragment to store history.
+        // If hash changes haven't been explicitly disabled, update the hash
+        // fragment to store history.
       } else if (this._wantsHashChange) {
         this.fragment = frag;
         this._updateHash(window.location, frag, options.replace);
         if (this.iframe && (frag != this.getFragment(this.getHash(this.iframe)))) {
           // Opening and closing the iframe tricks IE7 and earlier to push a history entry on hash-tag change.
           // When replace is true, we don't want this.
-          if(!options.replace) this.iframe.document.open().close();
+          if (!options.replace) this.iframe.document.open().close();
           this._updateHash(this.iframe.location, frag, options.replace);
         }
 
-      // If you've told us that you explicitly don't want fallback hashchange-
-      // based history, then `navigate` becomes a page refresh.
+        // If you've told us that you explicitly don't want fallback hashchange-
+        // based history, then `navigate` becomes a page refresh.
       } else {
         window.location.assign(this.options.root + fragment);
       }
@@ -1141,12 +1160,12 @@
   // Creating a Backbone.View creates its initial element outside of the DOM,
   // if an existing element is not provided...
   var View = Backbone.View = function(options) {
-    this.cid = _.uniqueId('view');
-    this._configure(options || {});
-    this._ensureElement();
-    this.initialize.apply(this, arguments);
-    this.delegateEvents();
-  };
+      this.cid = _.uniqueId('view');
+      this._configure(options || {});
+      this._ensureElement();
+      this.initialize.apply(this, arguments);
+      this.delegateEvents();
+    };
 
   // Cached regex to split keys for `delegate`.
   var delegateEventSplitter = /^(\S+)\s*(.*)$/;
@@ -1168,7 +1187,7 @@
 
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
-    initialize: function(){},
+    initialize: function() {},
 
     // **render** is the core function that your view should override, in order
     // to populate its element (`this.el`), with the appropriate HTML. The
@@ -1192,7 +1211,7 @@
     make: function(tagName, attributes, content) {
       var el = document.createElement(tagName);
       if (attributes) $(el).attr(attributes);
-      if (content) $(el).html(content);
+      if (content != null) $(el).html(content);
       return el;
     },
 
@@ -1229,7 +1248,8 @@
         if (!_.isFunction(method)) method = this[events[key]];
         if (!method) throw new Error('Method "' + events[key] + '" does not exist');
         var match = key.match(delegateEventSplitter);
-        var eventName = match[1], selector = match[2];
+        var eventName = match[1],
+          selector = match[2];
         method = _.bind(method, this);
         eventName += '.delegateEvents' + this.cid;
         if (selector === '') {
@@ -1277,11 +1297,11 @@
   });
 
   // The self-propagating extend function that Backbone classes use.
-  var extend = function (protoProps, classProps) {
-    var child = inherits(this, protoProps, classProps);
-    child.extend = this.extend;
-    return child;
-  };
+  var extend = function(protoProps, classProps) {
+      var child = inherits(this, protoProps, classProps);
+      child.extend = this.extend;
+      return child;
+    };
 
   // Set up inheritance for the model, collection, and view.
   Model.extend = Collection.extend = Router.extend = View.extend = extend;
@@ -1294,7 +1314,7 @@
     'create': 'POST',
     'update': 'PUT',
     'delete': 'DELETE',
-    'read':   'GET'
+    'read': 'GET'
   };
 
   // Override this function to change the manner in which Backbone persists
@@ -1319,7 +1339,10 @@
     options || (options = {});
 
     // Default JSON-request options.
-    var params = {type: type, dataType: 'json'};
+    var params = {
+      type: type,
+      dataType: 'json'
+    };
 
     // Ensure that we have a URL.
     if (!options.url) {
@@ -1335,7 +1358,9 @@
     // For older servers, emulate JSON by encoding the request into an HTML-form.
     if (Backbone.emulateJSON) {
       params.contentType = 'application/x-www-form-urlencoded';
-      params.data = params.data ? {model: params.data} : {};
+      params.data = params.data ? {
+        model: params.data
+      } : {};
     }
 
     // For older servers, emulate HTTP by mimicking the HTTP method with `_method`
@@ -1375,57 +1400,60 @@
   // -------
 
   // Shared empty constructor function to aid in prototype-chain creation.
-  var ctor = function(){};
+  var ctor = function() {};
 
   // Helper function to correctly set up the prototype chain, for subclasses.
   // Similar to `goog.inherits`, but uses a hash of prototype properties and
   // class properties to be extended.
   var inherits = function(parent, protoProps, staticProps) {
-    var child;
+      var child;
 
-    // The constructor function for the new subclass is either defined by you
-    // (the "constructor" property in your `extend` definition), or defaulted
-    // by us to simply call the parent's constructor.
-    if (protoProps && protoProps.hasOwnProperty('constructor')) {
-      child = protoProps.constructor;
-    } else {
-      child = function(){ parent.apply(this, arguments); };
-    }
+      // The constructor function for the new subclass is either defined by you
+      // (the "constructor" property in your `extend` definition), or defaulted
+      // by us to simply call the parent's constructor.
+      if (protoProps && protoProps.hasOwnProperty('constructor')) {
+        child = protoProps.constructor;
+      } else {
+        child = function() {
+          parent.apply(this, arguments);
+        };
+      }
 
-    // Inherit class (static) properties from parent.
-    _.extend(child, parent);
+      // Inherit class (static) properties from parent.
+      _.extend(child, parent);
 
-    // Set the prototype chain to inherit from `parent`, without calling
-    // `parent`'s constructor function.
-    ctor.prototype = parent.prototype;
-    child.prototype = new ctor();
+      // Set the prototype chain to inherit from `parent`, without calling
+      // `parent`'s constructor function.
+      ctor.prototype = parent.prototype;
+      child.prototype = new ctor();
 
-    // Add prototype properties (instance properties) to the subclass,
-    // if supplied.
-    if (protoProps) _.extend(child.prototype, protoProps);
+      // Add prototype properties (instance properties) to the subclass,
+      // if supplied.
+      if (protoProps) _.extend(child.prototype, protoProps);
 
-    // Add static properties to the constructor function, if supplied.
-    if (staticProps) _.extend(child, staticProps);
+      // Add static properties to the constructor function, if supplied.
+      if (staticProps) _.extend(child, staticProps);
 
-    // Correctly set child's `prototype.constructor`.
-    child.prototype.constructor = child;
+      // Correctly set child's `prototype.constructor`.
+      child.prototype.constructor = child;
 
-    // Set a convenience property in case the parent's prototype is needed later.
-    child.__super__ = parent.prototype;
+      // Set a convenience property in case the parent's prototype is needed later.
+      child.__super__ = parent.prototype;
 
-    return child;
-  };
+      return child;
+    };
 
   // Helper function to get a value from a Backbone object as a property
   // or as a function.
   var getValue = function(object, prop) {
-    if (!(object && object[prop])) return null;
-    return _.isFunction(object[prop]) ? object[prop]() : object[prop];
-  };
+      if (!(object && object[prop])) return null;
+      return _.isFunction(object[prop]) ? object[prop]() : object[prop];
+    };
 
   // Throw an error when a URL is needed, and none is supplied.
   var urlError = function() {
-    throw new Error('A "url" property or function must be specified');
-  };
+      throw new Error('A "url" property or function must be specified');
+    };
 
-}).call(this);
+  return Backbone;
+}));
