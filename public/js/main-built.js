@@ -21661,46 +21661,141 @@ define('backbone-forms-bootstrap',['jquery', 'underscore', 'backbone', 'backbone
 
 }).call(this);
 
-var jade = function(a) {
-    Array.isArray || (Array.isArray = function(a) {
-      return "[object Array]" == toString.call(a)
-    }), Object.keys || (Object.keys = function(a) {
-      var b = [];
-      for (var c in a) a.hasOwnProperty(c) && b.push(a);
-      return b
-    }), a.attrs = function b(b) {
-      var c = [],
-        d = b.terse;
-      delete b.terse;
-      var e = Object.keys(b),
-        f = e.length;
-      if (f) {
-        c.push("");
-        for (var g = 0; g < f; ++g) {
-          var h = e[g],
-            i = b[h];
-          "boolean" == typeof i || null == i ? i && (d ? c.push(h) : c.push(h + '="' + h + '"')) : "class" == h && Array.isArray(i) ? c.push(h + '="' + a.escape(i.join(" ")) + '"') : c.push(h + '="' + a.escape(i) + '"')
-        }
-      }
-      return c.join(" ")
-    }, a.escape = function(a) {
-      return String(a).replace(/&(?!\w+;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-    }, a.rethrow = function d(a, b, c, d) {
-      var e = 3,
-        f = b.split("\n"),
-        g = Math.max(d - e, 0),
-        h = Math.min(f.length, d + e),
-        e = f.slice(g, h).map(function(a, b) {
-          var c = b + g + 1;
-          return (c == d ? "  > " : "    ") + c + "| " + a
-        }).join("\n");
-      a.path = c, a.message = (c || "Jade") + ":" + d + "\n" + e + "\n\n" + a.message;
-      throw a
-    };
-    return a
-  }({});
 
-define('jade',{load: function(id){throw new Error("Dynamic load not allowed: " + id);}});
+
+
+
+var jade = (function(exports){
+/*!
+ * Jade - runtime
+ * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * Lame Array.isArray() polyfill for now.
+ */
+
+if (!Array.isArray) {
+  Array.isArray = function(arr){
+    return '[object Array]' == toString.call(arr);
+  };
+}
+
+/**
+ * Lame Object.keys() polyfill for now.
+ */
+
+if (!Object.keys) {
+  Object.keys = function(obj){
+    var arr = [];
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        arr.push(obj);
+      }
+    }
+    return arr;
+  } 
+}
+
+/**
+ * Render the given attributes object.
+ *
+ * @param {Object} obj
+ * @return {String}
+ * @api private
+ */
+
+exports.attrs = function attrs(obj){
+  var buf = []
+    , terse = obj.terse;
+  delete obj.terse;
+  var keys = Object.keys(obj)
+    , len = keys.length;
+  if (len) {
+    buf.push('');
+    for (var i = 0; i < len; ++i) {
+      var key = keys[i]
+        , val = obj[key];
+      if ('boolean' == typeof val || null == val) {
+        if (val) {
+          terse
+            ? buf.push(key)
+            : buf.push(key + '="' + key + '"');
+        }
+      } else if ('class' == key && Array.isArray(val)) {
+        buf.push(key + '="' + exports.escape(val.join(' ')) + '"');
+      } else {
+        buf.push(key + '="' + exports.escape(val) + '"');
+      }
+    }
+  }
+  return buf.join(' ');
+};
+
+/**
+ * Escape the given string of `html`.
+ *
+ * @param {String} html
+ * @return {String}
+ * @api private
+ */
+
+exports.escape = function escape(html){
+  return String(html)
+    .replace(/&(?!\w+;)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+};
+
+/**
+ * Re-throw the given `err` in context to the
+ * `str` of jade, `filename`, and `lineno`.
+ *
+ * @param {Error} err
+ * @param {String} str
+ * @param {String} filename
+ * @param {String} lineno
+ * @api private
+ */
+
+exports.rethrow = function rethrow(err, str, filename, lineno){
+  var context = 3
+    , lines = str.split('\n')
+    , start = Math.max(lineno - context, 0)
+    , end = Math.min(lines.length, lineno + context); 
+
+  // Error context
+  var context = lines.slice(start, end).map(function(line, i){
+    var curr = i + start + 1;
+    return (curr == lineno ? '  > ' : '    ')
+      + curr
+      + '| '
+      + line;
+  }).join('\n');
+
+  // Alter exception message
+  err.path = filename;
+  err.message = (filename || 'Jade') + ':' + lineno 
+    + '\n' + context + '\n\n' + err.message;
+  throw err;
+};
+
+  return exports;
+
+})({});
+
+
+
+
+
+define('jade',{
+        version: '0.0.1',
+    load: function (name, parentRequire, load, config) {
+                    
+    }
+});
 define('jade!../templates/check', function(){ return function anonymous(locals, attrs, escape, rethrow) {
 var attrs = jade.attrs, escape = jade.escape, rethrow = jade.rethrow;
 var buf = [];
@@ -23222,10 +23317,14 @@ return buf.join("");
       };
 
       App.prototype.showError = function(message) {
-        var error;
-        return this.flash.append(error = new ErrorView({
+        var error,
+          _this = this;
+        this.flash.append(error = new ErrorView({
           message: message
         }));
+        return window.setTimeout((function() {
+          return error.$(".alert").alert('close');
+        }), 2000);
       };
 
       App.prototype.showNotice = function(message) {
@@ -23275,9 +23374,9 @@ return buf.join("");
       }
 
       AppRouter.prototype.appRoutes = {
-        '': 'showTasks',
         'settings': 'showSettings',
-        'task/:id': 'showTask'
+        'task/:id': 'showTask',
+        '*anything': 'showTasks'
       };
 
       return AppRouter;
