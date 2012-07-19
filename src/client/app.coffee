@@ -33,14 +33,18 @@ define (require) ->
   jQuery.fn.reset = ->
     $(this).each -> this.reset()
 
+  heatmapHeader = ->
+    firstDayOfWeek = moment().sod().day 0
+    week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
+
   getWeekdaysAsArray = (full) ->
     today = moment().sod()
-    startingWeekday = parseInt(app.user.get 'starting_weekday') + parseInt(app.offset ? 0)
+    if app.daysInView is 6 then startingWeekday = parseInt(app.user.get 'starting_weekday') + parseInt(app.offset ? 0)
+    else startingWeekday = parseInt(today.day()) + parseInt(app.offset ? 0) - 1
     firstDayOfWeek = moment().sod()
     firstDayOfWeek.day startingWeekday
-    console.log app.offset, firstDayOfWeek.format("dddd, MMMM Do YYYY, h:mm:ss a")
     if firstDayOfWeek.diff(today, 'days') > 0 then firstDayOfWeek.day(startingWeekday - 7)
-    lengthOfWeek = if full then 6 else Math.min 6, today.diff firstDayOfWeek, 'days'
+    lengthOfWeek = if full then app.daysInView else Math.min app.daysInView, today.diff firstDayOfWeek, 'days'
     week = (firstDayOfWeek.clone().add('d', day) for day in [0..lengthOfWeek])
 
   colorArray = (numberOfRows) ->
@@ -144,11 +148,11 @@ define (require) ->
       'click a.add': 'clickedAdd'
       'keypress #newtask': 'keypressNewTask'
       'submit #newtask': 'submitNewTask'
+    initialize: ->
+      app.vent.on 'window:resize', => @render()
+      app.vent.on 'app:changeOffset', => @render()
     templateHelpers: ->
       getWeekdaysAsArray: getWeekdaysAsArray
-    render: ->
-      @$el.html _.template @template, @serializeData()
-      @showCollection()
     clickedAdd: ->
       @toggleNewTaskButton()
       @toggleNewTaskForm()
@@ -188,6 +192,8 @@ define (require) ->
     events:
       'click .brand': 'clickedHome'
       'click .settings': 'clickedSettings'
+      'click .moveForward': 'clickedMoveForward'
+      'click .moveBackward': 'clickedMoveBackward'
     initialize: ->
       app.vent.on 'scroll:window', @addDropShadow, @
     addDropShadow: ->
@@ -199,6 +205,10 @@ define (require) ->
     clickedSettings: (e) ->
       e.preventDefault()
       app.vent.trigger 'settings:clicked'
+    clickedMoveForward: ->
+      app.vent.trigger 'app:moveForward'
+    clickedMoveBackward: ->
+      app.vent.trigger 'app:moveBackward'
 
   class SettingsView extends Backbone.Marionette.Layout
     template: require('jade!../templates/settings')()
@@ -448,6 +458,7 @@ define (require) ->
       sentenceCase: (string) -> string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
       titleCase: (string) -> (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() for word in string.split ' ').join ' '
       pluralize: (word, count) -> word += 's' if count > 0
+      heatmapHeader: heatmapHeader
       getWeekdaysAsArray: getWeekdaysAsArray
       gsub: (source, pattern, replacement) ->
         result = ''
@@ -518,11 +529,14 @@ define (require) ->
       @tasks = new Tasks
       if window.bootstrap.user? then @user.set window.bootstrap.user
       if window.bootstrap.tasks? then @tasks.reset window.bootstrap.tasks
+      @daysInView = 6
+      @offset = 0
 
       @navBar = new NavBarView model: @user
       @tasksView = new TasksView collection: @tasks
       @settingsView = new SettingsView model: @user
 
+      @toggleWidth()
       @showApp()
 
       @router = new AppRouter controller: @
@@ -537,6 +551,9 @@ define (require) ->
 
       # Events
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
+      $(window).bind 'resize', => @toggleWidth()
+
+
       app.vent.on 'task:check', @check, @
       app.vent.on 'task:uncheck', @uncheck, @
       app.vent.on 'error', @showError, @
@@ -547,20 +564,25 @@ define (require) ->
       app.vent.on 'task:delete', @deleteTask, @
       app.vent.on 'settings:clicked', @showSettings, @
       app.vent.on 'home:clicked', @showTasks, @
+      app.vent.on 'app:moveForward', @moveForward, @
+      app.vent.on 'app:moveBackward', @moveBackward, @
+    toggleWidth: ->
+      old = @daysInView
+      @daysInView = if $(window).width() <= 480 then 1 else 6
+      unless @daysInView is old then app.vent.trigger 'window:resize'
     showApp: ->
       @addRegions
         navigation: '.navigation'
         body: '.body'
       @flash = new MultiRegion el: '.flash'
       @navigation.show @navBar
-    showTasks: (offset) ->
-      @offset = offset
-      if offset then @router.navigate 'offset/' + @offset
-      else @router.navigate ''
       $(@body.el).hammer().bind 'swipe', (ev) =>
         switch ev.direction
           when 'left' then @vent.trigger 'app:moveForward'
           when 'right' then @vent.trigger 'app:moveBackward'
+    showTasks: ->
+      @offset = 0
+      @router.navigate ''
       @body.show @tasksView = new TasksView collection: @tasks
     showSettings: ->
       @router.navigate 'settings'
@@ -585,15 +607,19 @@ define (require) ->
       @flash.append notice = new NoticeView message: message
       window.setTimeout (=> notice.$(".alert").alert('close')), 2000
     hideErrors: -> @flash.close()
-    # check: (options) ->
-    #   (@tasks.get options.task_id).get('checks').create date: options.date, task_id: options.task_id
-    # uncheck: (model) ->
-    #   model.destroy()
+    moveForward: ->
+      unless @offset is 0
+        if @daysInView is 1 then @offset += 1
+        else @offset += 7
+        @vent.trigger 'app:changeOffset'
+    moveBackward: ->
+      if @daysInView is 1 then @offset -= 1
+      else @offset -= 7
+      @vent.trigger 'app:changeOffset'
 
   class AppRouter extends Backbone.Marionette.AppRouter
     appRoutes:
       '': 'showTasks'
-      'offset/:offset': 'showTasks'
       'settings': 'showSettings'
       'task/:id': 'showTask'
 

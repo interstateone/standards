@@ -25,6 +25,7 @@
 // We then reset it for fixed navbars in the #gridSystem mixin
 .navbar .container {
   width: auto;
+  text-align: center;
 }
 
 // Navbar button for toggling navbar items in responsive layouts
@@ -46,6 +47,11 @@
 .btn-navbar .icon-bar + .icon-bar {
   margin-top: 3px;
 }
+.nav-collapse {
+  position: absolute;
+  top: 5px;
+  right: 0;
+}
 // Override the default collapsed state
 .nav-collapse.collapse {
   height: auto;
@@ -59,18 +65,41 @@
   .brand:hover {
     text-decoration: none;
   }
+
+  .controls {
+    margin: 0 auto;
+    width: 200px;
+    position: relative;
+  }
+
+  .moveBackward {
+    position: absolute;
+    top: 18px;
+    left: 0;
+    font-size: 200%;
+    color: @dropdownBorder;
+    cursor: pointer;
+  }
+  .moveForward {
+    position: absolute;
+    top: 18px;
+    right: 0;
+    font-size: 200%;
+    color: @dropdownBorder;
+    cursor: pointer;
+  }
   // Website or project name
   .brand {
-    float: left;
-    display: block;
+    display: inline-block;
     padding: 12px 20px;
-    margin-left: -20px; // negative indent to left-align the text down the page
+    margin: 0 20px;
     font-size: 30px;
     font-weight: 200;
     line-height: 1;
     color: @grayDark;
     font-family: "LeagueGothic";
     text-transform: uppercase;
+    cursor: pointer;
   }
   // Plain text in topbar
   .navbar-text {

@@ -4,7 +4,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(function(require) {
-    var $, App, AppRouter, Backbone, ButtonRadio, CheckView, Checks, ErrorView, Form, InfoForm, Marionette, MultiRegion, NavBarView, NoticeView, PasswordForm, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, Timezone, User, colorArray, getWeekdaysAsArray, initialize, renderColors, _;
+    var $, App, AppRouter, Backbone, ButtonRadio, CheckView, Checks, ErrorView, Form, InfoForm, Marionette, MultiRegion, NavBarView, NoticeView, PasswordForm, SettingsView, Task, TaskRowView, TaskView, Tasks, TasksView, Timezone, User, colorArray, getWeekdaysAsArray, heatmapHeader, initialize, renderColors, _;
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
@@ -57,17 +57,32 @@
         return this.reset();
       });
     };
+    heatmapHeader = function() {
+      var day, firstDayOfWeek, week;
+      firstDayOfWeek = moment().sod().day(0);
+      return week = (function() {
+        var _i, _results;
+        _results = [];
+        for (day = _i = 0; _i <= 6; day = ++_i) {
+          _results.push(firstDayOfWeek.clone().add('d', day));
+        }
+        return _results;
+      })();
+    };
     getWeekdaysAsArray = function(full) {
-      var day, firstDayOfWeek, lengthOfWeek, startingWeekday, today, week, _ref;
+      var day, firstDayOfWeek, lengthOfWeek, startingWeekday, today, week, _ref, _ref1;
       today = moment().sod();
-      startingWeekday = parseInt(app.user.get('starting_weekday')) + parseInt((_ref = app.offset) != null ? _ref : 0);
+      if (app.daysInView === 6) {
+        startingWeekday = parseInt(app.user.get('starting_weekday')) + parseInt((_ref = app.offset) != null ? _ref : 0);
+      } else {
+        startingWeekday = parseInt(today.day()) + parseInt((_ref1 = app.offset) != null ? _ref1 : 0) - 1;
+      }
       firstDayOfWeek = moment().sod();
       firstDayOfWeek.day(startingWeekday);
-      console.log(app.offset, firstDayOfWeek.format("dddd, MMMM Do YYYY, h:mm:ss a"));
       if (firstDayOfWeek.diff(today, 'days') > 0) {
         firstDayOfWeek.day(startingWeekday - 7);
       }
-      lengthOfWeek = full ? 6 : Math.min(6, today.diff(firstDayOfWeek, 'days'));
+      lengthOfWeek = full ? app.daysInView : Math.min(app.daysInView, today.diff(firstDayOfWeek, 'days'));
       return week = (function() {
         var _i, _results;
         _results = [];
@@ -277,15 +292,20 @@
         'submit #newtask': 'submitNewTask'
       };
 
+      TasksView.prototype.initialize = function() {
+        var _this = this;
+        app.vent.on('window:resize', function() {
+          return _this.render();
+        });
+        return app.vent.on('app:changeOffset', function() {
+          return _this.render();
+        });
+      };
+
       TasksView.prototype.templateHelpers = function() {
         return {
           getWeekdaysAsArray: getWeekdaysAsArray
         };
-      };
-
-      TasksView.prototype.render = function() {
-        this.$el.html(_.template(this.template, this.serializeData()));
-        return this.showCollection();
       };
 
       TasksView.prototype.clickedAdd = function() {
@@ -356,7 +376,9 @@
 
       NavBarView.prototype.events = {
         'click .brand': 'clickedHome',
-        'click .settings': 'clickedSettings'
+        'click .settings': 'clickedSettings',
+        'click .moveForward': 'clickedMoveForward',
+        'click .moveBackward': 'clickedMoveBackward'
       };
 
       NavBarView.prototype.initialize = function() {
@@ -379,6 +401,14 @@
       NavBarView.prototype.clickedSettings = function(e) {
         e.preventDefault();
         return app.vent.trigger('settings:clicked');
+      };
+
+      NavBarView.prototype.clickedMoveForward = function() {
+        return app.vent.trigger('app:moveForward');
+      };
+
+      NavBarView.prototype.clickedMoveBackward = function() {
+        return app.vent.trigger('app:moveBackward');
       };
 
       return NavBarView;
@@ -892,6 +922,7 @@
             return word += 's';
           }
         },
+        heatmapHeader: heatmapHeader,
         getWeekdaysAsArray: getWeekdaysAsArray,
         gsub: function(source, pattern, replacement) {
           var match, result;
@@ -1012,6 +1043,8 @@
         if (window.bootstrap.tasks != null) {
           this.tasks.reset(window.bootstrap.tasks);
         }
+        this.daysInView = 6;
+        this.offset = 0;
         this.navBar = new NavBarView({
           model: this.user
         });
@@ -1021,6 +1054,7 @@
         this.settingsView = new SettingsView({
           model: this.user
         });
+        this.toggleWidth();
         this.showApp();
         this.router = new AppRouter({
           controller: this
@@ -1041,6 +1075,9 @@
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
+        $(window).bind('resize', function() {
+          return _this.toggleWidth();
+        });
         app.vent.on('task:check', this.check, this);
         app.vent.on('task:uncheck', this.uncheck, this);
         app.vent.on('error', this.showError, this);
@@ -1048,10 +1085,22 @@
         app.vent.on('task:clicked', this.showTask, this);
         app.vent.on('task:delete', this.deleteTask, this);
         app.vent.on('settings:clicked', this.showSettings, this);
-        return app.vent.on('home:clicked', this.showTasks, this);
+        app.vent.on('home:clicked', this.showTasks, this);
+        app.vent.on('app:moveForward', this.moveForward, this);
+        return app.vent.on('app:moveBackward', this.moveBackward, this);
+      };
+
+      App.prototype.toggleWidth = function() {
+        var old;
+        old = this.daysInView;
+        this.daysInView = $(window).width() <= 480 ? 1 : 6;
+        if (this.daysInView !== old) {
+          return app.vent.trigger('window:resize');
+        }
       };
 
       App.prototype.showApp = function() {
+        var _this = this;
         this.addRegions({
           navigation: '.navigation',
           body: '.body'
@@ -1059,7 +1108,6 @@
         this.flash = new MultiRegion({
           el: '.flash'
         });
-        return this.navigation.show(this.navBar);
         this.navigation.show(this.navBar);
         return $(this.body.el).hammer().bind('swipe', function(ev) {
           switch (ev.direction) {
@@ -1071,13 +1119,9 @@
         });
       };
 
-      App.prototype.showTasks = function(offset) {
-        this.offset = offset;
-        if (offset) {
-          this.router.navigate('offset/' + this.offset);
-        } else {
-          this.router.navigate('');
-        }
+      App.prototype.showTasks = function() {
+        this.offset = 0;
+        this.router.navigate('');
         return this.body.show(this.tasksView = new TasksView({
           collection: this.tasks
         }));
@@ -1138,6 +1182,26 @@
         return this.flash.close();
       };
 
+      App.prototype.moveForward = function() {
+        if (this.offset !== 0) {
+          if (this.daysInView === 1) {
+            this.offset += 1;
+          } else {
+            this.offset += 7;
+          }
+          return this.vent.trigger('app:changeOffset');
+        }
+      };
+
+      App.prototype.moveBackward = function() {
+        if (this.daysInView === 1) {
+          this.offset -= 1;
+        } else {
+          this.offset -= 7;
+        }
+        return this.vent.trigger('app:changeOffset');
+      };
+
       return App;
 
     })(Backbone.Marionette.Application);
@@ -1151,7 +1215,6 @@
 
       AppRouter.prototype.appRoutes = {
         '': 'showTasks',
-        'offset/:offset': 'showTasks',
         'settings': 'showSettings',
         'task/:id': 'showTask'
       };

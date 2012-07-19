@@ -21,7 +21,7 @@ div.row-fluid
       table.weekday-heatmap
         thead
           tr
-          <% _.each(getWeekdaysAsArray(true), function (day) { %>
+          <% _.each(heatmapHeader(), function (day) { %>
           th <%= day.format('ddd').slice(0,1) %>
           <% }); %>
         tbody
