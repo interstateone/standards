@@ -116,6 +116,64 @@ class Standards < Sinatra::Base
 	  redirect "/"
 	end
 
+	post "/forgot/?" do
+		if !valid_email? params[:email]
+			flash[:error] = "Please enter the email address you signed up with."
+			redirect '/login'
+		else
+			user = User.first(:email => params[:email])
+			if !user.nil?
+				@key = user.password_reset_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
+				user.save
+
+				@name = user.name
+				@url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
+
+				resetWorker = EmailWorker.new
+				resetWorker.username = ENV['EMAIL_USERNAME'] || settings.email_username
+				resetWorker.password = ENV['EMAIL_PASSWORD'] || settings.email_password
+				resetWorker.to = user.email
+				resetWorker.from = ENV['EMAIL_USERNAME'] || settings.email_username
+				resetWorker.subject = "Reset your Standards password"
+				resetWorker.body = erb :reset_password_email, :layout => false
+
+				if production?
+					resetWorker.queue
+				else
+					resetWorker.run_local
+				end
+
+				flash[:notice] = "You've been sent a password reset email to the address you provided, click the link inside to do so."
+				redirect "/"
+			end
+		end
+	end
+
+	get '/reset/:key/?' do
+		@user = User.first :password_reset_key => params[:key]
+		if !@user.nil?
+			erb :reset_password
+		else
+			flash[:error] = "That is not a valid password reset link."
+			redirect '/'
+		end
+	end
+
+	post '/reset/?' do
+		user = User.first :password_reset_key => params[:key]
+		if !user.nil?
+			user.password = params[:password]
+			user.password_reset_key = nil
+			user.save
+			session[:id] = user.id
+			flash[:notice] = "Great! You're password has been changed."
+			redirect '/'
+		else
+			flash[:error] = "That is not a valid password reset link."
+			redirect '/'
+		end
+	end
+
 	get '/*' do
 		if logged_in?
 			@user = current_user
