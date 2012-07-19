@@ -28,18 +28,6 @@ module Sinatra
 			end
 		end
 
-		def valid_email?(email)
-			if email =~ /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/
-				domain = email.match(/\@(.+)/)[1]
-				Resolv::DNS.open do |dns|
-					@mx = dns.getresources(domain, Resolv::DNS::Resource::IN::MX)
-				end
-				@mx.size > 0 ? true : false
-			else
-				false
-			end
-		end
-
 		def switch_pronouns(string)
 			string.gsub(/\b(I am|You are|I|You|Your|My)\b/i) do |pronoun|
 				case pronoun.downcase

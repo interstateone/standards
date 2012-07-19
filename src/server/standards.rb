@@ -57,39 +57,34 @@ class Standards < Sinatra::Base
 	post "/signup/?" do
 	  # Validate the fields first
 	  # Don't worry about existing emails, we'll handle that later
-	  if !valid_email? params[:email]
-	    flash[:error] = "Please enter a valid email address."
-	    redirect '/signup'
-	  else
-	    # Try creating a new user
-	    user = User.new
-	    user.name = params[:name]
-	    user.email = params[:email]
-	    user.password = params[:password]
-	    # If user already exists, sign them in
-	    if existing_user = User.authenticate(params[:email], params[:password])
-	      session[:id] = existing_user.id
-	      if session[:return_to]
-	        redirect_url = session[:return_to]
-	        session[:return_to] = false
-	        redirect redirect_url
-	      else
-	        redirect '/'
-	      end
-	    # If user doesn't exist but is a valid new user, sign them up
-	    elsif user.save
-	      # Flash thank you, sign in and redirect
-	      session[:id] = user.id
-	      flash[:notice] = "Thanks for signing up!"
-	      redirect "/"
-	    # If user doesn't exists and is not a valid new user, throw errors
-	    else
-	      user.errors.each do |e|
-	        flash[:error] = e
-	      end
-	      redirect '/signup'
-	    end
-	  end
+    # Try creating a new user
+    user = User.new
+    user.name = params[:name]
+    user.email = params[:email]
+    user.password = params[:password]
+    # If user already exists, sign them in
+    if existing_user = User.authenticate(params[:email], params[:password])
+      session[:id] = existing_user.id
+      if session[:return_to]
+        redirect_url = session[:return_to]
+        session[:return_to] = false
+        redirect redirect_url
+      else
+        redirect '/'
+      end
+    # If user doesn't exist but is a valid new user, sign them up
+    elsif user.save
+      # Flash thank you, sign in and redirect
+      session[:id] = user.id
+      flash[:notice] = "Thanks for signing up!"
+      redirect "/"
+    # If user doesn't exists and is not a valid new user, throw errors
+    else
+      user.errors.each do |e|
+        flash[:error] = e
+      end
+      redirect '/signup'
+    end
 	end
 
 	get "/login/?" do
