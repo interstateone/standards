@@ -27,7 +27,7 @@ define (require) ->
     url: '/api/checks'
 
   Backbone.Marionette.Renderer.render = (template, data) ->
-    _.template template, data
+    template data
 
   # Map JS reset() function to jQuery
   jQuery.fn.reset = ->
@@ -69,7 +69,7 @@ define (require) ->
 
   class CheckView extends Backbone.Marionette.ItemView
     tagName: 'td'
-    template: require('jade!../templates/check')()
+    template: require 'jade!../templates/check'
     initialize: ->
       if @model.isNew? then @date = @model.get 'date'
       else _.extend @, @model
@@ -81,13 +81,13 @@ define (require) ->
       else
         @trigger 'task:check', @date
     render: ->
-      @$el.html @template
+      @$el.html @template()
       if @model.isNew? then @$('img').addClass 'complete'
       @
 
   class TaskRowView extends Backbone.Marionette.CompositeView
     tagName: 'tr'
-    template: require('jade!../templates/task-row')()
+    template: require 'jade!../templates/task-row'
     itemView: CheckView
     initialEvents: ->
       if @collection?
@@ -143,7 +143,7 @@ define (require) ->
     id: 'tasksView'
     itemView: TaskRowView
     itemViewContainer: 'tbody'
-    template: require('jade!../templates/tasks-table')()
+    template: require 'jade!../templates/tasks-table'
     events:
       'click a.add': 'clickedAdd'
       'keypress #newtask': 'keypressNewTask'
@@ -188,7 +188,7 @@ define (require) ->
       @toggleNewTaskForm()
 
   class NavBarView extends Backbone.Marionette.ItemView
-    template: require('jade!../templates/navbar')()
+    template: require 'jade!../templates/navbar'
     events:
       'click .brand': 'clickedHome'
       'click .settings': 'clickedSettings'
@@ -213,7 +213,7 @@ define (require) ->
     hideArrows: -> @$('.arrow').each -> $(@).hide()
 
   class SettingsView extends Backbone.Marionette.Layout
-    template: require('jade!../templates/settings')()
+    template: require 'jade!../templates/settings'
     regions:
       info: '.info'
       password: '.password'
@@ -394,21 +394,21 @@ define (require) ->
 
 
   class ErrorView extends Backbone.Marionette.View
-    template: require('jade!../templates/error-flash')()
+    template: require 'jade!../templates/error-flash'
     render: ->
-      @$el.html _.template @template, @serializeData()
+      @$el.html @template @serializeData()
     serializeData: ->
       message: @options.message
 
   class NoticeView extends Backbone.Marionette.View
-    template: require('jade!../templates/notice-flash')()
+    template: require 'jade!../templates/notice-flash'
     render: ->
-      @$el.html _.template @template, @serializeData()
+      @$el.html @template @serializeData()
     serializeData: ->
       message: @options.message
 
   class TaskView extends Backbone.Marionette.ItemView
-    template: require('jade!../templates/taskview')()
+    template: require 'jade!../templates/taskview'
     events:
       'click a.delete': 'clickedDelete'
       'click a.delete-confirm': 'confirmDelete'

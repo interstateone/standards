@@ -1,34 +1,31 @@
-h2 <%= titleCase(title) %>
-p Remember! You're doing this because <%= switchPronouns(purpose) %>.
+h2= titleCase(title)
+p Remember! You're doing this because #{switchPronouns(purpose)}.
 
 div.row-fluid
   div.span3
     div.well
-      span.large-stat <%= percentComplete %>%
+      span.large-stat #{percentComplete}%
       p Completion
   div.span3
     div.well
-      <% if (count > 0) { %>
-      p You've done this
-      span.large-stat <%= count %>
-      p <%= pluralize('time', count) %> since you started <%= timeAgo %>.
-      <% } else { %>
-      p You haven't done this since you started <%= timeAgo %>.
-      <% } %>
+      if count > 0
+        p You've done this
+        span.large-stat= count
+        p #{pluralize('time', count)} since you started #{timeAgo}.
+      else
+        p You haven't done this since you started #{timeAgo}.
   div.span6
     div.well
       h3 Weekday Heatmap
       table.weekday-heatmap
         thead
           tr
-          <% _.each(heatmapHeader(), function (day) { %>
-          th <%= day.format('ddd').slice(0,1) %>
-          <% }); %>
+          each day in heatmapHeader()
+            th= day.format('ddd').slice(0,1)
         tbody
           tr
-          <% _.each(heatmap, function (day) { %>
-          td(style!="background-color: <%= day.temp %>") <%= day.count %>
-          <% }); %>
+          each day in heatmap
+            td(style="background-color: #{day.temp}")= day.count
 
 a.delete.btn.btn-danger.pull-right Delete
 
@@ -36,7 +33,7 @@ div.modal.hide.fade.deleteModal
   div.modal-header
     h3 Delete
   div.modal-body
-    p Are you sure you want to delete the task "<%= title %>"?
+    p Are you sure you want to delete the task "#{title}"?
   div.modal-footer
     a.btn(href="#", data-dismiss="modal") No, I'll give it another shot
     a.delete-confirm.btn.btn-danger(data-loading-text="Deleting...") Yes, delete it

@@ -1,9 +1,8 @@
 thead
   tr
     th
-    <% _.each(getWeekdaysAsArray(true), function (day) { %>
-    th <%= day.format('ddd') %>
-    <% }); %>
+    each day in getWeekdaysAsArray(true)
+      th= day.format('ddd')
 tfoot
   tr
     td(class="title add", style="height: 50px;", colspan="8")

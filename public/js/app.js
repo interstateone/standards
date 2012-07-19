@@ -50,7 +50,7 @@
 
     })(Backbone.Collection);
     Backbone.Marionette.Renderer.render = function(template, data) {
-      return _.template(template, data);
+      return template(data);
     };
     jQuery.fn.reset = function() {
       return $(this).each(function() {
@@ -132,7 +132,7 @@
 
       CheckView.prototype.tagName = 'td';
 
-      CheckView.prototype.template = require('jade!../templates/check')();
+      CheckView.prototype.template = require('jade!../templates/check');
 
       CheckView.prototype.initialize = function() {
         if (this.model.isNew != null) {
@@ -155,7 +155,7 @@
       };
 
       CheckView.prototype.render = function() {
-        this.$el.html(this.template);
+        this.$el.html(this.template());
         if (this.model.isNew != null) {
           this.$('img').addClass('complete');
         }
@@ -175,7 +175,7 @@
 
       TaskRowView.prototype.tagName = 'tr';
 
-      TaskRowView.prototype.template = require('jade!../templates/task-row')();
+      TaskRowView.prototype.template = require('jade!../templates/task-row');
 
       TaskRowView.prototype.itemView = CheckView;
 
@@ -284,7 +284,7 @@
 
       TasksView.prototype.itemViewContainer = 'tbody';
 
-      TasksView.prototype.template = require('jade!../templates/tasks-table')();
+      TasksView.prototype.template = require('jade!../templates/tasks-table');
 
       TasksView.prototype.events = {
         'click a.add': 'clickedAdd',
@@ -372,7 +372,7 @@
         return NavBarView.__super__.constructor.apply(this, arguments);
       }
 
-      NavBarView.prototype.template = require('jade!../templates/navbar')();
+      NavBarView.prototype.template = require('jade!../templates/navbar');
 
       NavBarView.prototype.events = {
         'click .brand': 'clickedHome',
@@ -434,7 +434,7 @@
         return SettingsView.__super__.constructor.apply(this, arguments);
       }
 
-      SettingsView.prototype.template = require('jade!../templates/settings')();
+      SettingsView.prototype.template = require('jade!../templates/settings');
 
       SettingsView.prototype.regions = {
         info: '.info',
@@ -793,10 +793,10 @@
         return ErrorView.__super__.constructor.apply(this, arguments);
       }
 
-      ErrorView.prototype.template = require('jade!../templates/error-flash')();
+      ErrorView.prototype.template = require('jade!../templates/error-flash');
 
       ErrorView.prototype.render = function() {
-        return this.$el.html(_.template(this.template, this.serializeData()));
+        return this.$el.html(this.template(this.serializeData()));
       };
 
       ErrorView.prototype.serializeData = function() {
@@ -816,10 +816,10 @@
         return NoticeView.__super__.constructor.apply(this, arguments);
       }
 
-      NoticeView.prototype.template = require('jade!../templates/notice-flash')();
+      NoticeView.prototype.template = require('jade!../templates/notice-flash');
 
       NoticeView.prototype.render = function() {
-        return this.$el.html(_.template(this.template, this.serializeData()));
+        return this.$el.html(this.template(this.serializeData()));
       };
 
       NoticeView.prototype.serializeData = function() {
@@ -839,7 +839,7 @@
         return TaskView.__super__.constructor.apply(this, arguments);
       }
 
-      TaskView.prototype.template = require('jade!../templates/taskview')();
+      TaskView.prototype.template = require('jade!../templates/taskview');
 
       TaskView.prototype.events = {
         'click a.delete': 'clickedDelete',
