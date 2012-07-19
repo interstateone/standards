@@ -14,6 +14,7 @@ class Standards < Sinatra::Base
 
 	use Rack::Cache
 	use Rack::Deflater
+	set :public_folder, 'public'
 
 	SITE_TITLE = "Standards"
 

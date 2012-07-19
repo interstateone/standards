@@ -18,6 +18,7 @@ class API < Sinatra::Base
 
 	use Rack::Cache
 	use Rack::Deflater
+	set :public_folder, 'public'
 
 	configure :production do
 		DataMapper.setup(:default, ENV['DATABASE_URL'])
