@@ -551,6 +551,12 @@ define (require) ->
           when 404 then @vent.trigger 'error', 'The server didn\'t understand that action.'
           when 500 then @vent.trigger 'error', 'There was a server error, try again.'
 
+      $(document).on 'click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', (event) ->
+        event.preventDefault()
+        window.location = $(this).attr "href"
+
+      new FastClick document.body
+
       # Events
       $(window).bind 'scroll touchmove', => @vent.trigger 'scroll:window'
       $(window).bind 'resize', => @toggleWidth()
@@ -647,7 +653,5 @@ define (require) ->
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();`
-
-    new FastClick document.body
 
   return initialize: initialize

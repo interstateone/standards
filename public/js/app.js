@@ -1086,6 +1086,11 @@
               return _this.vent.trigger('error', 'There was a server error, try again.');
           }
         });
+        $(document).on('click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', function(event) {
+          event.preventDefault();
+          return window.location = $(this).attr("href");
+        });
+        new FastClick(document.body);
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
@@ -1267,7 +1272,6 @@
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();;
 
-    new FastClick(document.body);
     return {
       initialize: initialize
     };
