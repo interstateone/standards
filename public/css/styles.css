@@ -4481,6 +4481,9 @@ input[type="submit"].btn.btn-mini {
   width: 200px;
   position: relative;
 }
+.navbar .arrow:hover {
+  text-decoration: none;
+}
 .navbar .moveBackward {
   position: absolute;
   top: 18px;
@@ -5413,6 +5416,18 @@ a.thumbnail:hover {
 .hero-unit img {
   max-width: 100%;
   max-height: 500px;
+}
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-select: none;
+  /* disable text select */
+
+  -webkit-touch-callout: none;
+  /* disable callout, image save panel (popup) */
+
+  -webkit-tap-highlight-color: transparent;
+  /* "turn off" link highlight */
+
 }
 @font-face {
   font-family: 'LeagueGothic';
