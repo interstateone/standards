@@ -118,7 +118,7 @@ class Standards < Sinatra::Base
 	end
 
 	post "/forgot/?" do
-		if !valid_email? params[:email]
+		if params[:email].nil? or params[:email] == ''
 			flash[:error] = "Please enter the email address you signed up with."
 			redirect '/login'
 		else
