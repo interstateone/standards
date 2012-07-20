@@ -2,9 +2,9 @@ $ ->
 
 	# Prevent iOS from opening a new Safari instance for anchor tags unless pointing to external page
 	$(document).on 'click tap', 'a[href]', (event) ->
-			unless event.target.attr('href').indexOf('http:')
-				event.preventDefault()
-				window.location = $(this).attr "href"
+		unless ~$(event.target).attr('href').indexOf('http:')
+			event.preventDefault()
+			window.location = $(event.target).attr('href')
 
 	# Let forgot password button make post to alternate route than submitting the login
 	$('button.forgot').click (e) ->

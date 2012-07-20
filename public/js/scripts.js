@@ -4,9 +4,9 @@
   $(function() {
     var addDropShadow, name, timezone;
     $(document).on('click tap', 'a[href]', function(event) {
-      if (!event.target.attr('href').indexOf('http:')) {
+      if (!~$(event.target).attr('href').indexOf('http:')) {
         event.preventDefault();
-        return window.location = $(this).attr("href");
+        return window.location = $(event.target).attr('href');
       }
     });
     $('button.forgot').click(function(e) {
