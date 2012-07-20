@@ -60,8 +60,8 @@
   <div class="container flash"></div>
   <div class="container body"></div>
   <!-- Javascript -->
+  <%= yield %>
   <%= '<script data-main="/js/main.js" src="/js/lib/require.js"></script>' if ENV['RACK_ENV'] != 'production' %>
   <%= '<script data-main="/js/main-built.js" src="/js/lib/require.js"></script>' if ENV['RACK_ENV'] == 'production' %>
-  <%= yield %>
 </body>
 </html>
