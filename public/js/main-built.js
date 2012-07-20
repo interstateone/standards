@@ -21808,7 +21808,7 @@ buf.push(attrs({ "class": ("minibar") }, {"class":true}));
 buf.push('></div></div><a');
 buf.push(attrs({ 'title':(purpose), "class": ("task") }, {"class":true,"title":true}));
 buf.push('>');
-var __val__ = title
+var __val__ = titleCase(title)
 buf.push(escape(null == __val__ ? "" : __val__));
 buf.push('</a></td>');
 }
@@ -22320,6 +22320,24 @@ return buf.join("");
         e.preventDefault();
         console.log('clicked', this.model.id);
         return this.model.select();
+      };
+
+      TaskRowView.prototype.templateHelpers = function() {
+        return {
+          titleCase: function(string) {
+            var word;
+            return ((function() {
+              var _i, _len, _ref, _results;
+              _ref = string.split(' ');
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                word = _ref[_i];
+                _results.push(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+              }
+              return _results;
+            })()).join(' ');
+          }
+        };
       };
 
       TaskRowView.prototype.onRender = function() {
@@ -23201,6 +23219,11 @@ return buf.join("");
               return _this.vent.trigger('error', 'There was a server error, try again.');
           }
         });
+        $(document).on('click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', function(event) {
+          event.preventDefault();
+          return window.location = $(this).attr("href");
+        });
+        new FastClick(document.body);
         $(window).bind('scroll touchmove', function() {
           return _this.vent.trigger('scroll:window');
         });
@@ -23382,7 +23405,6 @@ return buf.join("");
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();;
 
-    new FastClick(document.body);
     return {
       initialize: initialize
     };
