@@ -1,10 +1,29 @@
 $ ->
 
-	# Prevent iOS from opening a new Safari instance for anchor tags
-	# :not selector prevents operating on classes that are listed below
-	$(document).on 'click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', (event) ->
-			event.preventDefault()
-			window.location = $(this).attr "href"
+	# Prevent iOS from opening a new Safari instance for anchor tags unless pointing to external page
+	$(document).on 'click tap', 'a[href]', (event) ->
+			unless event.target.attr('href').indexOf('http:')
+				event.preventDefault()
+				window.location = $(this).attr "href"
+
+	# Let forgot password button make post to alternate route than submitting the login
+	$('button.forgot').click (e) ->
+		e.preventDefault()
+		$(this).parents('form').attr("action", '/forgot')
+		$(this).parents('form').submit()
+
+	# Add drop shadow to navbar when page is scrolled
+	window.onscroll = addDropShadow
+
+	# Use the touchmove event for touch devices because onscroll isn't fired until the scrolling/panning stops
+	window.addEventListener('touchmove', addDropShadow, false)
+
+	addDropShadow = ->
+		header = $('.navbar')
+		if window.pageYOffset > 0
+			header.addClass 'nav-drop-shadow'
+		else
+			header.removeClass 'nav-drop-shadow'
 
 	# Name validator
 	# Must be longer than one character
