@@ -48,6 +48,12 @@ class Standards < Sinatra::Base
 		if logged_in?
 			Time.zone = current_user.timezone
 		end
+
+		if ENV['RACK_ENV'] == 'production'
+			@host = 'https://' + request.host
+		else
+			@host = ''
+		end
 	end
 
 	get "/signup/?" do
