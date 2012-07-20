@@ -582,15 +582,15 @@ define (require) ->
         body: '.body'
       @flash = new MultiRegion el: '.flash'
       @navigation.show @navBar
-      $(@body.el).hammer().bind 'swipe', (ev) =>
-        switch ev.direction
-          when 'left' then @vent.trigger 'app:moveForward'
-          when 'right' then @vent.trigger 'app:moveBackward'
     showTasks: ->
       @offset = 0
       @router.navigate ''
       @navBar.showArrows()
       @body.show @tasksView = new TasksView collection: @tasks
+      $(@tasksView.el).hammer().bind 'swipe', (ev) =>
+        switch ev.direction
+          when 'left' then @vent.trigger 'app:moveForward'
+          when 'right' then @vent.trigger 'app:moveBackward'
     showSettings: ->
       @router.navigate 'settings'
       @navBar.hideArrows()

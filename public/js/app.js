@@ -1124,7 +1124,6 @@
       };
 
       App.prototype.showApp = function() {
-        var _this = this;
         this.addRegions({
           navigation: '.navigation',
           body: '.body'
@@ -1132,8 +1131,18 @@
         this.flash = new MultiRegion({
           el: '.flash'
         });
-        this.navigation.show(this.navBar);
-        return $(this.body.el).hammer().bind('swipe', function(ev) {
+        return this.navigation.show(this.navBar);
+      };
+
+      App.prototype.showTasks = function() {
+        var _this = this;
+        this.offset = 0;
+        this.router.navigate('');
+        this.navBar.showArrows();
+        this.body.show(this.tasksView = new TasksView({
+          collection: this.tasks
+        }));
+        return $(this.tasksView.el).hammer().bind('swipe', function(ev) {
           switch (ev.direction) {
             case 'left':
               return _this.vent.trigger('app:moveForward');
@@ -1141,15 +1150,6 @@
               return _this.vent.trigger('app:moveBackward');
           }
         });
-      };
-
-      App.prototype.showTasks = function() {
-        this.offset = 0;
-        this.router.navigate('');
-        this.navBar.showArrows();
-        return this.body.show(this.tasksView = new TasksView({
-          collection: this.tasks
-        }));
       };
 
       App.prototype.showSettings = function() {
