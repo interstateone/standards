@@ -9,4 +9,8 @@ class Task
 	property :purpose, Text
 
 	timestamps :on
+
+  def created_on
+    attribute_get(:created_on).to_time.in_time_zone(self.user.timezone)
+  end
 end
