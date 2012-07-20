@@ -106,6 +106,8 @@ define (require) ->
       e.preventDefault()
       console.log 'clicked', @model.id
       @model.select()
+    templateHelpers: ->
+      titleCase: (string) -> (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() for word in string.split ' ').join ' '
     onRender: -> @renderHeight()
     renderCollection: ->
       @triggerBeforeRender()

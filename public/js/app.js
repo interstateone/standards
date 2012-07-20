@@ -207,6 +207,24 @@
         return this.model.select();
       };
 
+      TaskRowView.prototype.templateHelpers = function() {
+        return {
+          titleCase: function(string) {
+            var word;
+            return ((function() {
+              var _i, _len, _ref, _results;
+              _ref = string.split(' ');
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                word = _ref[_i];
+                _results.push(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+              }
+              return _results;
+            })()).join(' ');
+          }
+        };
+      };
+
       TaskRowView.prototype.onRender = function() {
         return this.renderHeight();
       };
