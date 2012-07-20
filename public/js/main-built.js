@@ -21900,9 +21900,7 @@ buf.push('><a');
 buf.push(attrs({ 'href':("#"), 'data-toggle':("dropdown"), "class": ('dropdown-toggle') }, {"href":true,"data-toggle":true}));
 buf.push('><i');
 buf.push(attrs({ "class": ('icon-user') }, {}));
-buf.push('></i><b');
-buf.push(attrs({ "class": ('caret') }, {}));
-buf.push('></b></a><ul');
+buf.push('></i></a><ul');
 buf.push(attrs({ "class": ('dropdown-menu') }, {}));
 buf.push('><li><p>');
 var __val__ = name
