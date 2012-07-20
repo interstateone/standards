@@ -9,7 +9,7 @@ $ ->
 	# Let forgot password button make post to alternate route than submitting the login
 	$('button.forgot').click (e) ->
 		e.preventDefault()
-		$(this).parents('form').attr("action", '/forgot')
+		$(this).parents('form').attr("action", 'https://mystandards.herokuapp.com/forgot')
 		$(this).parents('form').submit()
 
 	# Add drop shadow to navbar when page is scrolled

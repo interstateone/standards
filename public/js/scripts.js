@@ -11,7 +11,7 @@
     });
     $('button.forgot').click(function(e) {
       e.preventDefault();
-      $(this).parents('form').attr("action", '/forgot');
+      $(this).parents('form').attr("action", 'https://mystandards.herokuapp.com/forgot');
       return $(this).parents('form').submit();
     });
     $(window).on('scroll touchmove', function() {
