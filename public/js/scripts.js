@@ -2,7 +2,7 @@
 (function() {
 
   $(function() {
-    var addDropShadow, name, timezone;
+    var name, timezone;
     $(document).on('click tap', 'a[href]', function(event) {
       if (!~$(event.target).attr('href').indexOf('http:')) {
         event.preventDefault();
@@ -14,17 +14,13 @@
       $(this).parents('form').attr("action", '/forgot');
       return $(this).parents('form').submit();
     });
-    window.onscroll = addDropShadow;
-    window.addEventListener('touchmove', addDropShadow, false);
-    addDropShadow = function() {
-      var header;
-      header = $('.navbar');
+    $(window).on('scroll touchmove', function() {
       if (window.pageYOffset > 0) {
-        return header.addClass('nav-drop-shadow');
+        return $('.navbar').addClass('nav-drop-shadow');
       } else {
-        return header.removeClass('nav-drop-shadow');
+        return $('.navbar').removeClass('nav-drop-shadow');
       }
-    };
+    });
     $('input#name').keyup(function() {
       if ($(this).val().length > 1) {
         if (!$(this).parents('.control-group').hasClass('success')) {

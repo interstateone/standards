@@ -13,17 +13,9 @@ $ ->
 		$(this).parents('form').submit()
 
 	# Add drop shadow to navbar when page is scrolled
-	window.onscroll = addDropShadow
-
-	# Use the touchmove event for touch devices because onscroll isn't fired until the scrolling/panning stops
-	window.addEventListener('touchmove', addDropShadow, false)
-
-	addDropShadow = ->
-		header = $('.navbar')
-		if window.pageYOffset > 0
-			header.addClass 'nav-drop-shadow'
-		else
-			header.removeClass 'nav-drop-shadow'
+	$(window).on 'scroll touchmove', ->
+		if window.pageYOffset > 0 then $('.navbar').addClass 'nav-drop-shadow'
+		else $('.navbar').removeClass 'nav-drop-shadow'
 
 	# Name validator
 	# Must be longer than one character
