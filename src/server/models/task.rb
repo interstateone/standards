@@ -11,6 +11,8 @@ class Task
 	timestamps :on
 
   def created_on
-    attribute_get(:created_on).to_time.in_time_zone(self.user.timezone)
+    unless attribute_get(:created_on).nil?
+      attribute_get(:created_on).to_time.in_time_zone(self.user.timezone).to_date
+    end
   end
 end
