@@ -1104,7 +1104,7 @@
               return _this.vent.trigger('error', 'There was a server error, try again.');
           }
         });
-        $(document).on('click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', function(event) {
+        $(document).on('click tap', 'a[href="/logout"]', function(event) {
           event.preventDefault();
           return window.location = $(this).attr("href");
         });

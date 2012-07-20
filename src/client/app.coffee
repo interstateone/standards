@@ -553,7 +553,7 @@ define (require) ->
           when 404 then @vent.trigger 'error', 'The server didn\'t understand that action.'
           when 500 then @vent.trigger 'error', 'There was a server error, try again.'
 
-      $(document).on 'click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', (event) ->
+      $(document).on 'click tap', 'a[href="/logout"]', (event) ->
         event.preventDefault()
         window.location = $(this).attr "href"
 
