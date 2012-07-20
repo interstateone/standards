@@ -930,8 +930,10 @@
           })()).join(' ');
         },
         pluralize: function(word, count) {
-          if (count > 0) {
+          if (count > 1) {
             return word += 's';
+          } else {
+            return word;
           }
         },
         heatmapHeader: heatmapHeader,

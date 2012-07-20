@@ -459,7 +459,7 @@ define (require) ->
     templateHelpers:
       sentenceCase: (string) -> string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
       titleCase: (string) -> (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() for word in string.split ' ').join ' '
-      pluralize: (word, count) -> word += 's' if count > 0
+      pluralize: (word, count) -> if count > 1 then word += 's' else word
       heatmapHeader: heatmapHeader
       getWeekdaysAsArray: getWeekdaysAsArray
       gsub: (source, pattern, replacement) ->
