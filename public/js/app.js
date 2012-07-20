@@ -872,7 +872,7 @@
           firstDay = moment(Math.min(createdDay.valueOf(), firstCheckDay.valueOf()));
         }
         percentComplete = Math.ceil(count * 100 / (today.diff(firstDay, 'days') + 1));
-        timeAgo = today.diff(firstDay, 'hours') > 24 ? firstDay.fromNow() : 'today';
+        timeAgo = firstDay.fromNow();
         console.log(today.diff(firstDay, 'hours'));
         weekdayCount = this.weekdayCount();
         heatmap = this.heatmap(weekdayCount);

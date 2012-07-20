@@ -23003,7 +23003,7 @@ return buf.join("");
           firstDay = moment(Math.min(createdDay.valueOf(), firstCheckDay.valueOf()));
         }
         percentComplete = Math.ceil(count * 100 / (today.diff(firstDay, 'days') + 1));
-        timeAgo = today.diff(firstDay, 'hours') > 24 ? firstDay.fromNow() : 'today';
+        timeAgo = firstDay.fromNow();
         console.log(today.diff(firstDay, 'hours'));
         weekdayCount = this.weekdayCount();
         heatmap = this.heatmap(weekdayCount);
@@ -23061,8 +23061,10 @@ return buf.join("");
           })()).join(' ');
         },
         pluralize: function(word, count) {
-          if (count > 0) {
+          if (count > 1) {
             return word += 's';
+          } else {
+            return word;
           }
         },
         heatmapHeader: heatmapHeader,

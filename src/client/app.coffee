@@ -431,7 +431,7 @@ define (require) ->
         firstDay = moment(Math.min createdDay.valueOf(), firstCheckDay.valueOf())
 
       percentComplete = Math.ceil(count * 100 / (today.diff(firstDay, 'days') + 1))
-      timeAgo = if today.diff(firstDay, 'hours') > 24 then firstDay.fromNow() else 'today'
+      timeAgo = firstDay.fromNow()
       console.log today.diff(firstDay, 'hours')
       weekdayCount = @weekdayCount()
       heatmap = @heatmap weekdayCount
