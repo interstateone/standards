@@ -2,32 +2,11 @@
 (function() {
 
   $(function() {
-    var $select, name, timezone;
-    $(document).on(function() {
-      'click';
-
-      'a[href]:not(.delete, .delete-confirm, .target, .title)';
-      return function(event) {
-        event.preventDefault();
-        return window.location = $(this).attr("href");
-      };
+    var name, timezone;
+    $(document).on('click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', function(event) {
+      event.preventDefault();
+      return window.location = $(this).attr("href");
     });
-    $(document).on(function() {
-      'tap';
-
-      'a[href]:not(.delete, .delete-confirm, .target, .title)';
-      return function(event) {
-        event.preventDefault();
-        return window.location = $(this).attr("href");
-      };
-    });
-    $('section [href^=#]').click(function(e) {
-      return e.preventDefault();
-    });
-    $select = $('select#timezone');
-    if ($select.data("zone") !== null) {
-      $select.val($select.data("zone"));
-    }
     $('input#name').keyup(function() {
       if ($(this).val().length > 1) {
         if (!$(this).parents('.control-group').hasClass('success')) {
@@ -63,28 +42,20 @@
         }
       }
     });
-    if ($('div.btn-group[data-toggle-name=*]').length) {
-      $('div.btn-group[data-toggle-name=*]').each(function() {
-        var form, group, hidden, name;
-        group = $(this);
-        form = group.parents('form').eq(0);
-        name = group.attr('data-toggle-name');
-        hidden = $('input[name="' + name + '"]', form);
-        return $('button', group).each(function() {
-          var button;
-          button = $(this);
-          button.live('click', function() {
-            return hidden.val($(this).val());
-          });
-          if (button.val() === hidden.val()) {
-            return button.addClass('active');
-          }
-        });
-      });
-    }
     timezone = jstz.determine();
     name = timezone.name();
-    return $('input#timezone').val(name);
+    $('input#timezone').val(name);
+    var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-30914801-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();;
+
+    return new FastClick(document.body);
   });
 
 }).call(this);

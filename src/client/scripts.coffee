@@ -2,28 +2,9 @@ $ ->
 
 	# Prevent iOS from opening a new Safari instance for anchor tags
 	# :not selector prevents operating on classes that are listed below
-	$(document).on ->
-		'click'
-		'a[href]:not(.delete, .delete-confirm, .target, .title)'
-		(event) ->
+	$(document).on 'click tap', 'a[href]:not(.delete, .delete-confirm, .target, .title)', (event) ->
 			event.preventDefault()
 			window.location = $(this).attr "href"
-
-	$(document).on ->
-		'tap'
-		'a[href]:not(.delete, .delete-confirm, .target, .title)'
-		(event) ->
-			event.preventDefault()
-			window.location = $(this).attr "href"
-
-	# Disable do-nothing links
-	$('section [href^=#]').click (e) ->
-		e.preventDefault()
-
-	# Set the timezone dropdown to the current value
-	$select = $('select#timezone')
-	if $select.data("zone") != null
-		$select.val($select.data("zone"))
 
 	# Name validator
 	# Must be longer than one character
@@ -56,24 +37,19 @@ $ ->
 			if $(this).parents('.control-group').hasClass('success')
 				$(this).parents('.control-group').toggleClass("success")
 
-	# If this is the settings page, handle the weekday radio buttons
-	# Credit: http://dan.doezema.com/2012/03/twitter-bootstrap-radio-button-form-inputs/
-	if $('div.btn-group[data-toggle-name=*]').length
-		$('div.btn-group[data-toggle-name=*]').each ->
-			group   = $(this)
-			form    = group.parents('form').eq(0)
-			name    = group.attr('data-toggle-name')
-			hidden  = $('input[name="' + name + '"]', form)
-			$('button', group).each ->
-				button = $(this)
-				button.live 'click', ->
-					hidden.val($(this).val())
-				if button.val() == hidden.val()
-					button.addClass 'active'
-
 	# Submit timezone with signup
 	timezone = jstz.determine()
 	name = timezone.name()
 	$('input#timezone').val(name)
 
-# End document.ready ----------------------------------------------------------------
+	`var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-30914801-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+	  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();`
+
+	new FastClick document.body
