@@ -12,9 +12,9 @@ define (require) ->
   require 'plugins'
 
   # App Components
-  User = require 'user'
-  Task = require 'task'
-  Form = require 'form'
+  User = require 'cs!user'
+  Task = require 'cs!task'
+  Form = require 'cs!form'
 
   class Tasks extends Backbone.Collection
     model: Task

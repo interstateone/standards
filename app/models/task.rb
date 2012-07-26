@@ -8,11 +8,11 @@ class Task
 	property :title, Text, :required => true
 	property :purpose, Text
 
-	timestamps :on
+  timestamps :on
 
-  def created_on
+  def created_at
     unless attribute_get(:created_on).nil?
-      attribute_get(:created_on).to_time.in_time_zone(self.user.timezone).to_date
+      attribute_get(:created_on).to_time.in_time_zone(self.user.timezone)
     end
   end
 end
