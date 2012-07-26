@@ -14,7 +14,8 @@
     inlineText: true,
     useStrict: false,
     pragmasOnSave: {
-        excludeJade : true
+        excludeCoffeeScript: true,
+        excludeJade: true
     },
     skipModuleInsertion: false,
     stubModules: ['text'],
