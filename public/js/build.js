@@ -1,9 +1,10 @@
 ({
-    mainConfigFile: '../public/js/main.js',
-    baseUrl: '../public/js/',
+    mainConfigFile: './main.js',
+    baseUrl: '.',
     include: ["main"],
-    name: 'main',
-    out: "../public/js/main-built.js",
+    name: 'lib/almond.js',
+    out: "./main-built.js",
+    wrap: true,
     optimize: "none",
     uglify: {
         toplevel: true,
