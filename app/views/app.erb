@@ -64,8 +64,7 @@
   <!-- Javascript -->
   <%= yield %>
   <%= '<script data-main="/js/main.js" src="/js/lib/require.js"></script>' if ENV['RACK_ENV'] != 'production' %>
-<<<<<<< HEAD
-  <%= '<script data-main="/js/main-built.js" src="/js/lib/require.js"></script>' if ENV['RACK_ENV'] == 'production' %>
+  <%= '<script src="/js/main-built.js"></script>' if ENV['RACK_ENV'] == 'production' %>
   <script type="text/javascript">
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-30914801-1']);
@@ -77,8 +76,5 @@
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
   </script>
-=======
-  <%= '<script src="/js/main-built.js"></script>' if ENV['RACK_ENV'] == 'production' %>
->>>>>>> App layout loads almond build in production
 </body>
 </html>
