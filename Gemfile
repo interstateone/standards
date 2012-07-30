@@ -23,6 +23,7 @@ gem 'thin'
 gem 'garb'
 gem 'json'
 gem 'rack-cache'
+gem 'execjs'
 
 group :test do
 	gem 'rack-test', :require => 'rack/test'
