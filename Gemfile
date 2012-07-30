@@ -1,7 +1,6 @@
 # A sample Gemfile
 source "https://rubygems.org"
 
-# gem "rails"
 gem "sinatra"
 gem "datamapper", :require => "data_mapper"
 gem 'activesupport', :require => 'active_support'
@@ -23,6 +22,7 @@ gem 'thin'
 gem 'garb'
 gem 'json'
 gem 'rack-cache'
+gem 'less-rb', :git => 'https://github.com/maccman/less-rb.git'
 gem 'execjs'
 
 group :test do

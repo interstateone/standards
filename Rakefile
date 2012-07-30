@@ -47,10 +47,9 @@ EOM
     end
 
     task :less do
-      `cd public/less; lessc bootstrap.less > ../css/styles.css`
-      unless $?.success?
-        raise RuntimeError, "css compilation with lessc failed."
-      end
+      less = File.read('public/less/bootstrap.less')
+      css = Less::Parser.compile(less, :paths => ['public/less/'])
+      File.write('public/css/styles.css')
     end
   end
 
