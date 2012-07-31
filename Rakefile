@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'pathname'
 require 'tempfile'
+require 'less'
 
 namespace :requirejs do
 
@@ -47,9 +48,11 @@ EOM
     end
 
     task :less do
-      less = File.read('public/less/bootstrap.less')
-      css = Less::Parser.compile(less, :paths => ['public/less/'])
-      File.write('public/css/styles.css')
+      less = File.open('public/less/bootstrap.less', 'r').read
+      parser = Less::Parser.new :paths => ['public/less/']
+      tree = parser.parse less
+      css = tree.to_css
+      File.open('public/css/styles.css', 'w') {|f| f.write(css) }
     end
   end
 

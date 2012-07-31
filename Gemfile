@@ -22,7 +22,7 @@ gem 'thin'
 gem 'garb'
 gem 'json'
 gem 'rack-cache'
-gem 'less-rb', :git => 'https://github.com/maccman/less-rb.git'
+gem 'less'
 gem 'execjs'
 
 group :test do
