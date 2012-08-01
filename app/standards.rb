@@ -12,7 +12,10 @@ class Standards < Sinatra::Base
 	require_relative 'workers/emailworker'
 	register Sinatra::Flash
 
-	use Rack::Cache
+	if memcache_servers = ENV["MEMCACHE_SERVERS"]
+	  use Rack::Cache
+		set :static_cache_control, [:public, :max_age => 300]
+	end
 	use Rack::Deflater
 	set :public_folder, 'public'
 

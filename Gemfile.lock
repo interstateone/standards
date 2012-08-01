@@ -12,6 +12,7 @@ GEM
     commonjs (0.2.6)
     crack (0.3.1)
     daemons (1.1.8)
+    dalli (2.1.0)
     data_objects (0.10.8)
       addressable (~> 2.1)
     datamapper (1.2.0)
@@ -175,6 +176,7 @@ DEPENDENCIES
   activesupport
   bowtie
   colorist
+  dalli
   datamapper
   dm-aggregates
   dm-core
