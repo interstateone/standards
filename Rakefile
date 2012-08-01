@@ -41,7 +41,7 @@ EOM
     end
 
     task :rjs do
-      `cd public/js; node lib/r.js -o build.js`
+      `cd public/js; ../../bin/node lib/r.js -o build.js`
       unless $?.success?
         raise RuntimeError, "js compilation with r.js failed."
       end
@@ -52,6 +52,7 @@ EOM
       parser = Less::Parser.new :paths => ['public/less/']
       tree = parser.parse less
       css = tree.to_css
+      Dir.mkdir 'public/css/'
       File.open('public/css/styles.css', 'w') {|f| f.write(css) }
     end
   end
