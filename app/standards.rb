@@ -13,8 +13,11 @@ class Standards < Sinatra::Base
   register Sinatra::Flash
 
   if memcache_servers = ENV["MEMCACHE_SERVERS"]
-    use Rack::Cache
-    set :static_cache_control, [:public, :max_age => 300]
+    use Rack::Cache,
+      :verbose => true,
+      :metastore => "memcached://#{memcache_servers}",
+      :entitystore => "memcached://#{memcache_servers}"
+    set :static_cache_control, [:public, {:max_age => 60*60*24*7}]
   end
   use Rack::Deflater
   set :public_folder, 'public'
