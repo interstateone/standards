@@ -100,6 +100,7 @@ GEM
     json_pure (1.6.7)
     less (2.2.1)
       commonjs (~> 0.2.6)
+    libv8 (3.11.8.3)
     listen (0.4.7)
       rb-fchange (~> 0.0.5)
       rb-fsevent (~> 0.9.1)
@@ -126,6 +127,7 @@ GEM
     rb-fsevent (0.9.1)
     rb-inotify (0.8.8)
       ffi (>= 0.5.0)
+    ref (1.0.0)
     resolv-ipv6favor (0.0.0)
     rest (2.0.2)
       net-http-persistent
@@ -150,6 +152,8 @@ GEM
       sinatra (>= 1.0.0)
     stringex (1.3.3)
     term-ansicolor (1.0.7)
+    therubyracer (0.11.0beta5)
+      ref
     thin (1.4.1)
       daemons (>= 1.0.9)
       eventmachine (>= 0.12.6)
@@ -186,6 +190,7 @@ DEPENDENCIES
   iron_worker
   json
   less
+  libv8 (~> 3.11.8)
   pony
   rack-cache
   rack-test
@@ -194,6 +199,7 @@ DEPENDENCIES
   shotgun
   sinatra
   sinatra-flash
+  therubyracer (= 0.11.0beta5)
   thin
   timecop
   tzinfo

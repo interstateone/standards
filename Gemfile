@@ -25,6 +25,11 @@ gem 'rack-cache'
 gem 'less'
 gem 'execjs'
 
+group :production do
+  gem 'therubyracer', '0.11.0beta5'
+  gem 'libv8', '~> 3.11.8'
+end
+
 group :test do
 	gem 'rack-test', :require => 'rack/test'
 	gem 'guard-rspec'
