@@ -14,6 +14,8 @@ class User
 	property :timezone, String, :default => "Mountain Time (US & Canada)"
 	property :email_permission, Boolean, :default => false
 	property :starting_weekday, Integer, :default => 0
+	property :daily_reminder_permission, Boolean, :default => false
+	property :daily_reminder_time, Integer, :default => 17
 
 	timestamps :on
 
@@ -21,6 +23,13 @@ class User
 	validates_presence_of :email
 	validates_uniqueness_of :email
 	validates_presence_of :hashed_password, :message => "Password must be at least 8 characters with one number."
+	validates_with_block :daily_reminder_time do
+		if @daily_reminder_time.between?(0,23)
+			true
+		else
+			[false, 'Not a valid hour value.']
+		end
+	end
 
 	before :save do
 
