@@ -7,9 +7,9 @@ require 'fileutils'
 require 'pathname'
 require 'tempfile'
 
-if ENV['RACK_ENV'] == 'production'
+unless ENV['DATABASE_URL'].nil?
   DataMapper.setup(:default, ENV['DATABASE_URL'])
-elsif ENV['RACK_ENV'] == 'development'
+else
   yaml = YAML.load_file("config.yaml")
   yaml.each_pair do |key, value|
     set(key.to_sym, value)
@@ -81,11 +81,12 @@ task "assets:precompile" => ["assets:precompile:external"]
 
 namespace :reminders do
   task :daily do
+    server_time = Time.now
     User.all.each do |user|
       next unless user.daily_reminder_permission
+      user_time = server_time.in_time_zone(user.timezone)
       puts "checking #{user.id}"
-      server_time = Time.now.in_time_zone(user.timezone).hour
-      if server_time == user.daily_reminder_time
+      if user_time.hour == user.daily_reminder_time && user_time.min.between?(0,5)
         puts "sending email to #{user.id}"
         RestClient.post "https://api:key-2oe0h2j0yx214p4vnz7wyv9ef1c5fdk2"\
         "@api.mailgun.net/v2/app4624790.mailgun.org/messages",
