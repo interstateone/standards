@@ -7,6 +7,7 @@ define (require) ->
   Marionette = require 'marionette'
   require 'moment'
   require 'jquery-hammer'
+  require 'mobiscroll'
 
   # App Libs
   require 'plugins'
@@ -321,6 +322,34 @@ define (require) ->
 
       html.join ''
 
+  class Hour extends Backbone.Form.editors.Base
+    getValue: ->
+      data = @$el.scroller('getValue')
+      hours = parseInt data[0]
+      if parseInt(data[1]) is 1 then hours += 12
+      hours
+    setValue: (value) ->
+      if value > 11
+        hour = value - 12
+        pm = 1
+      else
+        hour = value
+        pm = 0
+      @$el.scroller('setValue', [hour, pm], true)
+    initialize: ->
+      super
+      @$el.scroller
+        preset: 'time'
+        theme: 'android-ics light'
+        display: 'inline'
+        mode: 'mixed'
+        rows: 3
+        timeWheels: 'hA'
+        showLabel: false
+    render: ->
+      @setValue @value
+      @
+
   class InfoForm extends Form
     template: require('jade!../templates/info-form')()
     events:
@@ -357,7 +386,7 @@ define (require) ->
         type: 'Checkbox'
       daily_reminder_time:
         title: 'Reminder time'
-        type: 'Number'
+        type: Hour
       email_permission:
         title: 'Do you want to receive email updates about Standards?'
         type: 'Checkbox'

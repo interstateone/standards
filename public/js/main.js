@@ -15,6 +15,7 @@ require.config({
     moment: 'lib/moment',
     hammer: 'lib/hammer',
     'jquery-hammer': 'lib/jquery.hammer',
+    mobiscroll: 'lib/mobiscroll',
     plugins: 'plugins',
     app: 'app'
   },
