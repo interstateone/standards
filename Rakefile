@@ -1,9 +1,26 @@
+require 'bundler/setup'
+Bundler.require()
+require 'active_support/core_ext/time/zones'
+require 'active_support/time_with_zone'
+require 'active_support/core_ext/time/conversions'
 require 'fileutils'
 require 'pathname'
 require 'tempfile'
-require 'less'
 
-namespace :requirejs do
+if ENV['RACK_ENV'] == 'production'
+  DataMapper.setup(:default, ENV['DATABASE_URL'])
+elsif ENV['RACK_ENV'] == 'development'
+  yaml = YAML.load_file("config.yaml")
+  yaml.each_pair do |key, value|
+    set(key.to_sym, value)
+  end
+
+  DataMapper.setup(:default, "postgres://" + settings.db_user + ":" + settings.db_password + "@" + settings.db_host + "/" + settings.db_name)
+end
+
+require_relative 'app/models/init'
+
+namespace :assets do
 
   # From Rails 3 assets.rake; we have the same problem:
   #
@@ -19,25 +36,23 @@ namespace :requirejs do
       `node -v`
     rescue Errno::ENOENT
       STDERR.puts <<-EOM
-Unable to find 'node' on the current path, required for precompilation
-using the requirejs-ruby gem. To install node.js, see http://nodejs.org/
-OS X Homebrew users can use 'brew install node'.
+Unable to find 'node' on the current path.
 EOM
       exit 1
     end
   end
 
   namespace :precompile do
-    task :all => ["requirejs:precompile:rjs",
-                  "requirejs:precompile:less"]
+    task :all => ["assets:precompile:rjs",
+                  "assets:precompile:less"]
 
     # Invoke another ruby process if we're called from inside
     # assets:precompile so we don't clobber the environment
     #
     # We depend on test_node here so we'll fail early and hard if node
     # isn't available.
-    task :external => ["requirejs:test_node"] do
-      Rake::Task["requirejs:precompile:all"].invoke
+    task :external => ["assets:test_node"] do
+      Rake::Task["assets:precompile:all"].invoke
     end
 
     task :rjs do
@@ -59,11 +74,26 @@ EOM
 
   desc "Precompile r.js and less assets"
   task :precompile do
-    invoke_or_reboot_rake_task "requirejs:precompile:all"
+    invoke_or_reboot_rake_task "assets:precompile:all"
   end
 end
+task "assets:precompile" => ["assets:precompile:external"]
 
-task "assets:precompile" => ["requirejs:precompile:external"]
-if ARGV[0] == "requirejs:precompile:all"
-  task "assets:environment" => ["requirejs:precompile:disable_js_compressor"]
+namespace :reminders do
+  task :daily do
+    User.all.each do |user|
+      next unless user.daily_reminder_permission
+      puts "checking #{user.id}"
+      server_time = Time.now.in_time_zone(user.timezone).hour
+      if server_time == user.daily_reminder_time
+        puts "sending email to #{user.id}"
+        RestClient.post "https://api:key-2oe0h2j0yx214p4vnz7wyv9ef1c5fdk2"\
+        "@api.mailgun.net/v2/app4624790.mailgun.org/messages",
+        :from => "Standards <standards@brandonevans.ca>",
+        :to => user.email,
+        :subject => "Today's Reminder",
+        :text => "Remember to check off your standards for the day!"
+      end
+    end
+  end
 end

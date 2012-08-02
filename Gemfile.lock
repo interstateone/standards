@@ -197,6 +197,7 @@ DEPENDENCIES
   rack-cache
   rack-test
   resolv-ipv6favor
+  rest-client
   rspec
   shotgun
   sinatra
