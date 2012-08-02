@@ -352,12 +352,18 @@ define (require) ->
               val: _.keys(obj)[0]
               label: _.values(obj)[0]
             callback result
+      daily_reminder_permission:
+        title: 'Remind me each day if I haven\'t checked anything off yet'
+        type: 'Checkbox'
+      daily_reminder_time:
+        title: 'Reminder time'
+        type: 'Number'
       email_permission:
         title: 'Do you want to receive email updates about Standards?'
         type: 'Checkbox'
     fieldsets: [
       legend: 'Info'
-      fields: ['name', 'email', 'starting_weekday', 'timezone', 'email_permission']
+      fields: ['name', 'email', 'starting_weekday', 'timezone', 'daily_reminder_permission', 'daily_reminder_time', 'email_permission']
     ]
 
   class PasswordForm extends Form
