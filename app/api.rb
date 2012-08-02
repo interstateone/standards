@@ -64,7 +64,7 @@ class API < Sinatra::Base
 		if user = User.authenticate(params[:email], params[:password])
 			content_type :json
 			session[:id] = user.id
-			user.attributes.only(:id, :name, :email, :starting_weekday, :timezone).to_json
+			user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission, :daily_reminder_permission, :daily_reminder_time).to_json
 		else
 			status 401
 		end
@@ -128,7 +128,7 @@ class API < Sinatra::Base
 	get "/user/info/?" do
 		content_type :json
 		login_required
-		current_user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission).to_json
+		current_user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission, :daily_reminder_permission, :daily_reminder_time).to_json
 	end
 
 	# Forgot password --------------------------------
@@ -226,10 +226,12 @@ class API < Sinatra::Base
 			:email => data['email'],
 			:starting_weekday => data['starting_weekday'],
 			:timezone => data['timezone'],
-			:email_permission => data['email_permission'] || false
+			:email_permission => data['email_permission'] || false,
+			:daily_reminder_permission => data['daily_reminder_permission'] || false,
+			:daily_reminder_time => data['daily_reminder_time']
 		)
 
-		user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission).to_json
+		user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission, :daily_reminder_permission, :daily_reminder_time).to_json
 	end
 
 	# Update Password --------------------------------
