@@ -1,19 +1,15 @@
 /* Datewheel overlay */
 .dw {
-  min-width:170px;
-  padding: 0 10px;
+  min-width: 170px;
+  padding: 0;
   position: absolute;
-  top: 5%;
   left: 0;
   z-index: 1001;
   color: #000;
-  font-family: arial, verdana, sans-serif;
-  font-size: 12px;
   text-shadow: none;
 }
 .dwi {
   position: static;
-  margin: 5px;
   display: inline-block;
 }
 .dwwr {
@@ -33,8 +29,6 @@
 /* Datewheel wheel container wrapper */
 .dwc {
   float: left;
-  margin: 0 2px 5px 2px;
-  padding-top: 30px;
 }
 .dwcc {
   clear: both;
@@ -57,9 +51,7 @@
 }
 /* Datewheel wheel container */
 .dwrc {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
+  .border-radius(4px);
 }
 .dwwc {
   margin: 0;
@@ -73,10 +65,10 @@
   margin: 4px 2px;
   position: relative;
   background: #888;
-  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #000),color-stop(0.35, #333),color-stop(0.50, #888),color-stop(0.65, #333),color-stop(1, #000));
-  background: -moz-linear-gradient(#000 0%,#333 35%, #888 50%,#333 65%,#000 100%);
-  background: -ms-linear-gradient(#000 0%,#333 35%, #888 50%,#333 65%,#000 100%);
-  background: -o-linear-gradient(#000 0%,#333 35%, #888 50%,#333 65%,#000 100%);
+  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #000),color-stop(0.35, #666),color-stop(0.50, #888),color-stop(0.65, #666),color-stop(1, #000));
+  background: -moz-linear-gradient(#000 0%,#666 35%, #888 50%,#666 65%,#000 100%);
+  background: -ms-linear-gradient(#000 0%,#666 35%, #888 50%,#666 65%,#000 100%);
+  background: -o-linear-gradient(#000 0%,#666 35%, #888 50%,#666 65%,#000 100%);
 }
 .dww {
   margin: 0 2px;
@@ -87,10 +79,10 @@
 .dwsc .dww {
   color: #fff;
   background: #444;
-  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #000),color-stop(0.45, #444),color-stop(0.55, #444),color-stop(1, #000));
-  background: -moz-linear-gradient(#000 0%,#444 45%, #444 55%, #000 100%);
-  background: -ms-linear-gradient(#000 0%,#444 45%, #444 55%, #000 100%);
-  background: -o-linear-gradient(#000 0%,#444 45%, #444 55%, #000 100%);
+  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #000),color-stop(0.45, #666),color-stop(0.55, #666),color-stop(1, #000));
+  background: -moz-linear-gradient(#000 0%,#666 45%, #666 55%, #000 100%);
+  background: -ms-linear-gradient(#000 0%,#666 45%, #666 55%, #000 100%);
+  background: -o-linear-gradient(#000 0%,#666 45%, #666 55%, #000 100%);
 }
 .dww ul {
   list-style: none;
@@ -108,9 +100,8 @@
   display: block;
   text-align: center;
   line-height: 40px;
-  font-size: 20px;
+  font-weight: normal;
   white-space: nowrap;
-  text-shadow: 0 1px 1px #000;
   opacity: .3;
   filter: Alpha(Opacity=30);
 }
@@ -135,18 +126,17 @@
 }
 .dwwbp {
   top: 0;
-  -webkit-border-radius: 3px 3px 0 0;
-  -moz-border-radius: 3px 3px 0 0;
-  border-radius: 3px 3px 0 0;
-  font-size: 40px;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+  font-size: 20px;
 }
 .dwwbm {
   bottom: 0;
-  -webkit-border-radius: 0 0 3px 3px;
-  -moz-border-radius: 0 0 3px 3px;
-  border-radius: 0 0 3px 3px;
-  font-size: 32px;
-  font-weight: bold;
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;
+  font-size: 20px;
 }
 .dwpm .dwwc {
   background: transparent;
@@ -168,10 +158,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #000),color-stop(0.52, rgba(44,44,44,0)),color-stop(0.48, rgba(44,44,44,0)),color-stop(1, #000));
-  background: -moz-linear-gradient(#000 0%,rgba(44,44,44,0) 52%, rgba(44,44,44,0) 48%, #000 100%);
-  background: -ms-linear-gradient(#000 0%,rgba(44,44,44,0) 52%, rgba(44,44,44,0) 48%, #000 100%);
-  background: -o-linear-gradient(#000 0%,rgba(44,44,44,0) 52%, rgba(44,44,44,0) 48%, #000 100%);
+  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #000),color-stop(0.52, rgba(200,200,200,0)),color-stop(0.48, rgba(200,200,200,0)),color-stop(1, #000));
+  background: -moz-linear-gradient(#000 0%,rgba(200,200,200,0) 52%, rgba(200,200,200,0) 48%, #000 100%);
+  background: -ms-linear-gradient(#000 0%,rgba(200,200,200,0) 52%, rgba(200,200,200,0) 48%, #000 100%);
+  background: -o-linear-gradient(#000 0%,rgba(200,200,200,0) 52%, rgba(200,200,200,0) 48%, #000 100%);
 }
 /* Background line */
 .dwwol {
@@ -182,8 +172,6 @@
   width: 100%;
   height: 0;
   margin-top: -1px;
-  border-top: 1px solid #333;
-  border-bottom: 1px solid #555;
 }
 /* Datewheel button */
 .dwbg .dwb {
@@ -192,22 +180,9 @@
   line-height: 40px;
   padding: 0 15px;
   margin: 0 2px;
-  font-size: 10px;
-  font-weight: bold;
   text-decoration: none;
-  text-shadow:0 -1px 1px #000;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius:5px;
-  box-shadow:0 1px 3px rgba(0,0,0,0.5);
-  -moz-box-shadow:0 1px 3px rgba(0,0,0,0.5);
-  -webkit-box-shadow:0 1px 3px rgba(0,0,0,0.5);
-  color: #fff;
-  background:#000;
-  background:-webkit-gradient(linear,left bottom,left top,color-stop(0.5, #000),color-stop(0.5, #6e6e6e));
-  background:-moz-linear-gradient(#6e6e6e 50%,#000 50%);
-  background:-ms-linear-gradient(#6e6e6e 50%,#000 50%);
-  background:-o-linear-gradient(#6e6e6e 50%,#000 50%);
+  .border-radius(4px);
+  #gradient > .vertical(#6e6e6e, #000);
 }
 /* Datewheel button container */
 .dwbc {
@@ -223,7 +198,7 @@
 }
 /* Hidden label */
 .dwhl {
-  padding-top: 10px;
+  // padding-top: 10px;
 }
 .dwhl .dwl {
   display: none;
@@ -231,38 +206,64 @@
 /* Backgrounds */
 .dwbg {
   background: #fff;
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
+  .border-radius(4px);
 }
 .dwbg .dwpm .dww {
   color: #000;
   background: #fff;
-  border: 1px solid #AAA;
+  border: 1px solid @btnBorder;
 }
 .dwbg .dwwb {
-  background: #ccc;
-  color: #888;
-  text-shadow: 0 -1px 1px #333;
-  box-shadow: 0 0 5px #333;
-  -webkit-box-shadow: 0 0 5px #333;
-  -moz-box-shadow: 0 0 5px #333;
+  margin-left: -1px;
+  color: @grayDark;
+  text-align: center;
+  line-height: 25px !important;
+  text-shadow: 0 1px 1px rgba(255,255,255,.75);
+  vertical-align: middle;
+  .buttonBackground(@btnBackground, @btnBackgroundHighlight);
+  border: 1px solid @btnBorder;
+  border-bottom-color: darken(@btnBorder, 10%);
+  .border-radius(4px);
+  @shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
+  .box-shadow(@shadow);
+  cursor: pointer;
+}
+
+.dwbg .dwwb:hover {
+  color: @grayDark;
+  text-decoration: none;
+  background-color: darken(@white, 10%);
+  background-position: 0 -15px;
+
+  // transition is only when going to hover, otherwise the background
+  // behind the gradient (there for IE<=9 fallback) gets mismatched
+  .transition(background-position .1s linear);
 }
 .dwbg .dwwbp {
-  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #bdbdbd),color-stop(1, #f7f7f7));
-  background: -moz-linear-gradient(#f7f7f7,#bdbdbd);
-  background: -ms-linear-gradient(#f7f7f7,#bdbdbd);
-  background: -o-linear-gradient(#f7f7f7,#bdbdbd);
+  .buttonBackground(@btnBackground, @btnBackgroundHighlight);
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
 }
 .dwbg .dwwbm {
-  background: -webkit-gradient(linear,left bottom,left top,color-stop(0, #f7f7f7),color-stop(1, #bdbdbd));
-  background: -moz-linear-gradient(#bdbdbd,#f7f7f7);
-  background: -ms-linear-gradient(#bdbdbd,#f7f7f7);
-  background: -o-linear-gradient(#bdbdbd,#f7f7f7);
+  .buttonBackground(@btnBackground, @btnBackgroundHighlight);
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;
 }
 .dwbg .dwb-a {
-  .buttonBackground(@btnBackground, @btnBackgroundHighlight);
+  background-image: none;
+  @shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+  .box-shadow(@shadow);
+  background-color: darken(@white, 10%);
+  background-color: darken(@white, 15%) e("\9");
+  outline: 0;
 }
 .dwbg .dwwl .dwb-a {
-  .buttonBackground(@btnBackground, @btnBackgroundHighlight);
+  background-image: none;
+  @shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
+  .box-shadow(@shadow);
+  background-color: darken(@white, 10%);
+  background-color: darken(@white, 15%) e("\9");
+  outline: 0;
 }

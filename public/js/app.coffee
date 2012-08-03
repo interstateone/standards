@@ -340,10 +340,11 @@ define (require) ->
       super
       @$el.scroller
         preset: 'time'
-        theme: 'android-ics light'
         display: 'inline'
         mode: 'mixed'
         rows: 3
+        height: 30
+        width: 50
         timeWheels: 'hA'
         showLabel: false
     render: ->
