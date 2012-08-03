@@ -186,6 +186,12 @@ class Standards < Sinatra::Base
       @user = current_user
       @tasks = @user.tasks
       @checks = @user.checks
+
+      @result = []
+      TZInfo::Timezone.all.each do |zone|
+        @result.push zone.identifier => zone
+      end
+
       erb :home, :layout => :app
     else
       erb :index

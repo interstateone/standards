@@ -1,6 +1,7 @@
 <!-- bootstrap user's data -->
 <script>
-	bootstrap = {};
-	bootstrap.user = <%= current_user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission, :daily_reminder_permission, :daily_reminder_time).to_json %>;
-	bootstrap.tasks = <%= current_user.tasks.to_json :methods => [:checks] %>;
+  bootstrap = {};
+  bootstrap.user = <%= @user.attributes.only(:id, :name, :email, :starting_weekday, :timezone, :email_permission, :daily_reminder_permission, :daily_reminder_time).to_json %>;
+  bootstrap.tasks = <%= @user.tasks.to_json :methods => [:checks] %>;
+  bootstrap.timezones = <%= @result.to_json %>;
 </script>

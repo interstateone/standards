@@ -309,15 +309,15 @@ define (require) ->
     _arrayToHtml: (array) ->
       html = []
 
-      html.push '<select id="timezone" name="timezone">'
+      html.push '<div class="input-append"><select id="timezone" name="timezone">'
 
       _.each array, (option) ->
         if _.isObject option then html.push "<option value=\"#{ option.val ? '' }\">#{ option.label }</option>"
         else html.push "<option>#{ option }</option>"
 
       html.push '''
-        </select>
-        <button class="btn geolocate" type="button"><i class="icon-map-marker"></i></button>
+        </select><button class="btn add-on" type="button"><i class="icon-map-marker"></i></button>
+        </div>
         '''
 
       html.join ''
@@ -376,11 +376,10 @@ define (require) ->
         title: 'Timezone'
         type: Timezone
         options: (callback) ->
-          $.get '/api/timezones', (data) ->
-            result = _.map data, (obj) ->
-              val: _.keys(obj)[0]
-              label: _.values(obj)[0]
-            callback result
+          result = _.map bootstrap.timezones, (obj) ->
+            val: _.keys(obj)[0]
+            label: _.values(obj)[0]
+          callback result
       daily_reminder_permission:
         title: 'Remind me each day if I haven\'t checked anything off yet'
         type: 'Checkbox'
