@@ -47,15 +47,6 @@ describe 'A user' do
 		@user.password = "asdfghjk4"
 		@user.save.should == true
 	end
-
-	it 'should be invalid with a password that doesnt contain a number' do
-		@user.attributes = valid_user_attributes.except(:password)
-		@user.save.should == false
-		@user.password = "asdfghjk"
-		@user.save.should == false
-		@user.password = "asdfghjk4"
-		@user.save.should == true
-	end
 end
 
 describe 'A task' do
@@ -159,20 +150,6 @@ describe 'When logged in as a user' do
 		# This is an AJAX request...
 		last_response.body.include? 'Task deleted'
 	end
-
-	it 'if first day of week should still show yesterday' do
-		# The current weekday index
-		today = Date.today
-		today_wday = Date.today.wday
-
-		# Move to Sunday using the index
-		sunday = today - today_wday
-		saturday = sunday - 1
-		Timecop.freeze(sunday) do
-			get '/'
-			last_response.body.include? saturday.strftime('%F')
-		end
-	end
 end
 
 describe 'Unauthorized users' do
@@ -184,7 +161,6 @@ describe 'Unauthorized users' do
 		@user.save
 		@task = Task.create :title => 'Ride a bike', :user => @user
 		get "/logout"
-		follow_redirect!
 	end
 
 	it 'should not be able to add tasks' do
@@ -219,7 +195,6 @@ describe 'task pages' do
 	it 'should throw an error if its not a valid task id' do
 		get '/23423423423423'
 		last_response.body.include? "That task can't be found."
-		# last_response.status.should be 404
 	end
 
 	it 'should load a task if its a valid task id' do
