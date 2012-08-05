@@ -113,6 +113,7 @@ GEM
     mime-types (1.19)
     multi_json (1.0.4)
     net-http-persistent (2.7)
+    newrelic_rpm (3.4.1)
     polyglot (0.3.3)
     pony (1.4)
       mail (> 2.0)
@@ -193,6 +194,7 @@ DEPENDENCIES
   json
   less
   libv8 (~> 3.11.8)
+  newrelic_rpm
   pony
   rack-cache
   rack-test

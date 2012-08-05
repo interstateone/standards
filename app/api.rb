@@ -21,6 +21,7 @@ class API < Sinatra::Base
 	set :public_folder, 'public'
 
 	configure :production do
+		require 'newrelic_rpm'
 		DataMapper.setup(:default, ENV['DATABASE_URL'])
 		use Rack::Session::Cookie, :expire_after => 2592000
 		set :session_secret, ENV['SESSION_KEY']

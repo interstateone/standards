@@ -26,6 +26,7 @@ gem 'rack-cache'
 gem 'less'
 gem 'execjs'
 gem 'rest-client', :require => 'rest_client'
+gem 'newrelic_rpm'
 
 group :production do
   gem 'therubyracer', '0.11.0beta5'
