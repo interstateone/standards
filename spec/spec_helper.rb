@@ -14,6 +14,7 @@ configure :test do
 end
 
 require_relative '../app/standards.rb'
+load 'Rakefile'
 
 module RSpecMixin
   include Rack::Test::Methods
@@ -24,7 +25,7 @@ module RSpecMixin
 end
 
 # Reset the database for each test
-Rspec.configure do |config|
+RSpec.configure do |config|
 	config.before(:each) { DataMapper.auto_migrate! }
 	config.include RSpecMixin
 end
