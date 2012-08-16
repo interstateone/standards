@@ -7,11 +7,11 @@ require 'fileutils'
 require 'pathname'
 require 'tempfile'
 
-configure :production do
+if (ENV['RAKE_ENV'] == 'production')
   DataMapper.setup(:default, ENV['DATABASE_URL'])
 end
 
-configure :development do
+if (ENV['RAKE_ENV'] == 'development')
   yaml = YAML.load_file("config.yaml")
   yaml.each_pair do |key, value|
     set(key.to_sym, value)
@@ -88,15 +88,18 @@ namespace :reminders do
       next unless user.daily_reminder_permission
       user_time = server_time.in_time_zone(user.timezone)
       puts "checking #{user.id}"
-      if (user_time.hour === user.daily_reminder_time) || ((user_time.hour === user.daily_reminder_time - 1) && (user_time.min.between?(55,60)) || (user_time.hour === user.daily_reminder_time + 1) && (user_time.min.between?(0,5)))
-        puts "sending email to #{user.id}"
-        if ENV['RACK_ENV'] === 'production' || ENV['RACK_ENV'] === 'development'
-          RestClient.post "https://api:key-2oe0h2j0yx214p4vnz7wyv9ef1c5fdk2"\
-          "@api.mailgun.net/v2/app4624790.mailgun.org/messages",
-          :from => "Standards <standards@brandonevans.ca>",
-          :to => user.email,
-          :subject => "Today's Reminder",
-          :text => "Remember to check off your standards for the day!"
+      unless (user.check_today?)
+        puts "no checks for #{user.id}"
+        if (user_time.hour === user.daily_reminder_time) || ((user_time.hour === user.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
+          puts "sending email to #{user.id}"
+          if ENV['RACK_ENV'] === 'production' || ENV['RACK_ENV'] === 'development'
+            RestClient.post "https://api:key-2oe0h2j0yx214p4vnz7wyv9ef1c5fdk2"\
+            "@api.mailgun.net/v2/app4624790.mailgun.org/messages",
+            :from => "Standards <standards@brandonevans.ca>",
+            :to => user.email,
+            :subject => "Today's Reminder",
+            :text => "Remember to check off your standards for the day!"
+          end
         end
       end
     end

@@ -22,8 +22,14 @@ describe 'Rake' do
     Rake::Task.define_task(:environment)
     @user1 = User.create :name => 'Mike', :email => 'evans.brandon+1@gmail.com', :password => 'Tes7yasdf', :daily_reminder_permission => true, :daily_reminder_time => 17, :timezone => 'America/New_York'
     @user2 = User.create :name => 'Mike', :email => 'evans.brandon+2@gmail.com', :password => 'Tes7yasdf', :daily_reminder_permission => false, :daily_reminder_time => 17, :timezone => 'America/New_York'
+    @task2 = Task.create :user => @user2, :title => 'Task'
+    @check2 = Check.create :user => @user2, :task => @task2, :date => Date.new(2012, 1, 1)
     @user3 = User.create :name => 'Mike', :email => 'evans.brandon+3@gmail.com', :password => 'Tes7yasdf', :daily_reminder_permission => true, :daily_reminder_time => 17, :timezone => 'Canada/Newfoundland'
     @user4 = User.create :name => 'Mike', :email => 'evans.brandon+4@gmail.com', :password => 'Tes7yasdf', :daily_reminder_permission => true, :daily_reminder_time => 17, :timezone => 'Asia/Katmandu'
+    @user5 = User.create :name => 'Mike', :email => 'evans.brandon+5@gmail.com', :password => 'Tes7yasdf', :daily_reminder_permission => true, :daily_reminder_time => 17, :timezone => 'America/New_York'
+    @user6 = User.create :name => 'Mike', :email => 'evans.brandon+6@gmail.com', :password => 'Tes7yasdf', :daily_reminder_permission => true, :daily_reminder_time => 17, :timezone => 'America/New_York'
+    @task6 = Task.create :user => @user6, :title => 'Task'
+    @check6 = Check.create :user => @user6, :task => @task6, :date => Date.new(2012, 1, 1)
   end
 
   let :run_rake_task do
@@ -37,8 +43,14 @@ describe 'Rake' do
       result.string.should include 'checking 1'
       result.string.should_not include 'checking 2'
     end
-    it 'should send an email at the correct time (n offset)' do
+    it 'should only send an email if there are no checks' do
       Timecop.freeze(Time.new(2012, 1, 1, 15))
+      result = capture_stdout do run_rake_task end
+      result.string.should include 'no checks for 5'
+      result.string.should_not include 'no checks for 6'
+    end
+    it 'should send an email at the correct time (n offset)' do
+      Timecop.freeze(Time.new(2012, 1, 1, 14))
       result = capture_stdout do run_rake_task end
       result.string.should include 'sending email to 1'
       result.string.should_not include 'sending email to 3'
@@ -50,7 +62,7 @@ describe 'Rake' do
       result.string.should_not include 'sending email to 3'
     end
     it 'should send an email at the correct time (n.5 offset)' do
-      Timecop.freeze(Time.new(2012, 1, 1, 13, 30))
+      Timecop.freeze(Time.new(2012, 1, 1, 12, 30))
       result = capture_stdout do run_rake_task end
       result.string.should_not include 'sending email to 1'
       result.string.should include 'sending email to 3'

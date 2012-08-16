@@ -47,6 +47,15 @@ describe 'A user' do
 		@user.password = "asdfghjk4"
 		@user.save.should == true
 	end
+
+	it 'check_today? should return true only if there are checks today' do
+		@user.attributes = valid_user_attributes
+		@user.save
+		@user.check_today?.should === false
+		@task = Task.create(:user => @user, :title => 'Task')
+		@check = Check.create(:user => @user, :task => @task, :date => Date.today)
+		@user.check_today?.should === true
+	end
 end
 
 describe 'A task' do
