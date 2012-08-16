@@ -54,6 +54,10 @@ class User
 		nil
 	end
 
+	def check_today?
+		return !(self.checks.count :date => Date.today).zero?
+	end
+
 	protected
 
 	def self.encrypt(pass, salt)
