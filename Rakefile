@@ -7,20 +7,10 @@ require 'fileutils'
 require 'pathname'
 require 'tempfile'
 
-if (ENV['RAKE_ENV'] == 'production')
-  DataMapper.setup(:default, ENV['DATABASE_URL'])
+task :environment do
+  require './app/standards'
+  require './app/api'
 end
-
-if (ENV['RAKE_ENV'] == 'development')
-  yaml = YAML.load_file("config.yaml")
-  yaml.each_pair do |key, value|
-    set(key.to_sym, value)
-  end
-
-  DataMapper.setup(:default, "postgres://" + settings.db_user + ":" + settings.db_password + "@" + settings.db_host + "/" + settings.db_name)
-end
-
-require_relative 'app/models/init'
 
 namespace :assets do
 
@@ -82,7 +72,7 @@ end
 task "assets:precompile" => ["assets:precompile:external"]
 
 namespace :reminders do
-  task :daily do
+  task :daily => :environment do
     server_time = Time.now
     User.all.each do |user|
       next unless user.daily_reminder_permission
