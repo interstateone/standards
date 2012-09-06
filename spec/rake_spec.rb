@@ -87,5 +87,10 @@ describe 'Rake' do
       result.string.should_not include 'sending email to 3'
       result.string.should_not include 'sending email to 4'
     end
+    it 'should only send an email once per day' do
+      Timecop.freeze(Time.new(2012, 1, 1, 15, 10))
+      result = capture_stdout do run_rake_task end
+      result.string.should_not include 'sending email to 1'
+    end
   end
 end

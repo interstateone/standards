@@ -80,7 +80,7 @@ namespace :reminders do
       puts "checking #{user.id}"
       unless (user.check_today?)
         puts "no checks for #{user.id}"
-        if (user_time.hour === user.daily_reminder_time) || ((user_time.hour === user.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
+        if ((user_time.hour === user.daily_reminder_time) && (user_time.min == 0)) || ((user_time.hour === user.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
           puts "sending email to #{user.id}"
           if ENV['RACK_ENV'] === 'production' || ENV['RACK_ENV'] === 'development'
             RestClient.post "https://api:key-2oe0h2j0yx214p4vnz7wyv9ef1c5fdk2"\
