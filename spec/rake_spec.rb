@@ -50,7 +50,7 @@ describe 'Rake' do
       result.string.should_not include 'no checks for 6'
     end
     it 'should send an email at the correct time (n offset)' do
-      Timecop.freeze(Time.new(2012, 1, 1, 14))
+      Timecop.freeze(Time.new(2012, 1, 1, 15))
       result = capture_stdout do run_rake_task end
       result.string.should include 'sending email to 1'
       result.string.should_not include 'sending email to 3'
@@ -62,7 +62,7 @@ describe 'Rake' do
       result.string.should_not include 'sending email to 3'
     end
     it 'should send an email at the correct time (n.5 offset)' do
-      Timecop.freeze(Time.new(2012, 1, 1, 12, 30))
+      Timecop.freeze(Time.new(2012, 1, 1, 13, 30))
       result = capture_stdout do run_rake_task end
       result.string.should_not include 'sending email to 1'
       result.string.should include 'sending email to 3'
