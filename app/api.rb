@@ -304,6 +304,19 @@ class API < Sinatra::Base
 		current_user.tasks.get(params[:id]).to_json :methods => [:checks]
 	end
 
+	put '/tasks/:id/?' do
+		content_type :json
+		login_required
+		data = JSON.parse request.body.read.to_s
+		user = current_user
+		task = current_user.tasks.get(params[:id])
+		task.update(
+			:title => data['title'],
+			:purpose => data['purpose'],
+			:user => user)
+		task.attributes.to_json
+	end
+
 	delete '/tasks/:id/?' do
 		login_required
 		user = current_user

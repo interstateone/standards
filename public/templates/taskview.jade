@@ -1,5 +1,10 @@
-h2= titleCase(title)
-p Remember! You're doing this because #{switchPronouns(purpose)}.
+.input-append
+  h2
+    span= titleCase(title)
+    &nbsp;
+    a.edit-title(style="display:inline-block;clear:both;")
+      i.icon-pencil
+  p Remember! You're doing this because #{switchPronouns(purpose)}.
 
 div.row-fluid
   div.span3
