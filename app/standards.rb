@@ -11,6 +11,16 @@ class Standards < Sinatra::Base
   include Colorist
   require_relative 'workers/emailworker'
   register Sinatra::Flash
+  register Sinatra::AssetPack
+
+  assets do
+    serve '/js',  from: 'public/js'
+    serve '/css', from: 'public/css'
+    serve '/img', from: 'public/img'
+
+    js :app, '/js/main-built.js', []
+    css :app, '/css/styles.css', []
+  end
 
   if memcache_servers = ENV["MEMCACHE_SERVERS"]
     use Rack::Cache,

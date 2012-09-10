@@ -159,6 +159,11 @@ describe 'When logged in as a user' do
 		# This is an AJAX request...
 		last_response.body.include? 'Task deleted'
 	end
+
+	it 'should show user info on the settings page' do
+		get '/settings'
+		last_response.body.include? 'Mike'
+	end
 end
 
 describe 'Unauthorized users' do
