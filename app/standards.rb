@@ -22,13 +22,6 @@ class Standards < Sinatra::Base
     css :app, '/css/styles.css', []
   end
 
-  if memcache_servers = ENV["MEMCACHE_SERVERS"]
-    use Rack::Cache,
-      :verbose => true,
-      :metastore => Dalli::Client.new,
-      :entitystore => 'file:tmp/cache/rack/body'
-    set :static_cache_control, [:public, {:max_age => 60*60*24*7}]
-  end
   use Rack::Deflater
   set :public_folder, 'public'
 
