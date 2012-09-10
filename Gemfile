@@ -28,7 +28,6 @@ gem 'execjs'
 gem 'rest-client', :require => 'rest_client'
 gem 'newrelic_rpm', "3.4.1"
 gem 'rake'
-gem 'sinatra-assetpack', :require => 'sinatra/assetpack'
 
 group :production do
   gem 'therubyracer', '0.11.0beta5'

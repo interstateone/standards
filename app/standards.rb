@@ -11,17 +11,14 @@ class Standards < Sinatra::Base
   include Colorist
   require_relative 'workers/emailworker'
   register Sinatra::Flash
-  register Sinatra::AssetPack
 
-  assets do
-    serve '/js',  from: 'public/js'
-    serve '/css', from: 'public/css'
-    serve '/img', from: 'public/img'
-
-    js :app, '/js/main-built.js', []
-    css :app, '/css/styles.css', []
+  if memcache_servers = ENV["MEMCACHE_SERVERS"]
+    use Rack::Cache,
+      :verbose => true,
+      :metastore => Dalli::Client.new,
+      :entitystore => 'file:tmp/cache/rack/body'
+    set :static_cache_control, [:public, {:max_age => 60*60*24*7}]
   end
-
   use Rack::Deflater
   set :public_folder, 'public'
 
