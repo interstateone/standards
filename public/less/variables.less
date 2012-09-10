@@ -21,19 +21,18 @@
 
 // Accent colors
 // -------------------------
-@blue:                  #049cdb;
+@blue:                  #5194aa;
 @blueDark:              #0064cd;
 @green:                 #46a546;
 @red:                   #9d261d;
 @yellow:                #ffc40d;
-@orange:                #f89406;
+@orange:                #eb4b00;
 @pink:                  #c3325f;
 @purple:                #7a43b6;
-@olive:					#93AE79;
-
-@brown:					#4C412E;
-@taupe:					#D6BE80;
-@sage:					#D6BE80;
+@olive:					        #93AE79;
+@brown:					        #4C412E;
+@taupe:					        #D6BE80;
+@sage:					        #D6BE80;
 
 
 // Scaffolding
@@ -44,7 +43,7 @@
 
 // Links
 // -------------------------
-@linkColor:             #08c;
+@linkColor:             @blue;
 @linkColorHover:        darken(@linkColor, 15%);
 
 
@@ -70,7 +69,7 @@
 
 // Buttons
 // -------------------------
-@btnBackground:                     @white;
+@btnBackground:                     darken(@white, 5%);
 @btnBackgroundHighlight:            darken(@white, 10%);
 @btnBorder:                         darken(@white, 20%);
 
@@ -86,8 +85,8 @@
 @btnWarningBackground:              lighten(@orange, 15%);
 @btnWarningBackgroundHighlight:     @orange;
 
-@btnDangerbackground:               #ee5f5b;
-@btnDangerbackgroundHighlight:      #bd362f;
+@btnDangerbackground:               lighten(@orange, 15%);
+@btnDangerbackgroundHighlight:      @orange;
 
 @btnInverseBackground:              @gray;
 @btnInverseBackgroundHighlight:     @grayDarker;
