@@ -450,6 +450,7 @@ define (require) ->
       'click a.delete': 'clickedDelete'
       'click a.delete-confirm': 'confirmDelete'
       'click a.edit-title': 'editTitle'
+      'click a.cancel-update-title': 'removeUpdateForm'
       'click a.update-title': 'updateTitle'
     clickedDelete: ->
       @$(".deleteModal").modal()
@@ -461,17 +462,21 @@ define (require) ->
       @$('h2').find('span').replaceWith('<input type="text" class="title" />')
       @$('input.title').val(@model.get 'title').focus()
       @$('.edit-title').hide()
-      @$('input.title').after('<a class="btn update-title">Update</a>')
-      @$el.on 'keypress', 'input', (event) =>
+      @$('input.title').after('<a class="btn update-title">Update</a><a class="btn cancel-update-title">Cancel</a>')
+      @$el.on 'keydown', 'input', (event) =>
         key = if (event.which)? then event.which else event.keyCode
-        if key == 13 then @updateTitle()
+        console.log key
+        if key is 13 then @updateTitle()
+        else if key is 27 then @removeUpdateForm()
+    removeUpdateForm: ->
+      @$('input.title').replaceWith('<span />')
+      @$('h2').find('span').text @model.get('title')
+      @$('a.update-title').remove()
+      @$('a.cancel-update-title').remove()
+      @$('.edit-title').show()
     updateTitle: ->
       @model.set 'title', @$('input.title').val()
-      @model.save {}, success: =>
-        @$('input.title').replaceWith('<span />')
-        @$('h2').find('span').text @model.get('title')
-        @$('a.update-title').remove()
-        @$('.edit-title').show()
+      @model.save {}, success: => @removeUpdateForm()
     serializeData: ->
       count = @model.get('checks').length
       today = moment().sod()
