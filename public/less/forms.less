@@ -72,7 +72,7 @@ select,
   // line-height: @baseLineHeight;
   color: @gray;
   border: 1px solid @inputBorder;
-  .border-radius(3px);
+  .border-radius(2px);
 }
 .uneditable-textarea {
   width: auto;
@@ -93,7 +93,7 @@ input[type="radio"] {
   width: auto;
   height: auto;
   padding: 0;
-  margin: 3px 0;
+  margin: 2px 0;
   *margin-top: 0; /* IE7 */
   line-height: normal;
   cursor: pointer;
@@ -366,7 +366,7 @@ select:focus:required:invalid {
   select,
   .uneditable-input {
     *margin-left: 0;
-    .border-radius(0 3px 3px 0);
+    .border-radius(0 2px 2px 0);
     &:focus {
       position: relative;
       z-index: 2;
@@ -388,7 +388,7 @@ select:focus:required:invalid {
   }
   .add-on,
   .btn {
-    .border-radius(3px 0 0 3px);
+    .border-radius(2px 0 0 2px);
   }
   .active {
     background-color: lighten(@green, 30);
@@ -405,7 +405,7 @@ select:focus:required:invalid {
   input,
   select
   .uneditable-input {
-    .border-radius(3px 0 0 3px);
+    .border-radius(2px 0 0 2px);
   }
   .uneditable-input {
     border-left-color: #eee;
@@ -414,7 +414,7 @@ select:focus:required:invalid {
   .add-on,
   .btn {
     margin-left: -1px;
-    .border-radius(0 3px 3px 0);
+    .border-radius(0 2px 2px 0);
   }
 }
 // Remove all border-radius for inputs with both prepend and append
@@ -427,12 +427,12 @@ select:focus:required:invalid {
   .add-on:first-child,
   .btn:first-child {
     margin-right: -1px;
-    .border-radius(3px 0 0 3px);
+    .border-radius(2px 0 0 2px);
   }
   .add-on:last-child,
   .btn:last-child {
     margin-left: -1px;
-    .border-radius(0 3px 3px 0);
+    .border-radius(0 2px 2px 0);
   }
 }
 
