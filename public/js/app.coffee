@@ -11,6 +11,7 @@ define (require) ->
 
   # App Libs
   require 'plugins'
+  String = require 'cs!string'
 
   # App Components
   User = require 'cs!user'
@@ -108,7 +109,7 @@ define (require) ->
       console.log 'clicked', @model.id
       @model.select()
     templateHelpers: ->
-      titleCase: (string) -> (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() for word in string.split ' ').join ' '
+      titleCase: String.titleCase
     onRender: -> @renderHeight()
     renderCollection: ->
       @triggerBeforeRender()
@@ -516,29 +517,12 @@ define (require) ->
         heatmap.push count: count, temp: temp.toHexString()
       heatmap
     templateHelpers:
-      sentenceCase: (string) -> string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
-      titleCase: (string) -> (word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() for word in string.split ' ').join ' '
-      pluralize: (word, count) -> if count > 1 then word += 's' else word
+      sentenceCase: String.sentenceCase
+      titleCase: String.titleCase
+      pluralize: String.pluralize
+      gsub: String.gsub
       heatmapHeader: heatmapHeader
       getWeekdaysAsArray: getWeekdaysAsArray
-      gsub: (source, pattern, replacement) ->
-        result = ''
-
-        if _.isString pattern then pattern = RegExp.escape pattern
-
-        unless pattern.length || pattern.source
-          replacement = replacement ''
-          replacement + source.split('').join(replacement) + replacement
-
-        while source.length > 0
-          if match = source.match pattern
-            result += source.slice 0, match.index
-            result += replacement match
-            source = source.slice(match.index + match[0].length)
-          else
-            result += source
-            source = ''
-        result
       switchPronouns: (string) ->
         this.gsub string, /\b(I am|You are|I|You|Your|My)\b/i, (pronoun) ->
           switch pronoun[0].toLowerCase()
