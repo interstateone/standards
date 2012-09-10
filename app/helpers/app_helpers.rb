@@ -118,11 +118,11 @@ module Sinatra
 		end
 
 		def versioned_stylesheet(stylesheet)
-	    "/css/#{stylesheet}.css?" + File.mtime(File.join("/public/css", "#{stylesheet}.css")).to_i.to_s
+	    "/css/#{stylesheet}.css?" + File.mtime(File.join("public/css", "#{stylesheet}.css")).to_i.to_s
 	  end
 
 	  def versioned_javascript(js)
-	    "/css/#{js}.js?" + File.mtime(File.join("/public/js", "#{js}.js")).to_i.to_s
+	    "/js/#{js}.js?" + File.mtime(File.join("public/js", "#{js}.js")).to_i.to_s
 	  end
 	end
 
