@@ -83,8 +83,8 @@ namespace :reminders do
         if ((user_time.hour === user.daily_reminder_time) && (user_time.min == 0)) || ((user_time.hour === user.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
           puts "sending email to #{user.id}"
           if ENV['RACK_ENV'] === 'production' || ENV['RACK_ENV'] === 'development'
-            RestClient.post "https://api:key-2oe0h2j0yx214p4vnz7wyv9ef1c5fdk2"\
-            "@api.mailgun.net/v2/app4624790.mailgun.org/messages",
+            RestClient.post "https://api:key-3hcm94659ino89z6q586zrcw7noy7254"\
+            "@api.mailgun.net/v2/app3449307.mailgun.org/messages",
             :from => "Standards <standards@brandonevans.ca>",
             :to => user.email,
             :subject => "Today's Reminder",
