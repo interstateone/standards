@@ -31,6 +31,7 @@ define (require) ->
         if firstDayOfWeek.diff(today, 'days') > 0 then firstDayOfWeek.day(startingWeekday - 7)
         lengthOfWeek = if full then app.daysInView else Math.min app.daysInView, today.diff firstDayOfWeek, 'days'
         week = (firstDayOfWeek.clone().add('d', day) for day in [0..lengthOfWeek])
+      date: new Date()
     clickedAdd: ->
       @toggleNewTaskButton()
       @toggleNewTaskForm()

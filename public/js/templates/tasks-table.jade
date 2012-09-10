@@ -2,7 +2,10 @@ thead
   tr
     th
     each day in getWeekdaysAsArray(true)
-      th= day.format('ddd')
+      if date.getDay() == day.day()
+        th.today= day.format('ddd')
+      else
+        th= day.format('ddd')
 tfoot
   tr
     td(class="title add", style="height: 50px;", colspan="8")
