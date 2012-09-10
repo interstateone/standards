@@ -6,7 +6,7 @@ define (require) ->
   Backbone = require 'backbone'
   Marionette = require 'marionette'
   require 'relational'
-  window.Check = require 'cs!check'
+  window.Check = require 'cs!models/check'
 
   class Task extends Backbone.RelationalModel
     select: ->

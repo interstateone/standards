@@ -11,12 +11,15 @@ define (require) ->
 
   # App Libs
   require 'plugins'
-  String = require 'cs!string'
 
   # App Components
-  User = require 'cs!user'
-  Task = require 'cs!task'
-  Form = require 'cs!form'
+  User = require 'cs!models/user'
+  Task = require 'cs!models/task'
+
+  NavBarView = require 'cs!views/navbar'
+  TasksView = require 'cs!views/tasks'
+  TaskView = require 'cs!views/task'
+  SettingsView = require 'cs!views/settings'
 
   class Tasks extends Backbone.Collection
     model: Task
@@ -28,26 +31,11 @@ define (require) ->
     model: Check
     url: '/api/checks'
 
-  Backbone.Marionette.Renderer.render = (template, data) ->
-    template data
+  Backbone.Marionette.Renderer.render = (template, data) -> template(data)
 
   # Map JS reset() function to jQuery
   jQuery.fn.reset = ->
     $(this).each -> this.reset()
-
-  heatmapHeader = ->
-    firstDayOfWeek = moment().sod().day 0
-    week = (firstDayOfWeek.clone().add('d', day) for day in [0..6])
-
-  getWeekdaysAsArray = (full) ->
-    today = moment().sod()
-    if app.daysInView is 6 then startingWeekday = parseInt(app.user.get 'starting_weekday') + parseInt(app.offset ? 0)
-    else startingWeekday = parseInt(today.day()) + parseInt(app.offset ? 0) - 1
-    firstDayOfWeek = moment().sod()
-    firstDayOfWeek.day startingWeekday
-    if firstDayOfWeek.diff(today, 'days') > 0 then firstDayOfWeek.day(startingWeekday - 7)
-    lengthOfWeek = if full then app.daysInView else Math.min app.daysInView, today.diff firstDayOfWeek, 'days'
-    week = (firstDayOfWeek.clone().add('d', day) for day in [0..lengthOfWeek])
 
   colorArray = (numberOfRows) ->
     colors = []
@@ -69,469 +57,19 @@ define (require) ->
       $ministat.css("background-color", bgColors[row])
       $ministat.children('.minibar').css("background-color", barColors[row])
 
-  class CheckView extends Backbone.Marionette.ItemView
-    tagName: 'td'
-    template: require 'jade!../templates/check'
-    initialize: ->
-      if @model.isNew? then @date = @model.get 'date'
-      else _.extend @, @model
-    events:
-      'click': 'toggleCheck'
-    toggleCheck: ->
-      if @model.isNew?
-        @trigger 'task:uncheck', @model
-      else
-        @trigger 'task:check', @date
-    render: ->
-      @$el.html @template()
-      if @model.isNew? then @$('img').addClass 'complete'
-      @
-
-  class TaskRowView extends Backbone.Marionette.CompositeView
-    tagName: 'tr'
-    template: require 'jade!../templates/task-row'
-    itemView: CheckView
-    initialEvents: ->
-      if @collection?
-        @bindTo @collection, 'add', @render, @
-        @bindTo @collection, 'sync', @render, @
-        @bindTo @collection, 'remove', @render, @
-        @bindTo @collection, 'reset', @render, @
-    initialize: ->
-      @collection = @model.get 'checks'
-      @collection.comparator = (check) -> check.get 'date'
-      @on 'itemview:task:check', @check, @
-      @on 'itemview:task:uncheck', @uncheck, @
-    events:
-      'click .task': 'clickedTask'
-    clickedTask: (e) ->
-      e.preventDefault()
-      console.log 'clicked', @model.id
-      @model.select()
-    templateHelpers: ->
-      titleCase: String.titleCase
-    onRender: -> @renderHeight()
-    renderCollection: ->
-      @triggerBeforeRender()
-      @closeChildren()
-      @showCollection()
-      @triggerRendered()
-      @trigger "composite:collection:rendered"
-    showCollection: ->
-      ItemView = @getItemView()
-      weekdays = getWeekdaysAsArray()
-      for day, index in weekdays
-        check = @collection.find (check) ->
-          if (check.get 'date')? then (day.diff moment check.get 'date') is 0
-        boilerplate = {date: day.format('YYYY-MM-DD')}
-        @addItemView check ||= boilerplate, ItemView, index
-    check: (itemView, date) ->
-      @collection.create date: date
-    uncheck: (itemView, model) ->
-      model.destroy()
-    renderHeight: ->
-      count = @model.get('checks').length
-      createdDay = moment(@model.get 'created_on')
-      firstDay = createdDay.valueOf()
-      if @model.get('checks').length
-        firstCheckDay = moment(@model.get('checks').sort(silent: true).first().get 'date')
-        firstDay = Math.min createdDay.valueOf(), firstCheckDay.valueOf()
-      today = moment().sod()
-      total = (today.diff (moment firstDay), 'days') + 1
-      # console.log 'created', createdDay, 'firstCheckDay', firstCheckDay, 'first day', moment(firstDay), 'count', count, 'total', total
-      # console.log @collection.pluck 'date'
-      @$('.minibar').css "height", Math.min 50 * count / total, 50
-
-  class TasksView extends Backbone.Marionette.CompositeView
-    tagName: 'table'
-    id: 'tasksView'
-    itemView: TaskRowView
-    itemViewContainer: 'tbody'
-    template: require 'jade!../templates/tasks-table'
-    events:
-      'click a.add': 'clickedAdd'
-      'keypress #newtask': 'keypressNewTask'
-      'submit #newtask': 'submitNewTask'
-    initialize: ->
-      app.vent.on 'window:resize', => @render()
-      app.vent.on 'app:changeOffset', => @render()
-    templateHelpers: ->
-      getWeekdaysAsArray: getWeekdaysAsArray
-    clickedAdd: ->
-      @toggleNewTaskButton()
-      @toggleNewTaskForm()
-    toggleNewTaskButton: ->
-      unless @$('i').hasClass('cancel')
-        @$('i').animate({transform: 'rotate(45deg)'}, 'fast').toggleClass('cancel')
-      else
-        @$('i').animate({transform: ''}, 'fast').toggleClass('cancel')
-    toggleNewTaskForm: ->
-      if @$('#newtask').css('opacity') is '0'
-        @$('#newtask').animate(opacity: 1, 'fast').css 'visibility', 'visible'
-      else
-        @$('#newtask').animate({opacity: 0}, 'fast').reset().css 'visibility', 'hidden'
-    keypressNewTask: (e) ->
-      key = if (e.which)? then e.which else e.keyCode
-      if key == 13
-        e.preventDefault()
-        e.stopPropagation()
-        $('#newtask').submit()
-        _gaq.push(['_trackEvent', 'task', 'create'])
-    submitNewTask: (e) ->
-      e.preventDefault()
-      title = @$('input#title').val()
-      purpose = @$('input#purpose').val()
-      @collection.create title: title, purpose: purpose
-
-      # Remove welcome message after submitting first task
-      # $('.hero-unit').hide()
-
-      # renderColors()
-
-      @toggleNewTaskButton()
-      @toggleNewTaskForm()
-
-  class NavBarView extends Backbone.Marionette.ItemView
-    template: require 'jade!../templates/navbar'
-    events:
-      'click .brand': 'clickedHome'
-      'click .settings': 'clickedSettings'
-      'click .moveForward': 'clickedMoveForward'
-      'click .moveBackward': 'clickedMoveBackward'
-    initialize: ->
-      app.vent.on 'scroll:window', @addDropShadow, @
-    addDropShadow: ->
-      if window.pageYOffset > 0 then @$el.children().addClass 'nav-drop-shadow'
-      else @$el.children().removeClass 'nav-drop-shadow'
-    clickedHome: (e) ->
-      e.preventDefault()
-      app.vent.trigger 'home:clicked'
-    clickedSettings: (e) ->
-      e.preventDefault()
-      app.vent.trigger 'settings:clicked'
-    clickedMoveForward: ->
-      app.vent.trigger 'app:moveForward'
-    clickedMoveBackward: ->
-      app.vent.trigger 'app:moveBackward'
-    showArrows: -> @$('.arrow').each -> $(@).show()
-    hideArrows: -> @$('.arrow').each -> $(@).hide()
-
-  class SettingsView extends Backbone.Marionette.Layout
-    template: require 'jade!../templates/settings'
-    regions:
-      info: '.info'
-      password: '.password'
-
-  class ButtonRadio extends Backbone.Form.editors.Select
-    tagName: 'div'
-    events:
-      'click button': 'clickedButton'
-    render: ->
-      el = super
-      @updateButtons()
-      el
-    updateButtons: ->
-      @$('button').each (index, button) => if $(button).val() is @getValue() then $(button).addClass 'active'
-    clickedButton: (e) ->
-      @setValue $(e.target).val()
-      @$('button').each (index, button) => if $(button).val() is @getValue() then $(button).addClass 'active'
-    getValue: -> @$('input').val()
-    setValue: (value) -> @$('input').val value ? @getValue()
-    _arrayToHtml: (array) ->
-      html = []
-
-      html.push '<div class="btn-group" data-toggle="buttons-radio" data-toggle-name="starting_weekday" name="starting_weekday">'
-
-      _.each array, (option, index) =>
-        if _.isObject option
-          val = option.val ? ''
-          itemHtml = '<button type="button" class="btn" name="'+@id+'" value="'+val+'" id="'+@id+'-'+index+'" data-toggle="button">'+option.label+'</button>'
-        else
-          itemHtml = '<button type="button" class="btn" name="'+@id+'" value="'+option+'" id="'+@id+'-'+index+'" data-toggle="button">'+option.label+'</button>'
-        html.push itemHtml
-
-      html.push '''
-        </div>
-        <input type="hidden" name="starting_weekday">
-        '''
-
-      html.join ''
-
-  class Timezone extends Backbone.Form.editors.Select
-    tagName: 'div'
-    events:
-      'change select': 'resetButton'
-      'click button': 'getLocation'
-    render: ->
-      options = @schema.options
-
-      if options instanceof Backbone.Collection
-        collection = options
-        if collection.length > 0
-          @renderOptions options
-        else
-          collection.fetch
-            success: (collection) =>
-              @renderOptions options
-      else if _.isFunction options
-        options (result) =>
-          @renderOptions result
-          @disableButton()
-      else @renderOptions options
-      @
-    disableButton: -> unless navigator.geolocation? then @$('button').attr 'disabled', 'disabled'
-    resetButton: -> @$('button').css 'color', '#333333'
-    getLocation: ->
-      $button = @$ 'button'
-      unless $button.attr('disabled')?
-        navigator.geolocation.getCurrentPosition (position) =>
-            # lookup in geonames
-            lat = position.coords.latitude
-            long = position.coords.longitude
-            urlbase = "http://api.geonames.org/timezoneJSON?"
-            username = "interstateone"
-
-            url = urlbase + "lat=" + lat + "&" + "lng=" + long + "&" + "username=" + username
-
-            $.get url, (data) =>
-              $button.css('color', 'green')
-              @setValue data.timezoneId
-            .error -> $button.css('color', 'red')
-          # error function
-          (error) ->
-            switch (error.code)
-              when error.TIMEOUT then app.trigger 'error', 'Geolocation error: Timeout'
-              when error.POSITION_UNAVAILABLE then app.trigger 'error', 'Geolocation error: Position unavailable'
-              when error.PERMISSION_DENIED then app.trigger 'error', 'Geolocation error: Permission denied'
-              when error.UNKNOWN_ERROR then app.trigger 'error', 'Geolocation error: Unknown error'
-          timeout: 5000
-    getValue: -> @$('select').val()
-    setValue: (value) -> @$('select').val value
-    _arrayToHtml: (array) ->
-      html = []
-
-      html.push '<div class="input-append"><select id="timezone" name="timezone">'
-
-      _.each array, (option) ->
-        if _.isObject option then html.push "<option value=\"#{ option.val ? '' }\">#{ option.label }</option>"
-        else html.push "<option>#{ option }</option>"
-
-      html.push '''
-        </select><button class="btn add-on" type="button"><i class="icon-map-marker"></i></button>
-        </div>
-        '''
-
-      html.join ''
-
-  class Hour extends Backbone.Form.editors.Base
-    getValue: ->
-      data = @$el.scroller('getValue')
-      hours = parseInt data[0]
-      if parseInt(data[1]) is 1 then hours += 12
-      hours
-    setValue: (value) ->
-      if value > 11
-        hour = value - 12
-        pm = 1
-      else
-        hour = value
-        pm = 0
-      @$el.scroller('setValue', [hour, pm], true)
-    initialize: ->
-      super
-      @$el.scroller
-        preset: 'time'
-        display: 'inline'
-        mode: 'mixed'
-        rows: 3
-        height: 30
-        width: 50
-        timeWheels: 'hA'
-        showLabel: false
-    render: ->
-      @setValue @value
-      @
-
-  class InfoForm extends Form
-    template: require('jade!../templates/info-form')()
-    events:
-      'click button[type="submit"]': 'commitChanges'
-    commitChanges: (e) ->
-      e.preventDefault()
-      e.stopPropagation()
-      errors = @commit()
-      unless errors? then @model.save {}, success: -> app.vent.trigger 'notice', 'Your info has been updated.'
-    schema:
-      name:
-        title: 'Name'
-        type: 'Text'
-        validators: ['required']
-      email:
-        title: 'Email'
-        type: 'Text'
-        validators: ['email', 'required']
-      starting_weekday:
-        title: 'Weeks start on'
-        type: ButtonRadio
-        options: (callback) -> callback(val: day, label: moment().day(day).format('ddd').slice 0,1 for day in [0..6])
-      timezone:
-        title: 'Timezone'
-        type: Timezone
-        options: (callback) ->
-          result = _.map bootstrap.timezones, (obj) ->
-            val: _.keys(obj)[0]
-            label: _.values(obj)[0]
-          callback result
-      daily_reminder_permission:
-        title: 'Remind me each day if I haven\'t checked anything off yet'
-        type: 'Checkbox'
-      daily_reminder_time:
-        title: 'Reminder time'
-        type: Hour
-      email_permission:
-        title: 'Do you want to receive email updates about Standards?'
-        type: 'Checkbox'
-    fieldsets: [
-      legend: 'Info'
-      fields: ['name', 'email', 'starting_weekday', 'timezone', 'daily_reminder_permission', 'daily_reminder_time', 'email_permission']
-    ]
-
-  class PasswordForm extends Form
-    template: require('jade!../templates/password-form')()
-    events:
-      'click button[type="submit"]': 'commitChanges'
-    commitChanges: (e) ->
-      e.preventDefault()
-      e.stopPropagation()
-      errors = @validate()
-      unless errors? then $.ajax
-        url: '/api/user/password'
-        type: 'POST'
-        data: JSON.stringify
-          current_password: @$('input[name="current_password"]').val()
-          new_password: @$('input[name="new_password"]').val()
-        success: -> app.vent.trigger 'notice', 'Your password has been updated.'
-    schema:
-      current_password:
-        title: 'Current Password'
-        type: 'Password'
-      new_password:
-        title: 'New Password'
-        type: 'Password'
-        validators: [
-          (value, formValues) ->
-            lengthError =
-              type: 'Password'
-              message: 'Password must be at least 8 characters long.'
-            if value.length < 8 then lengthError
-        ]
-    fieldsets: [
-      legend: 'Change Password'
-      fields: ['current_password', 'new_password']
-    ]
-
-
   class ErrorView extends Backbone.Marionette.View
-    template: require 'jade!../templates/error-flash'
+    template: require 'jade!templates/error-flash'
     render: ->
       @$el.html @template @serializeData()
     serializeData: ->
       message: @options.message
 
   class NoticeView extends Backbone.Marionette.View
-    template: require 'jade!../templates/notice-flash'
+    template: require 'jade!templates/notice-flash'
     render: ->
       @$el.html @template @serializeData()
     serializeData: ->
       message: @options.message
-
-  class TaskView extends Backbone.Marionette.ItemView
-    template: require 'jade!../templates/taskview'
-    events:
-      'click a.delete': 'clickedDelete'
-      'click a.delete-confirm': 'confirmDelete'
-      'click a.edit-title': 'editTitle'
-      'click a.cancel-update-title': 'removeUpdateForm'
-      'click a.update-title': 'updateTitle'
-    clickedDelete: ->
-      @$(".deleteModal").modal()
-    confirmDelete: (e) ->
-      e.preventDefault()
-      @$('.delete-confirm').button('loading')
-      app.vent.trigger 'task:delete', @model.id
-    editTitle: ->
-      @$('h2').find('span').replaceWith('<input type="text" class="title" />')
-      @$('input.title').val(@model.get 'title').focus()
-      @$('.edit-title').hide()
-      @$('input.title').after('<a class="btn update-title">Update</a><a class="btn cancel-update-title">Cancel</a>')
-      @$el.on 'keydown', 'input', (event) =>
-        key = if (event.which)? then event.which else event.keyCode
-        console.log key
-        if key is 13 then @updateTitle()
-        else if key is 27 then @removeUpdateForm()
-    removeUpdateForm: ->
-      @$('input.title').replaceWith('<span />')
-      @$('h2').find('span').text @model.get('title')
-      @$('a.update-title').remove()
-      @$('a.cancel-update-title').remove()
-      @$('.edit-title').show()
-    updateTitle: ->
-      @model.set 'title', @$('input.title').val()
-      @model.save {}, success: => @removeUpdateForm()
-    serializeData: ->
-      count = @model.get('checks').length
-      today = moment().sod()
-
-      @model.get('checks').comparator = (check) -> check.get 'date'
-
-      createdDay = moment(@model.get 'created_on').sod()
-      firstDay = createdDay
-      if @model.get('checks').length
-        firstCheckDay = moment(@model.get('checks').sort(silent: true).first().get 'date')
-        firstDay = moment(Math.min createdDay.valueOf(), firstCheckDay.valueOf())
-
-      percentComplete = Math.ceil(count * 100 / (today.diff(firstDay, 'days') + 1))
-      timeAgo = firstDay.fromNow()
-      console.log today.diff(firstDay, 'hours')
-      weekdayCount = @weekdayCount()
-      heatmap = @heatmap weekdayCount
-
-      _.extend super,
-        count: count
-        percentComplete: percentComplete
-        timeAgo: timeAgo
-        heatmap: heatmap
-    weekdayCount: ->
-      weekdayCount = [0,0,0,0,0,0,0]
-      @model.get('checks').each (check) ->
-        weekdayIndex = moment(check.get('date')).day()
-        weekdayCount[weekdayIndex] += 1
-      weekdayCount
-    heatmap: (countArray) ->
-      heatmap = []
-      max = _.max countArray
-      max ||= 1
-      min = _.min countArray
-      for count in countArray
-        temp = $.Color('#FF0000').hue(Math.abs(count - max) / max * 40)
-        heatmap.push count: count, temp: temp.toHexString()
-      heatmap
-    templateHelpers:
-      sentenceCase: String.sentenceCase
-      titleCase: String.titleCase
-      pluralize: String.pluralize
-      gsub: String.gsub
-      heatmapHeader: heatmapHeader
-      getWeekdaysAsArray: getWeekdaysAsArray
-      switchPronouns: (string) ->
-        this.gsub string, /\b(I am|You are|I|You|Your|My)\b/i, (pronoun) ->
-          switch pronoun[0].toLowerCase()
-            when 'i' then 'you'
-            when 'you' then 'I'
-            when 'i am' then "You are"
-            when 'you are' then 'I am'
-            when 'your' then 'my'
-            when 'my' then 'your'
 
   class MultiRegion extends Backbone.Marionette.Region
     open: (view) ->
@@ -644,8 +182,6 @@ define (require) ->
       @router.navigate 'settings'
       @navBar.hideArrows()
       @body.show @settingsView = new SettingsView
-      @settingsView.info.show @infoForm = new InfoForm model: @user
-      @settingsView.password.show @passwordForm = new PasswordForm
     showTask: (id) ->
       task = @tasks.get id
       unless task?
@@ -687,4 +223,4 @@ define (require) ->
      window.app = new App
      window.app.initialize()
 
-  return initialize: initialize
+  return {initialize}
