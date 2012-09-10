@@ -181,7 +181,7 @@ define (require) ->
     showSettings: ->
       @router.navigate 'settings'
       @navBar.hideArrows()
-      @body.show @settingsView = new SettingsView
+      @body.show @settingsView = new SettingsView model: @user
     showTask: (id) ->
       task = @tasks.get id
       unless task?

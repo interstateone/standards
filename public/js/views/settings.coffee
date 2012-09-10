@@ -104,5 +104,5 @@ define (require) ->
       info: '.info'
       password: '.password'
     onRender: ->
-      @info.show new InfoForm model: @user
+      @info.show new InfoForm model: @model
       @password.show new PasswordForm
