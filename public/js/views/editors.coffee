@@ -13,9 +13,9 @@ define (require) ->
     events:
       'click button': 'clickedButton'
     render: ->
-      el = super
+      super()
       @updateButtons()
-      el
+      return this
     updateButtons: ->
       @$('button').each (index, button) =>
         if $(button).val() is @getValue() then $(button).addClass 'active'
@@ -27,39 +27,16 @@ define (require) ->
     setValue: (value) -> @$('input').val value ? @getValue()
     _arrayToHtml: (array) ->
       html = []
-
-      html.push '''<div class="btn-group"
-                        data-toggle="buttons-radio"
-                        data-toggle-name="starting_weekday"
-                        name="starting_weekday">'''
+      html.push '<div class="btn-group" data-toggle="buttons-radio" data-toggle-name="starting_weekday" name="starting_weekday">'
 
       _.each array, (option, index) =>
         if _.isObject option
           val = option.val ? ''
-          itemHtml = """<button type=\"button\"
-                                class=\"btn\"
-                                name=\"#{ @id }\"
-                                value=\"#{ val }\"
-                                id=\"#{ @id }-#{ index}\"
-                                data-toggle=\"button\">
-                                  #{ option.label }
-                                </button>"""
+          html.push "<button type=\"button\" class=\"btn\" name=\"#{ @id }\" value=\"#{ val }\" id=\"#{ @id }-#{ index}\" data-toggle=\"button\"> #{ option.label } </button>"
         else
-          itemHtml = """<button type=\"button\"
-                                class=\"btn\"
-                                name=\"#{ @id }\"
-                                value=\"#{ option }\"
-                                id=\"#{ @id }-#{ index }\"
-                                data-toggle=\"button\">
-                                  #{ option.label }
-                                </button>"""
-        html.push itemHtml
+          html.push "<button type=\"button\" class=\"btn\" name=\"#{ @id }\" value=\"#{ option }\" id=\"#{ @id }-#{ index }\" data-toggle=\"button\"> #{ option.label } </button>"
 
-      html.push '''
-        </div>
-        <input type="hidden" name="starting_weekday">
-        '''
-
+      html.push '</div><input type="hidden" name="starting_weekday">'
       html.join ''
 
   class Timezone extends Backbone.Form.editors.Select

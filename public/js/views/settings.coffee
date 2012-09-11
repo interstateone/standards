@@ -5,6 +5,7 @@ define (require) ->
   _ = require 'underscore'
   Backbone = require 'backbone'
   Marionette = require 'marionette'
+  require 'moment'
 
   Form = require 'cs!views/form'
   {ButtonRadio, Timezone, Hour} = require 'cs!views/editors'
@@ -31,9 +32,7 @@ define (require) ->
       starting_weekday:
         title: 'Weeks start on'
         type: ButtonRadio
-        options: (callback) -> callback
-          val: day
-          label: moment().day(day).format('ddd').slice 0,1 for day in [0..6]
+        options: (callback) -> callback(val: day, label: moment().day(day).format('ddd').slice 0,1 for day in [0..6])
       timezone:
         title: 'Timezone'
         type: Timezone
