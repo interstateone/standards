@@ -19,7 +19,6 @@ define (require) ->
       'click a.delete-confirm': 'confirmDelete'
       'click a.edit-title': 'editTitle'
       'click a.cancel-update-title': 'removeUpdateForm'
-      'click a.update-title': 'updateTitle'
     clickedDelete: ->
       @$(".deleteModal").modal()
     confirmDelete: (e) ->
@@ -30,7 +29,7 @@ define (require) ->
       @$('h2').find('span').replaceWith('<input type="text" class="title" />')
       @$('input.title').val(@model.get 'title').focus()
       @$('.edit-title').hide()
-      @$('input.title').after('<a class="btn update-title">Update</a><a class="btn cancel-update-title">Cancel</a>')
+      @$('input.title').after('<a class="cancel-update-title"><i class="icon-remove-sign"></i></a>')
       @$el.on 'keydown', 'input', (event) =>
         key = if (event.which)? then event.which else event.keyCode
         if key is 13 then @updateTitle()
@@ -38,7 +37,6 @@ define (require) ->
     removeUpdateForm: ->
       @$('input.title').replaceWith('<span />')
       @$('h2').find('span').text @model.get('title')
-      @$('a.update-title').remove()
       @$('a.cancel-update-title').remove()
       @$('.edit-title').show()
     updateTitle: ->
