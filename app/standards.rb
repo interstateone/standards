@@ -130,28 +130,22 @@ class Standards < Sinatra::Base
       redirect '/login'
     else
       user = User.first(:email => params[:email])
-      if !user.nil?
+      unless user.nil?
         @key = user.password_reset_key = Digest::SHA1.hexdigest(Time.now.to_s + rand(12341234).to_s)[1..20]
         user.save
 
         @name = user.name
         @url = ENV['CONFIRMATION_CALLBACK_URL'] || settings.confirmation_callback_url
 
-        resetWorker = EmailWorker.new
-        resetWorker.username = ENV['EMAIL_USERNAME'] || settings.email_username
-        resetWorker.password = ENV['EMAIL_PASSWORD'] || settings.email_password
-        resetWorker.to = user.email
-        resetWorker.from = ENV['EMAIL_USERNAME'] || settings.email_username
-        resetWorker.subject = "Reset your Standards password"
-        resetWorker.body = erb :reset_password_email, :layout => false
-
-        if production?
-          resetWorker.queue
-        else
-          resetWorker.run_local
-        end
+        RestClient.post "https://api:key-3hcm94659ino89z6q586zrcw7noy7254"\
+        "@api.mailgun.net/v2/app3449307.mailgun.org/messages",
+        :from => "Standards <standards@brandonevans.ca>",
+        :to => user.email,
+        :subject => "Reset your Standards password",
+        :html => erb(:reset_password_email, :layout => false)
 
         flash[:notice] = "You've been sent a password reset email to the address you provided, click the link inside to do so."
+        user = nil
         redirect "/"
       end
     end
