@@ -5,6 +5,7 @@ define (require) ->
   _ = require 'underscore'
   Backbone = require 'backbone'
   Marionette = require 'marionette'
+  require 'mobiscroll'
 
   Form = require 'cs!views/form'
 

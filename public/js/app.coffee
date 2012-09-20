@@ -7,7 +7,6 @@ define (require) ->
   Marionette = require 'marionette'
   require 'moment'
   require 'jquery-hammer'
-  require 'mobiscroll'
 
   # App Libs
   require 'plugins'
