@@ -66,33 +66,33 @@ define (require) ->
         @$('button').attr 'disabled', 'disabled'
     resetButton: -> @$('button').css 'color', '#333333'
     getLocation: ->
-      $button = @$ 'button'
-      unless $button.attr('disabled')?
-        navigator.geolocation.getCurrentPosition (position) =>
-            # lookup in geonames
-            lat = position.coords.latitude
-            long = position.coords.longitude
-            urlbase = "http://api.geonames.org/timezoneJSON?"
-            username = "interstateone"
+      $button = @$('button')
+      if $button.prop('disabled') is false and navigator.geolocation
+        navigator.geolocation.getCurrentPosition(@lookupTimezone, @noLocation, maximumAge: 60000, timeout: 5000)
+    lookupTimezone: (position) =>
+      $button = @$('button')
+      # lookup in geonames
+      lat = position.coords.latitude
+      long = position.coords.longitude
+      urlbase = "http://api.geonames.org/timezoneJSON?"
+      username = "interstateone"
 
-            url = "#{ urlbase }lat=#{ lat }&lng=#{ long }&username=#{ username }"
+      url = "#{ urlbase }lat=#{ lat }&lng=#{ long }&username=#{ username }"
 
-            $.get url, (data) =>
-              $button.css('color', 'green')
-              @setValue data.timezoneId
-            .error -> $button.css('color', 'red')
-          # error function
-          (error) ->
-            switch (error.code)
-              when error.TIMEOUT
-                app.trigger 'error', 'Geolocation error: Timeout'
-              when error.POSITION_UNAVAILABLE
-                app.trigger 'error', 'Geolocation error: Position unavailable'
-              when error.PERMISSION_DENIED
-                app.trigger 'error', 'Geolocation error: Permission denied'
-              when error.UNKNOWN_ERROR
-                app.trigger 'error', 'Geolocation error: Unknown error'
-          timeout: 5000
+      $.get url, (data) =>
+        $button.css('color', 'green')
+        @setValue data.timezoneId
+      .error -> $button.css('color', 'red')
+    noLocation: (error) ->
+      switch (error.code)
+        when error.TIMEOUT or error.code is 3
+          app.vent.trigger 'error', 'Geolocation error: Timeout'
+        when error.POSITION_UNAVAILABLE or error.code is 2
+          app.vent.trigger 'error', 'Geolocation error: Position unavailable'
+        when error.PERMISSION_DENIED or error.code is 1
+          app.vent.trigger 'error', 'Geolocation error: Permission denied'
+        else
+          app.vent.trigger 'error', 'Geolocation error: Unknown error'
     getValue: -> @$('select').val()
     setValue: (value) -> @$('select').val value
     _arrayToHtml: (array) ->
