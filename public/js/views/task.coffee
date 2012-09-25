@@ -18,6 +18,7 @@ define (require) ->
       'click a.delete': 'clickedDelete'
       'click a.delete-confirm': 'confirmDelete'
       'click a.edit-title': 'editTitle'
+      'click a.confirm-update-title': 'updateTitle'
       'click a.cancel-update-title': 'removeUpdateForm'
     clickedDelete: ->
       @$(".deleteModal").modal()
@@ -26,10 +27,11 @@ define (require) ->
       @$('.delete-confirm').button('loading')
       app.vent.trigger 'task:delete', @model.id
     editTitle: ->
-      @$('h2').find('span').replaceWith('<input type="text" class="title" />')
+      @$('h2').find('span').replaceWith('<input type="text" class="input-medium title" />')
       @$('input.title').val(@model.get 'title').focus()
       @$('.edit-title').hide()
-      @$('input.title').after('<a class="cancel-update-title"><i class="icon-remove-sign"></i></a>')
+      @$('input.title').after('<a class="cancel-update-title"><i class="edit-button icon-remove-sign"></i></a>')
+      @$('input.title').after('<a class="confirm-update-title"><i class="edit-button icon-ok-sign"></i></a>')
       @$el.on 'keydown', 'input', (event) =>
         key = if (event.which)? then event.which else event.keyCode
         if key is 13 then @updateTitle()
@@ -38,6 +40,7 @@ define (require) ->
       @$('input.title').replaceWith('<span />')
       @$('h2').find('span').text @model.get('title')
       @$('a.cancel-update-title').remove()
+      @$('a.confirm-update-title').remove()
       @$('.edit-title').show()
     updateTitle: ->
       @model.set 'title', @$('input.title').val()
