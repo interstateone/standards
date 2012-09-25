@@ -80,7 +80,7 @@ define (require) ->
       max ||= 1
       min = _.min countArray
       for count in countArray
-        temp = $.Color('#FF0000').hue(Math.abs(count - max) / max * 40)
+        temp = $.Color('#FF0000').hue(Math.abs(count - max) / (max - min) * 40)
         heatmap.push count: count, temp: temp.toHexString()
       heatmap
     templateHelpers:
