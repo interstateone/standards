@@ -48,10 +48,10 @@ define (require) ->
         title: 'Reminder time'
         type: Hour
       email_permission:
-        title: 'Do you want to receive email updates about Standards?'
+        title: 'Send me email updates about Standards'
         type: 'Checkbox'
     fieldsets: [
-      legend: 'Info'
+      legend: 'Settings'
       fields: [
         'name'
         'email'
@@ -105,3 +105,10 @@ define (require) ->
     onRender: ->
       @info.show new InfoForm model: @model
       @password.show new PasswordForm
+    serializeData: ->
+      data = super()
+      data.taskCount = app.tasks.length
+      data.checkCount = app.tasks.reduce (sum, task) ->
+          return sum + task.get('checks').length
+        , 0
+      return data
