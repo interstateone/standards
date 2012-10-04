@@ -18,8 +18,8 @@ define (require) ->
       e.preventDefault()
       e.stopPropagation()
       errors = @commit()
-      unless errors? then @model.save {}, success: ->
-        app.vent.trigger 'notice', 'Your info has been updated.'
+      unless errors? then @model.save {}, success: =>
+        app.vent.trigger 'settings:update'
     schema:
       name:
         title: 'Name'

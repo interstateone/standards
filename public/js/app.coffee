@@ -155,6 +155,7 @@ define (require) ->
       app.vent.on 'task:clicked', @showTask, @
       app.vent.on 'task:delete', @deleteTask, @
       app.vent.on 'settings:clicked', @showSettings, @
+      app.vent.on 'settings:update', @updateSettings, @
       app.vent.on 'home:clicked', @showTasks, @
       app.vent.on 'app:moveForward', @moveForward, @
       app.vent.on 'app:moveBackward', @moveBackward, @
@@ -181,6 +182,9 @@ define (require) ->
       @router.navigate 'settings'
       @navBar.hideArrows()
       @body.show @settingsView = new SettingsView model: @user
+    updateSettings: ->
+      app.vent.trigger 'notice', 'Your info has been updated.'
+      @settingsView.render()
     showTask: (id) ->
       task = @tasks.get id
       unless task?
