@@ -51,7 +51,7 @@ define (require) ->
         e.preventDefault()
         e.stopPropagation()
         $('#newtask').submit()
-        _gaq.push(['_trackEvent', 'task', 'create'])
+        _gaq.push(['_trackEvent', 'task', 'create task'])
     submitNewTask: (e) ->
       e.preventDefault()
       title = @$('input#title').val()

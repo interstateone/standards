@@ -17,8 +17,10 @@ define (require) ->
     toggleCheck: ->
       if @model.isNew?
         @trigger 'task:uncheck', @model
+        _gaq.push(['_trackEvent', 'check', 'uncheck'])
       else
         @trigger 'task:check', @date
+        _gaq.push(['_trackEvent', 'check', 'check'])
     render: ->
       @$el.html @template()
       if @model.isNew? then @$('img').addClass 'complete'

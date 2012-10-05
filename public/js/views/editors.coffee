@@ -70,6 +70,7 @@ define (require) ->
       $button = @$('button')
       if $button.prop('disabled') is false and navigator.geolocation
         navigator.geolocation.getCurrentPosition(@lookupTimezone, @noLocation, maximumAge: 60000, timeout: 5000)
+        _gaq.push(['_trackEvent', 'settings', 'get location'])
     lookupTimezone: (position) =>
       $button = @$('button')
       # lookup in geonames

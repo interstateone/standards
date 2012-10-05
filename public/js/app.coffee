@@ -176,8 +176,12 @@ define (require) ->
       @body.show @tasksView = new TasksView collection: @tasks
       $(@tasksView.el).hammer().bind 'swipe', (ev) =>
         switch ev.direction
-          when 'left' then @vent.trigger 'app:moveForward'
-          when 'right' then @vent.trigger 'app:moveBackward'
+          when 'left'
+            @vent.trigger 'app:moveForward'
+            _gaq.push(['_trackEvent', 'view', 'swipe left'])
+          when 'right'
+            @vent.trigger 'app:moveBackward'
+            _gaq.push(['_trackEvent', 'view', 'swipe right'])
     showSettings: ->
       @router.navigate 'settings'
       @navBar.hideArrows()
@@ -211,10 +215,12 @@ define (require) ->
         if @daysInView is 1 then @offset += 1
         else @offset += 7
         @vent.trigger 'app:changeOffset'
+        _gaq.push(['_trackEvent', 'view', 'move backward'])
     moveBackward: ->
       if @daysInView is 1 then @offset -= 1
       else @offset -= 7
       @vent.trigger 'app:changeOffset'
+      _gaq.push(['_trackEvent', 'view', 'move backward'])
 
   class AppRouter extends Backbone.Marionette.AppRouter
     appRoutes:

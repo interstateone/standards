@@ -26,6 +26,7 @@ define (require) ->
       e.preventDefault()
       @$('.delete-confirm').button('loading')
       app.vent.trigger 'task:delete', @model.id
+      _gaq.push(['_trackEvent', 'task', 'delete task'])
     editTitle: ->
       @$('h2').find('span').replaceWith('<input type="text" class="input-medium title" />')
       @$('input.title').val(@model.get 'title').focus()
@@ -45,6 +46,7 @@ define (require) ->
     updateTitle: ->
       @model.set 'title', @$('input.title').val()
       @model.save {}, success: => @removeUpdateForm()
+      _gaq.push(['_trackEvent', 'task', 'rename task'])
     serializeData: ->
       count = @model.get('checks').length
       today = moment().sod()
