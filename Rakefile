@@ -73,25 +73,8 @@ task "assets:precompile" => ["assets:precompile:external"]
 
 namespace :reminders do
   task :daily => :environment do
-    server_time = Time.now
     User.all.each do |user|
-      next unless user.daily_reminder_permission
-      user_time = server_time.in_time_zone(user.timezone)
-      puts "checking #{user.id}"
-      unless (user.check_today?)
-        puts "no checks for #{user.id}"
-        if ((user_time.hour === user.daily_reminder_time) && (user_time.min == 0)) || ((user_time.hour === user.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
-          puts "sending email to #{user.id}"
-          if ENV['RACK_ENV'] === 'production' || ENV['RACK_ENV'] === 'development'
-            RestClient.post "https://api:key-3hcm94659ino89z6q586zrcw7noy7254"\
-            "@api.mailgun.net/v2/app3449307.mailgun.org/messages",
-            :from => "Standards <standards@brandonevans.ca>",
-            :to => user.email,
-            :subject => "Today's Reminder",
-            :text => "Remember to check off your standards for the day!"
-          end
-        end
-      end
+      user.send_reminder_email
     end
   end
 end

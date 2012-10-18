@@ -56,6 +56,16 @@ describe 'A user' do
 		@check = Check.create(:user => @user, :task => @task, :date => Date.today)
 		@user.check_today?.should === true
 	end
+
+	it 'remaining_tasks should return an array of remaining checks' do
+		@user.attributes = valid_user_attributes
+		@user.save
+		@task1 = Task.create(:user => @user, :title => 'Task 1')
+		@task2 = Task.create(:user => @user, :title => 'Task 2')
+		@user.remaining_tasks.should == ['Task 1', 'Task 2']
+		@check = Check.create(:user => @user, :task => @task1, :date => Date.today)
+		@user.remaining_tasks.should == ['Task 2']
+	end
 end
 
 describe 'A task' do
