@@ -55,7 +55,7 @@ class User
   end
 
   def check_today?
-    return !(self.checks.count :date => Date.today.to_time.in_time_zone(self.timezone).to_date).zero?
+    return !(self.checks.count :date => Date.today).zero?
   end
 
   def remaining_tasks
