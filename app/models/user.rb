@@ -54,21 +54,21 @@ class User
     nil
   end
 
-  def check_today?
-    return !(self.checks.count :date => Date.today).zero?
-  end
-
   def remaining_tasks
     completeTasks = self.checks(:date => Date.today.to_time.in_time_zone(self.timezone).to_date).task.to_a
     incompleteTasks = self.tasks.to_a - completeTasks
     return incompleteTasks.map { |t| t.title }
   end
 
+  def check_today?
+    return !self.checks(:date => Date.today.to_time.in_time_zone(self.timezone).to_date).count.zero?
+  end
+
   def send_reminder_email
     return unless self.daily_reminder_permission
     user_time = Time.now.in_time_zone(self.timezone)
     puts "checking #{self.id}"
-    unless (self.check_today?)
+    unless self.check_today?
       puts "no checks for #{self.id}"
       if ((user_time.hour == self.daily_reminder_time) && (user_time.min == 0)) || ((user_time.hour == self.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
         puts "sending email to #{self.id}"

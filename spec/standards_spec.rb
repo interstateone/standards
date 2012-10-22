@@ -12,7 +12,7 @@ end
 
 module UserSpecHelper
 	def valid_user_attributes
-		{ :email => 'Test@gmail.com',
+		{ :email => 'Test@localhost',
 		:name => 'Mike',
 		:password => 'Tes7yasdf' }
 	end
@@ -65,6 +65,30 @@ describe 'A user' do
 		@user.remaining_tasks.should == ['Task 1', 'Task 2']
 		@check = Check.create(:user => @user, :task => @task1, :date => Date.today)
 		@user.remaining_tasks.should == ['Task 2']
+	end
+
+	describe 'when checking to remind' do
+		it 'should log "checking"' do
+			@user.attributes = valid_user_attributes
+			@user.daily_reminder_permission = true
+			@user.save
+			result = capture_stdout do
+				@user.send_reminder_email
+			end
+	    result.string.should include 'checking'
+		end
+
+		it 'should log "sending email" at the right time' do
+			@user.attributes = valid_user_attributes
+			@user.daily_reminder_permission = true
+			@user.daily_reminder_time = Time.now.hour
+			@user.save
+      Timecop.freeze(Time.new(2012, 1, 2, Time.now.hour))
+			result = capture_stdout do
+				@user.send_reminder_email
+			end
+	    result.string.should include 'sending email'
+		end
 	end
 end
 
