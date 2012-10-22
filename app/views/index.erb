@@ -1,20 +1,35 @@
 <div class="hero-unit">
-	<div class="center-container"><img src="/img/devices.jpg" alt=""></div>
-	<h1>Get stuck on repeat.</h1>
-	<p>Standards helps you build better habits.</p>
-	<p class="sign-up">
-		<a class="btn btn-primary btn-large" href="<%= @host %>/signup">
-			Sign up
-		</a>
-	</p>
-	<h2>What's this about?</h2>
-	<p>I found that when I wanted to build better habits, it helped me if there was a way to track and see how consistent I was being. Standards is designed to be readily accessible, persistent and smart in order to help you gauge your progress. Standards was influenced by Jake Lodwick's <a href="http://wehavestandards.com/">We Have Standards</a> and Doug Stewart's <a href="http://did.heroku.com/">DID</a>.</p>
-	<p>&mdash; Brandon Evans</p>
-	<h2>For the neckbeards</h2>
-	<p>Standards is primarily built with <a href="http://backbonejs.org/">Backbone</a> and <a href="http://github.com/twitter/bootstrap/">Bootstrap</a> on the frontend, served up by <a href="http://www.sinatrarb.com/">Sinatra</a> hosted on <a href="http://www.heroku.com/">Heroku</a>. The source is available on <a href="http://github.com/interstateone/standards">GitHub</a>.</p>
-	<p>
-		<iframe src="http://ghbtns.com/github-btn.html?user=interstateone&repo=standards&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
-<iframe src="http://ghbtns.com/github-btn.html?user=interstateone&repo=standards&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="95px" height="20px"></iframe>
-	</p>
-	<p><a href="https://twitter.com/standardsapp" class="twitter-follow-button" data-show-count="false">Follow @standardsapp</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></p>
+	<div class="row-fluid">
+		<div class="span4">
+			<h1>Get stuck on repeat.</h1>
+			<p>Standards helps you build better habits.</p>
+			<p class="sign-up">
+				<a class="btn btn-primary btn-large btn-pulse" href="<%= @host %>/signup">
+					Sign up
+				</a>
+			</p>
+		</div>
+		<div class="span8">
+			<img src="/img/devices.jpg" alt="" class="pull-left">
+		</div>
+	</div>
+	<div class="row-fluid">
+		<h2>How it works</h2>
+		<ol>
+			<li><h3>Enter your task</h3></li>
+			<li><h3>Get reminders</h3></li>
+			<li><h3>Complete your task</h3></li>
+			<li><h3>Track your progress</h3></li>
+			<li><h3>Rinse and repeat</h3></li>
+		</ol>
+		<p>Everyone knows it takes time to make habits. Standards learns which days you are less likely to complete tasks and send you reminders when you need them. And it's easy to see your consistency improve over time.</p>
+	</div>
+	<div class="row-fluid">
+		<p><a href="https://twitter.com/standardsapp" class="twitter-follow-button" data-show-count="false">Follow @standardsapp</a><script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></p>
+		<p>
+			<iframe src="http://ghbtns.com/github-btn.html?user=interstateone&repo=standards&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110px" height="20px"></iframe>
+			<iframe src="http://ghbtns.com/github-btn.html?user=interstateone&repo=standards&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="95px" height="20px"></iframe>
+		</p>
+		<p>made by <a href="https://brandonevans.ca">Brandon Evans</a></p>
+	</div>
 </div>

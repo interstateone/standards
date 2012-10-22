@@ -154,6 +154,45 @@
   .buttonBackground(@btnInverseBackground, @btnInverseBackgroundHighlight);
 }
 
+@-webkit-keyframes pulse {
+  from {
+    -webkit-box-shadow: 0 0 5px 0 @btnPrimaryBackgroundHighlight;
+    -webkit-animation-timing-function: ease-out;
+  }
+  50% {
+    -webkit-box-shadow: 0 0 15px 0 @btnPrimaryBackgroundHighlight;
+    -webkit-animation-timing-function: ease-in;
+  }
+  to {
+    -webkit-box-shadow: 0 0 5px 0 @btnPrimaryBackgroundHighlight;
+    -webkit-animation-timing-function: ease-out;
+  }
+}
+@-moz-keyframes pulse {
+  from {
+    -moz-box-shadow: 0 0 5px 0 @btnPrimaryBackgroundHighlight;
+    -moz-animation-timing-function: ease-out;
+  }
+  50% {
+    -moz-box-shadow: 0 0 15px 0 @btnPrimaryBackgroundHighlight;
+    -moz-animation-timing-function: ease-in;
+  }
+  to {
+    -moz-box-shadow: 0 0 5px 0 @btnPrimaryBackgroundHighlight;
+    -moz-animation-timing-function: ease-out;
+  }
+}
+
+.btn-pulse {
+  -webkit-animation-name: pulse;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-name: pulse;
+  -moz-animation-duration: 1s;
+  -moz-animation-iteration-count: infinite;
+  margin-right: 5px;
+}
+
 
 // Cross-browser Jank
 // --------------------------------------------------
