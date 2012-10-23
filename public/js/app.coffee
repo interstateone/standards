@@ -173,6 +173,7 @@ define (require) ->
       @offset = 0
       @router.navigate ''
       @navBar.showArrows()
+      @navBar.hideBackButton()
       @body.show @tasksView = new TasksView collection: @tasks
       $(@tasksView.el).hammer().bind 'swipe', (ev) =>
         switch ev.direction
@@ -185,6 +186,7 @@ define (require) ->
     showSettings: ->
       @router.navigate 'settings'
       @navBar.hideArrows()
+      @navBar.showBackButton()
       @body.show @settingsView = new SettingsView model: @user
     updateSettings: ->
       app.vent.trigger 'notice', 'Your info has been updated.'
@@ -197,6 +199,7 @@ define (require) ->
       else
         @router.navigate "task/#{ task.id }"
         @navBar.hideArrows()
+        @navBar.showBackButton()
         @body.show @taskView = new TaskView model: task
     deleteTask: (id) ->
       @tasks.get(id).destroy

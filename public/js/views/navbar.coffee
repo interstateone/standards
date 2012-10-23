@@ -10,6 +10,7 @@ define (require) ->
     template: require 'jade!templates/navbar'
     events:
       'click .brand': 'clickedHome'
+      'click .back': 'clickedHome'
       'click .settings': 'clickedSettings'
       'click .moveForward': 'clickedMoveForward'
       'click .moveBackward': 'clickedMoveBackward'
@@ -30,3 +31,5 @@ define (require) ->
       app.vent.trigger 'app:moveBackward'
     showArrows: -> @$('.arrow').each -> $(@).show()
     hideArrows: -> @$('.arrow').each -> $(@).hide()
+    showBackButton: -> @$('.back').show()
+    hideBackButton: -> @$('.back').hide()
