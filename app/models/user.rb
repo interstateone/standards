@@ -1,3 +1,6 @@
+require 'rest_client'
+require 'sinatra/base'
+
 class User
   include DataMapper::Resource
 
@@ -72,19 +75,25 @@ class User
       puts "no checks for #{self.id}"
       if ((user_time.hour == self.daily_reminder_time) && (user_time.min == 0)) || ((user_time.hour == self.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
         puts "sending email to #{self.id}"
-        @title = "Remember to complete your Standards today!"
-        @text = "<ul>"
+
+        title = "Remember to complete your Standards today!"
+        text = "<ul>"
         self.remaining_tasks.each do |task|
-          @text << "<li>#{ @task }</li>"
+          text << "<li>#{ task }</li>"
         end
-        @text << "</ul>"
-        if ENV['RACK_ENV'] == 'production' || ENV['RACK_ENV'] == 'development'
+        text << "</ul>"
+
+        # Note that we can't use Sinatra's nice erb method inside here
+        template = File.open('app/views/email.erb', 'r').read
+        renderer = ERB.new(template)
+        html_result = renderer.result(binding)
+        if ENV['RACK_ENV'] != 'test'
           RestClient.post "https://api:key-3hcm94659ino89z6q586zrcw7noy7254"\
                           "@api.mailgun.net/v2/app3449307.mailgun.org/messages",
                           :from => "Standards <standards@brandonevans.ca>",
                           :to => self.email,
                           :subject => "Today's Reminder",
-                          :html => erb(:email, :layout => false)
+                          :html => html_result
         end
       end
     end
