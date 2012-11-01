@@ -71,8 +71,8 @@ class User
     return unless self.daily_reminder_permission
     user_time = Time.now.in_time_zone(self.timezone)
     puts "checking #{self.id}"
-    unless self.check_today?
-      puts "no checks for #{self.id}"
+    if self.remaining_tasks.length > 0
+      puts "remaining tasks for #{self.id}"
       if ((user_time.hour == self.daily_reminder_time) && (user_time.min == 0)) || ((user_time.hour == self.daily_reminder_time - 1) && (user_time.min.between?(55,60)))
         puts "sending email to #{self.id}"
 

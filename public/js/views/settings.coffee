@@ -42,7 +42,7 @@ define (require) ->
             label: _.values(obj)[0]
           callback result
       daily_reminder_permission:
-        title: 'Remind me each day if I haven\'t checked anything off yet'
+        title: 'Remind me each day if I haven\'t completed all tasks'
         type: 'Checkbox'
       daily_reminder_time:
         title: 'Reminder time'
