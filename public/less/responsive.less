@@ -36,30 +36,30 @@
 // For desktops
 .visible-phone     { display: none; }
 .visible-tablet    { display: none; }
-.visible-desktop   { display: block; }
-.hidden-phone      { display: block; }
-.hidden-tablet     { display: block; }
+.visible-desktop   { display: table-cell; }
+.hidden-phone      { display: table-cell; }
+.hidden-tablet     { display: table-cell; }
 .hidden-desktop    { display: none; }
 
 // Phones only
 @media (max-width: 767px) {
   // Show
-  .visible-phone     { display: block; }
+  .visible-phone     { display: table-cell; }
   // Hide
   .hidden-phone      { display: none; }
   // Hide everything else
-  .hidden-desktop    { display: block; }
+  .hidden-desktop    { display: table-cell; }
   .visible-desktop   { display: none; }
 }
 
 // Tablets & small desktops only
 @media (min-width: 768px) and (max-width: 979px) {
   // Show
-  .visible-tablet    { display: block; }
+  .visible-tablet    { display: table-cell; }
   // Hide
   .hidden-tablet     { display: none; }
   // Hide everything else
-  .hidden-desktop    { display: block; }
+  .hidden-desktop    { display: table-cell; }
   .visible-desktop   { display: none; }
 }
 
@@ -214,7 +214,7 @@
 
 // TABLETS AND BELOW
 // -----------------
-@media (max-width: 979px) {
+@media (max-width: 767px) {
 
   // UNFIX THE TOPBAR
   // ----------------
